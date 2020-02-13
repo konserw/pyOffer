@@ -1,0 +1,9 @@
+{
+  "ioPaths": [
+    ["forms/*.ui", "generated/%%FILENAME%%_ui.py"],
+    ["resources/*.qrc", "generated/%%FILENAME%%_rc.py"]
+  ],
+  "rcc_options": "",
+  "uic_options": "--from-imports",
+  "force": false
+}
