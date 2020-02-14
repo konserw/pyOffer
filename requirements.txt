@@ -2,7 +2,6 @@ pytest
 PyHamcrest
 PyQt5
 PyQt5-sip
-pyqt5-tools
 pyqt5ac
 python-dotenv
 PyYAML
