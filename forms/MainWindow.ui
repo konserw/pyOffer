@@ -879,7 +879,7 @@
   <customwidget>
    <class>MerchandiseListView</class>
    <extends>QWidget</extends>
-   <header>MerchandiseListView.hpp</header>
+   <header>src.merchandise</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
