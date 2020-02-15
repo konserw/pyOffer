@@ -1,23 +1,15 @@
 import sys
 import logging
+from datetime import datetime
 import pyqt5ac
 
-from PyQt5.QtSql import QSqlDatabase
 from PyQt5.QtWidgets import QApplication
 
+VERSION = 0.1
 
 if __name__ == '__main__':
+    logging.info("koferta version {} started at {}", VERSION, datetime.now())
     app = QApplication(sys.argv)
-
-    db = QSqlDatabase.addDatabase("QPSQL")
-    db.setHostName("127.0.0.1")
-    db.setDatabaseName("koferta_test")
-    db.setUserName("postgres")
-    db.setPassword("docker")
-    ok = db.open()
-    if not ok:
-        logging.error("Failed to open database")
-        logging.error(db.lastError().text())
 
     pyqt5ac.main(config='pyqt5ac.json')
     from src.main_window import MainWindow
