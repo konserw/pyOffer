@@ -5,21 +5,22 @@ import pyqt5ac
 from PyQt5.QtSql import QSqlDatabase
 from PyQt5.QtWidgets import QApplication
 
-from src.main_window import MainWindow
-
 
 if __name__ == '__main__':
-    db = QSqlDatabase.addDatabase("QMYSQL")
+    app = QApplication(sys.argv)
+
+    db = QSqlDatabase.addDatabase("QPSQL")
     db.setHostName("127.0.0.1")
-    db.setDatabaseName("flightdb")
-    db.setUserName("acarlson")
-    db.setPassword("1uTbSbAs")
+    db.setDatabaseName("koferta_test")
+    db.setUserName("postgres")
+    db.setPassword("docker")
     ok = db.open()
     if not ok:
         logging.error("Failed to open database")
         logging.error(db.lastError().text())
+
     pyqt5ac.main(config='pyqt5ac.json')
-    app = QApplication(sys.argv)
+    from src.main_window import MainWindow
     main_window = MainWindow()
     main_window.show()
     sys.exit(app.exec_())
