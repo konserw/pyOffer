@@ -1,0 +1,1 @@
+ docker run --rm  --name postgres -e POSTGRES_PASSWORD=docker -e POSTGRES_DB=koferta_test -p 5432:5432 -v C:\pyOffer\db-setup:/docker-entrypoint-initdb.d -d postgres
