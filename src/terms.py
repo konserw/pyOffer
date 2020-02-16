@@ -13,7 +13,7 @@
 import typing
 from enum import Enum, unique
 
-from PyQt5.QtCore import QAbstractTableModel, QModelIndex, Qt, pyqtSlot
+from PyQt5.QtCore import QAbstractTableModel, QModelIndex, Qt, pyqtSlot, QVariant
 from PyQt5.QtWidgets import QDialog
 
 from generated.TermsChooserDialog_ui import Ui_TermsChooserDialog
@@ -37,11 +37,12 @@ class TermItem:
 
     @staticmethod
     def from_record(term_type, record):
-        t = TermItem
+        t = TermItem()
         t.type = term_type
         t.id = record.value("id")
         t.short_desc = record.value("shortDesc")
         t.long_desc = record.value("longDesc")
+        return t
 
 
 class TermModel(QAbstractTableModel):
@@ -66,7 +67,7 @@ class TermModel(QAbstractTableModel):
     def data(self, index: QModelIndex, role: int = ...) -> typing.Any:
         row = index.row()
         column = index.column()
-        if role == Qt.DisplayRole and index.isValid() and row < len(self.list):
+        if role == Qt.DisplayRole and index.isValid() and row < self.rowCount():
             t = self.list[row]
             if column == 0:
                 return t.id
@@ -74,7 +75,7 @@ class TermModel(QAbstractTableModel):
                 return t.short_desc
             elif column == 2:
                 return t.long_desc
-        return super().data(index, role)
+        return QVariant()
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int = ...) -> typing.Any:
         if role == Qt.DisplayRole:
@@ -101,8 +102,7 @@ class TermChooserDialogFactory:
         table = self.db.get_terms_table(term_type)
         model = TermModel(self.parent)
         for i in range(table.rowCount()):
-            record = table.record(i)
-            model.add(TermItem.from_record(term_type, record))
+            model.add(TermItem.from_record(term_type, table.record(i)))
         return TermsChooserDialog(self.parent, term_type, model)
 
 
@@ -113,7 +113,7 @@ class TermsChooserDialog(QDialog):
         self.ui.setupUi(self)
         self.term_type = term_type
         self.term_model = term_model
-        self.choosen_item = None
+        self.chosen_item = None
 
         self.titles = {
             TermType.billing: self.tr("Choose billing terms"),
@@ -129,5 +129,5 @@ class TermsChooserDialog(QDialog):
 
     @pyqtSlot("QModelIndex")
     def selection_changed(self, index):
-        self.choosen_item = index.internalPointer()
-        self.ui.plainTextEdit.setPlainText(self.choosen_item.long_desc)
+        self.chosen_item = index.internalPointer()
+        self.ui.plainTextEdit.setPlainText(self.chosen_item.long_desc)

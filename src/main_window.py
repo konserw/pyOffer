@@ -27,20 +27,20 @@ class MainWindow(QMainWindow):
 
     def select_delivery_terms(self):
         dialog = self.term_chooser_factory.get_terms_chooser_dialog(TermType.delivery)
-        if dialog.exec() == QDialog.Accepted and dialog.choosen_item:
-            self.ui.plain_text_edit_delivery.setPlainText(dialog.choosen_item.long_desc)
+        if dialog.exec() == QDialog.Accepted and dialog.chosen_item:
+            self.ui.plain_text_edit_delivery.setPlainText(dialog.chosen_item.long_desc)
 
     def select_offer_terms(self):
         dialog = self.term_chooser_factory.get_terms_chooser_dialog(TermType.offer)
-        if dialog.exec() == QDialog.Accepted and dialog.choosen_item:
-            self.ui.plain_text_edit_offer.setPlainText(dialog.choosen_item.long_desc)
+        if dialog.exec() == QDialog.Accepted and dialog.chosen_item:
+            self.ui.plain_text_edit_offer.setPlainText(dialog.chosen_item.long_desc)
 
     def select_billing_terms(self):
         dialog = self.term_chooser_factory.get_terms_chooser_dialog(TermType.billing)
-        if dialog.exec() == QDialog.Accepted and dialog.choosen_item:
-            self.ui.plain_text_edit_billing.setPlainText(dialog.choosen_item.long_desc)
+        if dialog.exec() == QDialog.Accepted and dialog.chosen_item:
+            self.ui.plain_text_edit_billing.setPlainText(dialog.chosen_item.long_desc)
 
     def select_delivery_date_terms(self):
         dialog = self.term_chooser_factory.get_terms_chooser_dialog(TermType.delivery_date)
-        if dialog.exec() == QDialog.Accepted and dialog.choosen_item:
-            self.ui.plain_text_edit_delivery_date.setPlainText(dialog.choosen_item.long_desc)
+        if dialog.exec() == QDialog.Accepted and dialog.chosen_item:
+            self.ui.plain_text_edit_delivery_date.setPlainText(dialog.chosen_item.long_desc)
