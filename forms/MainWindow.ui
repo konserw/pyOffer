@@ -35,21 +35,21 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
-           <widget class="QPushButton" name="addTowar">
+           <widget class="QPushButton" name="push_button_add_merchandise">
             <property name="text">
              <string>Dodaj Towar</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="rabat">
+           <widget class="QPushButton" name="push_button_discount">
             <property name="text">
              <string>Ustaw rabat</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="delw">
+           <widget class="QPushButton" name="push_button_remove_row">
             <property name="text">
              <string>Usuń wiersz</string>
             </property>
@@ -90,14 +90,14 @@
         <item row="0" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <widget class="QCommandLinkButton" name="commandLinkButton_klient">
+           <widget class="QCommandLinkButton" name="command_link_button_cutomer">
             <property name="text">
              <string>Wybór Klienta</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPlainTextEdit" name="plainTextEdit_klient">
+           <widget class="QPlainTextEdit" name="plain_text_edit_customer">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>0</horstretch>
@@ -118,7 +118,7 @@
          </layout>
         </item>
         <item row="0" column="2" rowspan="2">
-         <widget class="QGroupBox" name="waluta">
+         <widget class="QGroupBox" name="group_box_currency">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -130,7 +130,7 @@
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
            <item row="0" column="0" colspan="3">
-            <widget class="QRadioButton" name="radioButton_EUR">
+            <widget class="QRadioButton" name="radio_button_EUR">
              <property name="text">
               <string>Euro</string>
              </property>
@@ -140,7 +140,7 @@
             </widget>
            </item>
            <item row="1" column="0" colspan="3">
-            <widget class="QRadioButton" name="radioButton_PLN">
+            <widget class="QRadioButton" name="radio_button_PLN">
              <property name="text">
               <string>Złotówki</string>
              </property>
@@ -160,7 +160,7 @@
             </spacer>
            </item>
            <item row="2" column="2">
-            <widget class="QLabel" name="label_exchangeRate">
+            <widget class="QLabel" name="label_exchange_rate">
              <property name="enabled">
               <bool>true</bool>
              </property>
@@ -183,7 +183,7 @@
             </spacer>
            </item>
            <item row="3" column="2">
-            <widget class="QDoubleSpinBox" name="spinBox_exchangeRate">
+            <widget class="QDoubleSpinBox" name="spin_box_exchange_rate">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -205,7 +205,7 @@
          </widget>
         </item>
         <item row="1" column="0" colspan="2">
-         <widget class="QGroupBox" name="grupBox_zapytanie">
+         <widget class="QGroupBox" name="grup_box_query">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
             <horstretch>0</horstretch>
@@ -224,14 +224,14 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout">
                <item>
-                <widget class="QCheckBox" name="checkBox_zapytanieData">
+                <widget class="QCheckBox" name="check_box_query_date">
                  <property name="text">
                   <string>Data zapytania:</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="lineEdit_zapytanieData">
+                <widget class="QLineEdit" name="line_edit_query_date">
                  <property name="enabled">
                   <bool>false</bool>
                  </property>
@@ -247,7 +247,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButton_zapytanieData">
+                <widget class="QPushButton" name="push_button_query_date">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -274,14 +274,14 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_11">
                <item>
-                <widget class="QCheckBox" name="checkBox_zapytanieNr">
+                <widget class="QCheckBox" name="check_box_query_number">
                  <property name="text">
                   <string>Numer zapytania:</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="lineEdit_zapytanieNr">
+                <widget class="QLineEdit" name="line_edit_query_number">
                  <property name="enabled">
                   <bool>false</bool>
                  </property>
@@ -319,7 +319,7 @@
             </layout>
            </item>
            <item>
-            <widget class="QPlainTextEdit" name="plainTextEdit_zapytanie">
+            <widget class="QPlainTextEdit" name="plain_text_edit_query">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Ignored">
                <horstretch>0</horstretch>
@@ -350,14 +350,14 @@
             <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
            </property>
            <item row="0" column="0" colspan="2">
-            <widget class="QCommandLinkButton" name="commandLinkButton_shipingTerms">
+            <widget class="QCommandLinkButton" name="command_link_button_delivery">
              <property name="text">
               <string>Warunki Dostawy</string>
              </property>
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QPlainTextEdit" name="plainTextEdit_dostawa">
+            <widget class="QPlainTextEdit" name="plain_text_edit_delivery">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -379,14 +379,14 @@
             </widget>
            </item>
            <item row="2" column="0" colspan="2">
-            <widget class="QCommandLinkButton" name="commandLinkButton_shipmentTime">
+            <widget class="QCommandLinkButton" name="command_link_button_delivery_date">
              <property name="text">
               <string>Termin Dostawy</string>
              </property>
             </widget>
            </item>
            <item row="3" column="1">
-            <widget class="QPlainTextEdit" name="plainTextEdit_termin">
+            <widget class="QPlainTextEdit" name="plain_text_edit_delivery_date">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -408,14 +408,14 @@
             </widget>
            </item>
            <item row="4" column="0" colspan="2">
-            <widget class="QCommandLinkButton" name="commandLinkButton_paymentTerms">
+            <widget class="QCommandLinkButton" name="command_link_button_billing">
              <property name="text">
               <string>Warunki Płatności</string>
              </property>
             </widget>
            </item>
            <item row="5" column="1">
-            <widget class="QPlainTextEdit" name="plainTextEdit_platnosc">
+            <widget class="QPlainTextEdit" name="plain_text_edit_billing">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -437,14 +437,14 @@
             </widget>
            </item>
            <item row="6" column="0" colspan="2">
-            <widget class="QCommandLinkButton" name="commandLinkButton_offerTerms">
+            <widget class="QCommandLinkButton" name="command_link_button_offer">
              <property name="text">
               <string>Warunki Oferty</string>
              </property>
             </widget>
            </item>
            <item row="7" column="1">
-            <widget class="QPlainTextEdit" name="plainTextEdit_oferta">
+            <widget class="QPlainTextEdit" name="plain_text_edit_offer">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -466,7 +466,7 @@
             </widget>
            </item>
            <item row="8" column="1">
-            <widget class="QCommandLinkButton" name="commandLinkButton_other">
+            <widget class="QCommandLinkButton" name="command_link_button_remarks">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -479,7 +479,7 @@
             </widget>
            </item>
            <item row="9" column="1">
-            <widget class="QPlainTextEdit" name="plainTextEdit_uwagi">
+            <widget class="QPlainTextEdit" name="plainTextEdit_remarks">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -523,7 +523,7 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
-            <widget class="QCheckBox" name="kol_lp">
+            <widget class="QCheckBox" name="check_box_no_column">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -536,7 +536,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="kol_towar">
+            <widget class="QCheckBox" name="check_box_merchandise_column">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -549,7 +549,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="kol_specyfikacja">
+            <widget class="QCheckBox" name="check_box_details_column">
              <property name="enabled">
               <bool>true</bool>
              </property>
@@ -562,7 +562,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="kol_cenaKat">
+            <widget class="QCheckBox" name="check_box_list_price_eur_column">
              <property name="text">
               <string>Cena kat. EUR</string>
              </property>
@@ -572,7 +572,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="kol_cenaPln">
+            <widget class="QCheckBox" name="check_box_list_price_pln_column">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -585,7 +585,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="kol_rabat">
+            <widget class="QCheckBox" name="check_box_discount_column">
              <property name="text">
               <string>Rabat</string>
              </property>
@@ -595,7 +595,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="kol_cena">
+            <widget class="QCheckBox" name="check_box_price_column">
              <property name="text">
               <string>Cena</string>
              </property>
@@ -605,7 +605,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="kol_ilosc">
+            <widget class="QCheckBox" name="check_box_quantity_column">
              <property name="text">
               <string>Ilość</string>
              </property>
@@ -615,7 +615,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="kol_wartosc">
+            <widget class="QCheckBox" name="check_box_total_column">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -657,11 +657,11 @@
          </spacer>
         </item>
        </layout>
-       <zorder>grupBox_zapytanie</zorder>
+       <!--       <zorder>grupBox_zapytanie</zorder>
        <zorder>kolumny</zorder>
        <zorder>waluta</zorder>
        <zorder>verticalSpacer_7</zorder>
-       <zorder>groupBox</zorder>
+       <zorder>groupBox</zorder> -->
       </widget>
      </widget>
     </item>
@@ -676,30 +676,30 @@
      <height>24</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuOferta">
+   <widget class="QMenu" name="menu_offer">
     <property name="title">
      <string>Oferta</string>
     </property>
-    <addaction name="actionNew"/>
-    <addaction name="actionOpen"/>
-    <addaction name="actionSave"/>
-    <addaction name="actionNR"/>
+    <addaction name="action_new"/>
+    <addaction name="action_open"/>
+    <addaction name="action_save"/>
+    <addaction name="action_new_number"/>
    </widget>
-   <widget class="QMenu" name="menuExport">
+   <widget class="QMenu" name="menu_export">
     <property name="title">
      <string>Export</string>
     </property>
-    <addaction name="actionDo_PDF"/>
-    <addaction name="actionDruk"/>
+    <addaction name="action_PDF"/>
+    <addaction name="action_print"/>
    </widget>
-   <widget class="QMenu" name="menuHelp">
+   <widget class="QMenu" name="menu_help">
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionO_kOferta"/>
-    <addaction name="actionO_Qt"/>
+    <addaction name="action_about"/>
+    <addaction name="action_about_Qt"/>
    </widget>
-   <widget class="QMenu" name="menuKlient">
+   <!--   <widget class="QMenu" name="menu_customer">
     <property name="title">
      <string>Baza Danych</string>
     </property>
@@ -721,61 +721,58 @@
     <addaction name="actionExit"/>
    </widget>
    <addaction name="menuConnect"/>
-   <addaction name="menuOferta"/>
-   <addaction name="menuExport"/>
-   <addaction name="menuKlient"/>
-   <addaction name="menuHelp"/>
+   <addaction name="menu_customer"/>
+   -->
+   <addaction name="menu_offer"/>
+   <addaction name="menu_export"/>
+   <addaction name="menu_help"/>
   </widget>
-  <action name="actionNew">
+  <action name="action_new">
    <property name="text">
     <string>Nowa</string>
    </property>
   </action>
-  <action name="actionOpen">
+  <action name="action_open">
    <property name="text">
     <string>Otwórz</string>
    </property>
   </action>
-  <action name="actionSave">
+  <action name="action_save">
    <property name="text">
     <string>Zapisz</string>
    </property>
   </action>
-  <action name="actionExit">
+  <action name="action_exit">
    <property name="text">
     <string>Wyjście</string>
    </property>
   </action>
-  <action name="actionDo_PDF">
+  <action name="action_PDF">
    <property name="text">
     <string>PDF</string>
    </property>
   </action>
-  <action name="actionDo_HTML">
-   <property name="text">
-    <string>HTML</string>
-   </property>
-  </action>
-  <action name="actionDruk">
+  <action name="action_print">
    <property name="text">
     <string>Druk</string>
    </property>
   </action>
-  <action name="actionO_kOferta">
+  <action name="action_about">
    <property name="text">
     <string>O kOferta</string>
    </property>
   </action>
-  <action name="actionO_Qt">
+  <action name="action_about_Qt">
    <property name="text">
     <string>O Qt</string>
    </property>
   </action>
-  <action name="actionNR">
+  <action name="action_new_number">
    <property name="text">
     <string>Nadaj nowy numer</string>
    </property>
   </action>
+  <!--
   <action name="klientNowy">
    <property name="text">
     <string>Nowy Klient</string>
@@ -872,7 +869,8 @@
    <property name="text">
     <string>Zmień hasło</string>
    </property>
-  </action>
+	  </action>
+  -->
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
