@@ -131,4 +131,3 @@ class TermsChooserDialog(QDialog):
     def selection_changed(self, index):
         self.choosen_item = index.internalPointer()
         self.ui.plainTextEdit.setPlainText(self.choosen_item.long_desc)
-
