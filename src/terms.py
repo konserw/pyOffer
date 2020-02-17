@@ -70,7 +70,7 @@ class TermModel(QAbstractTableModel):
         if role == Qt.DisplayRole and index.isValid() and row < self.rowCount():
             t = self.list[row]
             if column == 0:
-                return t.id
+                return str(t.id)
             elif column == 1:
                 return t.short_desc
             elif column == 2:
