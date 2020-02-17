@@ -28,7 +28,7 @@ jobs:
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
       run: |
-        pyqt5ac -c .\pyqt5ac.json
+        pyqt5ac -c pyqt5ac.json
         pip install coveralls coverage
         coverage run -m pytest
         coveralls
