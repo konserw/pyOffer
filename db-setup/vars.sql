@@ -13,6 +13,4 @@ CREATE TABLE vars (
 -- Dumping data for table vars
 --
 
-INSERT INTO vars VALUES (1,'order email','biuro.pl@aliaxis.com'),(2,'exchange rate','4.45');
-
--- Dump completed on 2020-02-15 15:35:13
+INSERT INTO vars VALUES (1,'order email','biuro.pl@aliaxis.com');
