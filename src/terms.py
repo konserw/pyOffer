@@ -79,7 +79,7 @@ class TermModel(QAbstractTableModel):
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int = ...) -> typing.Any:
         if role == Qt.DisplayRole:
-            if orientation is Qt.Vertical:
+            if orientation == Qt.Vertical:
                 return str(section)
             return self.headers[section]
         return super().headerData(section, orientation, role)

@@ -23,7 +23,7 @@ CREATE TABLE saved_offers (
   print_price BOOLEAN NOT NULL DEFAULT '1',
   PRIMARY KEY (id),
   CONSTRAINT fk_saved_offers_billing FOREIGN KEY (terms_billing) REFERENCES terms_billing (id),
-  CONSTRAINT fk_saved_offers_customer FOREIGN KEY (customer_id) REFERENCES customers (id),
+  CONSTRAINT fk_saved_offers_customer FOREIGN KEY (customer_id) REFERENCES customers (customer_id),
   CONSTRAINT fk_saved_offers_delivery FOREIGN KEY (terms_delivery) REFERENCES terms_delivery (id),
   CONSTRAINT fk_saved_offers_deliveryDate FOREIGN KEY (terms_delivery_date) REFERENCES terms_delivery_date (id),
   CONSTRAINT fk_saved_offers_offer FOREIGN KEY (terms_offer) REFERENCES terms_offer (id),

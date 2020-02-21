@@ -1,6 +1,6 @@
 import pytest
 from hamcrest import assert_that, is_
-from src.customer import CustomerFactory, Customer
+from src.customer import Customer
 
 CUSTOMER_ID = 1
 SHORT_NAME = "short name"
@@ -8,30 +8,39 @@ FULL_NAME = "Full business name that is quite long"
 TITLE = "Mr."
 FIRST_NAME = "John"
 LAST_NAME = "Doe"
-ADDRESS = "255 Some street\nIn some town"
+ADDRESS = "255 Some street\\nIn some town"
 
 
-class MockDB:
-    def get_customer(self, customer_id):
-        assert_that(customer_id, is_(CUSTOMER_ID))
-        return (CUSTOMER_ID, SHORT_NAME, FULL_NAME, TITLE, FIRST_NAME, LAST_NAME, ADDRESS)
+class FakeRecord:
+    def __init__(self):
+        self.dict = {
+            "customer_id": CUSTOMER_ID,
+            "short_name": SHORT_NAME,
+            "full_name": FULL_NAME,
+            "title": TITLE,
+            "first_name": FIRST_NAME,
+            "last_name": LAST_NAME,
+            "address": ADDRESS,
+        }
+
+    def value(self, key):
+        return self.dict[key]
 
 
 @pytest.fixture
 def customer():
-    factory = CustomerFactory(MockDB())
-    return factory.get_customer_from_id(CUSTOMER_ID)
+    return Customer.from_record(FakeRecord())
 
 
 class TestCustomer:
-    def test_get_customer(self, customer):
+    def test_customer_from_record(self, customer):
         assert_that(customer.is_valid, is_(True))
         assert_that(customer.id, is_(CUSTOMER_ID))
         assert_that(customer.short_name, is_(SHORT_NAME))
         assert_that(customer.full_name, is_(FULL_NAME))
         assert_that(customer.title, is_(TITLE))
         assert_that(customer.last_name, is_(LAST_NAME))
-        assert_that(customer.address, is_(ADDRESS))
+        assert_that(customer.address, is_("255 Some street\nIn some town"))
 
     def test_concated_name(self, customer):
         assert_that(customer.concated_name, is_("Mr. John Doe"))
@@ -49,3 +58,9 @@ class TestCustomer:
     def test_null_id(self):
         customer = Customer()
         assert_that(customer.db_id, is_("NULL"))
+
+    def test_description(self, customer):
+        assert_that(customer.description, is_("Mr. John Doe\nFull business name that is quite long\n255 Some street\nIn some town"))
+
+    def test_str(self, customer):
+        assert_that(str(customer), is_("Customer 1: Mr. John Doe; Full business name that is quite long"))

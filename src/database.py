@@ -14,6 +14,12 @@ class Database:
             logging.error(self.database.lastError().text())
 
     @staticmethod
+    def get_customers_table():
+        model = QSqlTableModel()
+        model.setTable("customers_view")
+        model.select()
+
+    @staticmethod
     def get_terms_table(term_type):
         model = QSqlTableModel()
         model.setTable("terms_{}".format(term_type.name))

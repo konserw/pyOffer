@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="CustomerSearch" name="widget" native="true">
+    <widget class="CustomerSearch" name="customer_search" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -40,7 +40,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_exit">
+      <widget class="QPushButton" name="push_button_exit">
        <property name="text">
         <string>Wybierz</string>
        </property>
@@ -54,7 +54,7 @@
   <customwidget>
    <class>CustomerSearch</class>
    <extends>QWidget</extends>
-   <header>CustomerSearch.hpp</header>
+   <header>src.customer</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
