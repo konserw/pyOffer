@@ -117,93 +117,6 @@
           </item>
          </layout>
         </item>
-        <item row="0" column="2" rowspan="2">
-         <widget class="QGroupBox" name="group_box_currency">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="title">
-           <string>Waluta:</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_3">
-           <item row="0" column="0" colspan="3">
-            <widget class="QRadioButton" name="radio_button_EUR">
-             <property name="text">
-              <string>Euro</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0" colspan="3">
-            <widget class="QRadioButton" name="radio_button_PLN">
-             <property name="text">
-              <string>Złotówki</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="2" column="2">
-            <widget class="QLabel" name="label_exchange_rate">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="text">
-              <string>Kurs:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="3" column="2">
-            <widget class="QDoubleSpinBox" name="spin_box_exchange_rate">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="decimals">
-              <number>4</number>
-             </property>
-             <property name="maximum">
-              <double>99.999899999999997</double>
-             </property>
-             <property name="singleStep">
-              <double>0.010000000000000</double>
-             </property>
-             <property name="value">
-              <double>4.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
         <item row="1" column="0" colspan="2">
          <widget class="QGroupBox" name="grup_box_query">
           <property name="sizePolicy">
@@ -479,7 +392,7 @@
             </widget>
            </item>
            <item row="9" column="1">
-            <widget class="QPlainTextEdit" name="plainTextEdit_remarks">
+            <widget class="QPlainTextEdit" name="plain_text_edit_remarks">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -562,25 +475,12 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="check_box_list_price_eur_column">
+            <widget class="QCheckBox" name="check_box_list_price_column">
              <property name="text">
-              <string>Cena kat. EUR</string>
+              <string>Cena katalogowa</string>
              </property>
              <property name="checked">
               <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="check_box_list_price_pln_column">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>Cena kat. PLN</string>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
              </property>
             </widget>
            </item>
