@@ -46,7 +46,7 @@ class TermItem:
 
 
 class TermModel(QAbstractTableModel):
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.list = []
         self.headers = (
@@ -94,7 +94,7 @@ class TermModel(QAbstractTableModel):
 
 
 class TermChooserDialogFactory:
-    def __init__(self, parent, db):
+    def __init__(self, db, parent=None):
         self.parent = parent
         self.db = db
 
@@ -103,11 +103,11 @@ class TermChooserDialogFactory:
         model = TermModel(self.parent)
         for i in range(table.rowCount()):
             model.add(TermItem.from_record(term_type, table.record(i)))
-        return TermsChooserDialog(self.parent, term_type, model)
+        return TermsChooserDialog(term_type, model, self.parent)
 
 
 class TermsChooserDialog(QDialog):
-    def __init__(self, parent, term_type, term_model):
+    def __init__(self, term_type, term_model, parent=None):
         super().__init__(parent)
         self.ui = Ui_TermsChooserDialog()
         self.ui.setupUi(self)

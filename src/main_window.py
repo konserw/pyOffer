@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QMainWindow, QDialog
 
 from src.terms import TermChooserDialogFactory, TermType
 from src.database import Database
-from src.customer import CustomerSelection, CustomerFactory
+from src.customer import CustomerFactory
 
 from generated.MainWindow_ui import Ui_MainWindow
 
@@ -14,7 +14,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
 
         self.db = Database()
-        self.term_chooser_factory = TermChooserDialogFactory(self, self.db)
+        self.term_chooser_factory = TermChooserDialogFactory(self.db, self)
         self.customer_factory = CustomerFactory(self.db, self)
 
         self.ui.command_link_button_cutomer.clicked.connect(self.select_customer)
@@ -28,7 +28,6 @@ class MainWindow(QMainWindow):
         dialog = self.customer_factory.get_customer_selection()
         if dialog.exec() == QDialog.Accepted and dialog.chosen_item:
             self.ui.plain_text_edit_customer.setPlainText(dialog.chosen_item.description)
-
 
     def select_delivery_terms(self):
         dialog = self.term_chooser_factory.get_terms_chooser_dialog(TermType.delivery)
