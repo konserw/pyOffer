@@ -15,7 +15,7 @@ class MainWindow(QMainWindow):
 
         self.db = Database()
         self.term_chooser_factory = TermChooserDialogFactory(self.db, self)
-        self.customer_factory = CustomerFactory(self.db, self)
+        self.customer_factory = CustomerFactory(self)
 
         self.ui.command_link_button_cutomer.clicked.connect(self.select_customer)
 

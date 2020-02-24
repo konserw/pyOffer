@@ -17,12 +17,11 @@ from PyQt5.QtCore import QModelIndex, Qt, pyqtSlot
 
 
 class CustomerFactory:
-    def __init__(self, db, parent=None):
+    def __init__(self, parent=None):
         self.parent = parent
-        self.db = db
 
     def get_customer_selection(self):
-        model = CustomerSearchModel(self.parent, self.db)
+        model = CustomerSearchModel(self.parent)
         search = CustomerSearchWidget(model, self.parent)
         return CustomerSelection(search, self.parent)
 
@@ -58,7 +57,7 @@ class Customer:
         return "{}\n{}\n{}".format(self.concated_name, self.full_name, self.address)
 
     def __str__(self):
-        return "Customer {}: {}; {}".format(self.id, self.concated_name, self.full_name)
+        return "Customer {}: {}; {}".format(self.id, self.concated_name, self.short_name)
 
     @staticmethod
     def from_record(record):
@@ -74,13 +73,13 @@ class Customer:
 
 
 class CustomerSearchModel(QSqlTableModel):
-    def __init__(self, parent, db):
-        super().__init__(parent, db.database)
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self.setTable("customers_view")
         self.select()
         self.headers = (self.tr("Customer name"), self.tr("Company name"))
 
-    def columnCount(self, index: QModelIndex) -> int:
+    def columnCount(self, index: QModelIndex = QModelIndex) -> int:
         return 2
 
     def data(self, index: QModelIndex, role: int = ...):
@@ -99,6 +98,10 @@ class CustomerSearchModel(QSqlTableModel):
             return self.headers[section]
         return super().headerData(section, orientation, role)
 
+    @pyqtSlot("QString")
+    def search(self, pattern):
+        self.setFilter("first_name ilike '%{0}%' or full_name ilike '%{0}%' or last_name ilike '%{0}%'".format(pattern))
+
 
 class CustomerSearchWidget(QWidget):
     def __init__(self, model, parent=None):
@@ -114,14 +117,10 @@ class CustomerSearchWidget(QWidget):
         self.model = model
         self.table_widget.setModel(self.model)
         self.table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.line_edit.textChanged.connect(self.filter)
+        self.line_edit.textChanged.connect(self.model.search)
 
         self.chosen_item = None
         self.table_widget.clicked.connect(self.selection_changed)
-
-    @pyqtSlot("QString")
-    def filter(self, ex):
-        self.model.setFilter("short_name ilike '%{}%' or full_name ilike '%{}%' or last_name ilike '%{}%'".format(ex, ex, ex))
 
     @pyqtSlot("QModelIndex")
     def selection_changed(self, index):
