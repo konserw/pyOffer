@@ -18,13 +18,14 @@ from src.database import Database
 from src.customer import Customer, CustomerSearchModel
 
 
-@pytest.fixture
-def db():
-    return Database()
+try:
+    db = Database()
+except:
+    pytest.skip("Couldn't connect to database, skipping db tests", allow_module_level=True)
 
 
 class TestCustomerDB:
-    def test_customer_1(self, db):
+    def test_customer_1(self):
         customer_id = 1
         rec = db.get_customer_record(customer_id)
         customer = Customer.from_record(rec)
@@ -47,7 +48,7 @@ class TestCustomerDB:
         ))
         assert_that(str(customer), is_("Customer 1: Pan Jan Kowalski; PolImpEx"))
 
-    def test_customer_2(self, db):
+    def test_customer_2(self):
         customer_id = 2
         rec = db.get_customer_record(customer_id)
         customer = Customer.from_record(rec)
