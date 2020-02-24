@@ -8,7 +8,7 @@ FULL_NAME = "Full business name that is quite long"
 TITLE = "Mr."
 FIRST_NAME = "John"
 LAST_NAME = "Doe"
-ADDRESS = "255 Some street\\nIn some town"
+ADDRESS = "255 Some street\nIn some town"
 
 
 class FakeRecord:
@@ -20,7 +20,7 @@ class FakeRecord:
             "title": TITLE,
             "first_name": FIRST_NAME,
             "last_name": LAST_NAME,
-            "address": ADDRESS,
+            "address": "255 Some street\\nIn some town",
         }
 
     def value(self, key):
@@ -29,7 +29,15 @@ class FakeRecord:
 
 @pytest.fixture
 def customer():
-    return Customer.from_record(FakeRecord())
+    c = Customer()
+    c.id = CUSTOMER_ID
+    c.short_name = SHORT_NAME
+    c.full_name = FULL_NAME
+    c.title = TITLE
+    c.first_name = FIRST_NAME
+    c.last_name = LAST_NAME
+    c.address = ADDRESS
+    return c
 
 
 class TestCustomer:
@@ -40,7 +48,7 @@ class TestCustomer:
         assert_that(customer.full_name, is_(FULL_NAME))
         assert_that(customer.title, is_(TITLE))
         assert_that(customer.last_name, is_(LAST_NAME))
-        assert_that(customer.address, is_("255 Some street\nIn some town"))
+        assert_that(customer.address, is_(ADDRESS))
 
     def test_concated_name(self, customer):
         assert_that(customer.concated_name, is_("Mr. John Doe"))
@@ -50,7 +58,7 @@ class TestCustomer:
         assert_that(customer.is_valid, is_(False))
 
     def test_html_address(self, customer):
-        assert_that(customer.html_address, is_("255 Some street<br />\nIn some town"))
+        assert_that(customer.html_address, is_(ADDRESS))
 
     def test_db_id(self, customer):
         assert_that(customer.db_id, is_("1"))
@@ -63,4 +71,4 @@ class TestCustomer:
         assert_that(customer.description, is_("Mr. John Doe\nFull business name that is quite long\n255 Some street\nIn some town"))
 
     def test_str(self, customer):
-        assert_that(str(customer), is_("Customer 1: Mr. John Doe; Full business name that is quite long"))
+        assert_that(str(customer), is_("Customer 1: Mr. John Doe; short name"))
