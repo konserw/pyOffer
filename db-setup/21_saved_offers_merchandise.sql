@@ -5,7 +5,7 @@ CREATE TABLE saved_offers_merchandise (
   merchandise_id int NOT NULL,
   quantity real DEFAULT NULL,
   discount real DEFAULT NULL,
-  CONSTRAINT fk_saved_offers_merchandise_merchandise FOREIGN KEY (merchandise_id) REFERENCES merchandise (id),
+  CONSTRAINT fk_saved_offers_merchandise_merchandise FOREIGN KEY (merchandise_id) REFERENCES merchandise (merchandise_id),
   CONSTRAINT fk_saved_offers_merchandise_offer FOREIGN KEY (offer_id) REFERENCES saved_offers (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 

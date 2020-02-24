@@ -25,5 +25,5 @@ select
   customers.first_name AS first_name,
   customers.last_name AS last_name,
   companies.address AS address
-from customers natural join companies;
+FROM customers natural join companies;
 
