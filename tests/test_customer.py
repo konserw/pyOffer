@@ -58,7 +58,7 @@ class TestCustomer:
         assert_that(customer.is_valid, is_(False))
 
     def test_html_address(self, customer):
-        assert_that(customer.html_address, is_(ADDRESS))
+        assert_that(customer.html_address, is_("255 Some street<br />\nIn some town"))
 
     def test_db_id(self, customer):
         assert_that(customer.db_id, is_("1"))
