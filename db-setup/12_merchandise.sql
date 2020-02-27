@@ -24,7 +24,7 @@ select
   merchandise.code AS code,
   merchandise.description AS description,
   merchandise.unit AS unit,
-  price.value AS listing_price
+  price.value AS list_price
 FROM merchandise natural join price
 WHERE CURRENT_DATE BETWEEN price.valid_from AND price.valid_to;
 

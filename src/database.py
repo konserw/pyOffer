@@ -43,3 +43,11 @@ class Database:
         while model.canFetchMore():
             model.fetchMore()
         return model
+
+    @staticmethod
+    def get_merchandise_record(merchandise_id):
+        model = QSqlTableModel()
+        model.setTable("merchandise_view")
+        model.setFilter(F"merchandise_id = '{merchandise_id}'")
+        model.select()
+        return model.record(0)
