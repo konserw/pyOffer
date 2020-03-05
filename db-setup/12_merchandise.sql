@@ -1,4 +1,4 @@
-CREATE TYPE unit_type as ENUM('szt.', 'mb.');
+CREATE TYPE unit_type as ENUM('szt.', 'm');
 
 DROP TABLE IF EXISTS merchandise;
 CREATE TABLE merchandise (

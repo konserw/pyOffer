@@ -18,7 +18,7 @@ class Merchandise(QObject):
     @property
     def unit(self):
         if self.by_meter:
-            return self.tr("m.")
+            return self.tr("m")
         else:
             return self.tr("pc.")
 
@@ -37,6 +37,7 @@ class Merchandise(QObject):
         item.code = record.value("code")
         item.description = record.value("description")
         item.list_price = record.value("list_price")
+        item.by_meter = record.value("unit") == "m"
         return item
 
     def __eq__(self, other):
@@ -277,3 +278,38 @@ class MerchandiseListView(QTableView):
         drag_end_index = super().indexAt(a0.pos())
         self.model().moveRow(QModelIndex(), self.drag_start_index.row(), QModelIndex, drag_end_index.row())
         a0.acceptProposedAction()
+
+
+class MerchandiseSearchModel(QtCore.QSortFilterProxyModel):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.headers = (
+            self.tr("Code"),
+            self.tr("Description"),
+            self.tr("List price"),
+            self.tr("unit"),
+        )
+
+    @staticmethod
+    def get_column_value(index: QModelIndex, col: int):
+        return super().sourceModel().data(index.sibling(index.row(), col))
+
+    def lessThan(self, left: QModelIndex, right: QModelIndex) -> bool:
+        return self.get_column_value(left, 1) < self.get_column_value(right, 1)
+
+    def columnCount(self, parent: QModelIndex = ...) -> int:
+        return 4
+
+    def data(self, index: QModelIndex, role: int):
+        col = index.column()
+        if index.isValid() and role == Qt.DisplayRole:
+            return self.get_column_value(index, col+1)
+        #if index.isValid() and role == Qt.EditRole and col == 0:
+        return QVariant()
+
+    def headerData(self, section: int, orientation: Qt.Orientation, role: int = ...) -> typing.Any:
+        if role == Qt.DisplayRole and orientation == Qt.Vertical:
+            return self.headers[section]
+
+    def setFilter(self, filter):
+        super().sourceModel().setFilter(filter)
