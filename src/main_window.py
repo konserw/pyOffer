@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QMainWindow, QDialog
 from src.terms import TermChooserDialogFactory, TermType
 from src.database import Database
 from src.customer import CustomerFactory
+from src.merchandise import MerchandiseListModel
 
 from generated.MainWindow_ui import Ui_MainWindow
 
@@ -14,6 +15,8 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
 
         self.db = Database()
+        merchandise_list_model = MerchandiseListModel(self.db, self)
+        self.ui.tableView.setModel(merchandise_list_model)
         self.term_chooser_factory = TermChooserDialogFactory(self.db, self)
         self.customer_factory = CustomerFactory(self)
 
