@@ -12,7 +12,8 @@
 #   along with this program.  If not, see http://www.gnu.org/licenses/
 #
 import logging
-from PyQt5.QtSql import QSqlDatabase, QSqlTableModel
+from datetime import date
+from PyQt5.QtSql import QSqlDatabase, QSqlTableModel, QSqlQuery
 
 
 class Database:
@@ -38,7 +39,7 @@ class Database:
     @staticmethod
     def get_terms_table(term_type):
         model = QSqlTableModel()
-        model.setTable("terms_{}".format(term_type.name))
+        model.setTable(F"terms_{term_type.name}")
         model.select()
         while model.canFetchMore():
             model.fetchMore()
@@ -46,8 +47,9 @@ class Database:
 
     @staticmethod
     def get_merchandise_record(merchandise_id):
-        model = QSqlTableModel()
-        model.setTable("merchandise_view")
-        model.setFilter(F"merchandise_id = '{merchandise_id}'")
-        model.select()
-        return model.record(0)
+        text = f"select * from merchandise_view({date.today()}) where merchandise_id = '{merchandise_id}'"
+        query = QSqlQuery(text)
+        if not query.next():
+            logging.error(f"Query failed: {text}")
+            logging.error(query.lastError().text())
+        return query.record()

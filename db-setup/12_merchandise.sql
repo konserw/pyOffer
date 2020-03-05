@@ -18,13 +18,15 @@ CREATE TABLE price (
 );
 
 
-CREATE OR REPLACE VIEW merchandise_view AS
-select
-  merchandise.merchandise_id AS merchandise_id,
-  merchandise.code AS code,
-  merchandise.description AS description,
-  merchandise.unit AS unit,
-  price.value AS list_price
-FROM merchandise natural join price
-WHERE CURRENT_DATE BETWEEN price.valid_from AND price.valid_to;
-
+CREATE OR REPLACE FUNCTION merchandise_view(taget_date DATE)
+  returns table (merchandise_id INT, code TEXT, description TEXT, unit unit_type, list_price DECIMAL(8,2))
+AS $body$
+  select
+    merchandise.merchandise_id AS merchandise_id,
+    merchandise.code AS code,
+    merchandise.description AS description,
+    merchandise.unit AS unit,
+    price.value AS list_price
+  FROM merchandise natural join price
+  WHERE $1 BETWEEN price.valid_from AND price.valid_to
+$body$ language sql;
