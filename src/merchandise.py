@@ -1,8 +1,10 @@
 import typing
 from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtWidgets import QWidget, QTableView, QItemDelegate, QDoubleSpinBox
-from PyQt5.QtCore import QObject, QAbstractTableModel, QModelIndex, Qt, QVariant
+from PyQt5.QtSql import QSqlTableModel
+from PyQt5.QtWidgets import QWidget, QTableView, QItemDelegate, QDoubleSpinBox, QStyleOptionViewItem
+from PyQt5.QtCore import QObject, QAbstractTableModel, QModelIndex, Qt, QVariant, pyqtSlot
 
+from src.database import Database
 
 class Merchandise(QObject):
     def __init__(self, merchandise_id=None):
@@ -168,17 +170,14 @@ class MerchandiseListModel(QAbstractTableModel):
         super().endRemoveRows()
 
     def change_item_count(self, merchandise_id, count):
-        if count > 0:
-            try:
-                idx = self.list.index(Merchandise(merchandise_id))
-            except ValueError:  # item not on the list
-                item = Merchandise.from_sql_record(self.db.get_merchandise_record(merchandise_id))
-                item.count = count
-                self.list.append(item)
-            else:
-                self.list[idx].count = count
+        try:
+            idx = self.list.index(Merchandise(merchandise_id))
+        except ValueError:  # item not on the list
+            item = Merchandise.from_sql_record(self.db.get_merchandise_record(merchandise_id))
+            item.count = count
+            self.list.append(item)
         else:
-            self.list.remove(Merchandise(merchandise_id))
+            self.list[idx].count += count
 
     def removeRows(self, row: int, count: int, parent: QModelIndex = ...) -> bool:
         end = row + count - 1
@@ -246,7 +245,7 @@ class MerchandiseListDelegate(QItemDelegate):
         editor.interpretText()
         model.setData(index, editor.value(), Qt.EditRole)
 
-    def updateEditorGeometry(self, editor: QWidget, option: 'QStyleOptionViewItem', index: QtCore.QModelIndex) -> None:
+    def updateEditorGeometry(self, editor: QWidget, option: QStyleOptionViewItem, index: QtCore.QModelIndex) -> None:
         editor.setGeometry(option.rect)
 
 
@@ -283,16 +282,18 @@ class MerchandiseListView(QTableView):
 class MerchandiseSearchModel(QtCore.QSortFilterProxyModel):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.headers = (
+        self.headers = [
             self.tr("Code"),
             self.tr("Description"),
             self.tr("List price"),
             self.tr("unit"),
-        )
+        ]
 
-    @staticmethod
-    def get_column_value(index: QModelIndex, col: int):
-        return super().sourceModel().data(index.sibling(index.row(), col))
+    def get_item_id(self, row):
+        return self.sourceModel().data(self.createIndex(row, 0), Qt.DisplayRole)
+
+    def get_column_value(self, index: QModelIndex, col: int):
+        return self.sourceModel().data(index.sibling(index.row(), col), Qt.DisplayRole)
 
     def lessThan(self, left: QModelIndex, right: QModelIndex) -> bool:
         return self.get_column_value(left, 1) < self.get_column_value(right, 1)
@@ -308,8 +309,110 @@ class MerchandiseSearchModel(QtCore.QSortFilterProxyModel):
         return QVariant()
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int = ...) -> typing.Any:
-        if role == Qt.DisplayRole and orientation == Qt.Vertical:
+        if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             return self.headers[section]
 
-    def setFilter(self, filter):
-        super().sourceModel().setFilter(filter)
+    @pyqtSlot("QString")
+    def search(self, ex):
+        self.sourceModel().setFilter("code ilike '%{0}%' or description ilike '%{0}%'".format(ex))
+
+
+class MerchandiseSelectionModel(MerchandiseSearchModel):
+    def __init__(self, parent: QWidget = None):
+        super().__init__(parent)
+        self.headers.insert(0, self.tr("Count"))
+        self.selected = {}
+
+    def columnCount(self, parent: QModelIndex = ...) -> int:
+        return 5
+
+    def flags(self, index: QModelIndex) -> Qt.ItemFlags:
+        if index.isValid() and index.column() == 0:
+            return Qt.ItemIsEditable | Qt.ItemIsSelectable | Qt.ItemIsEnabled
+        return Qt.ItemIsEnabled
+
+    def setData(self, index: QModelIndex, value: typing.Any, role: int = ...) -> bool:
+        if role == Qt.EditRole and index.column() == 0:
+            item_id = self.get_item_id(index.row())
+            self.selected[item_id] = value
+            return True
+        return False
+
+
+class MerchandiseSelectionDelegate(QtWidgets.QItemDelegate):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def createEditor(self, parent: QWidget, option: QStyleOptionViewItem, index: QtCore.QModelIndex) -> QWidget:
+        if index.isValid() and index.column() == 0:
+            editor = QDoubleSpinBox(parent)
+            editor.setMinimum(0)
+            editor.setMaximum(999999)
+            editor.setSingleStep(1)
+            return editor
+        return QWidget(parent)
+
+    def setEditorData(self, editor: QWidget, index: QtCore.QModelIndex) -> None:
+        if index.isValid() and index.column() == 0:
+            editor.setValue(index.model().data(index, Qt.EditRole).toDouble())
+
+    def setModelData(self, editor: QWidget, model: QtCore.QAbstractItemModel, index: QtCore.QModelIndex) -> None:
+        if index.isValid() and index.column() == 0:
+            editor.interpretText()
+            model.setData(index, editor.value(), Qt.EditRole)
+
+    def updateEditorGeometry(self, editor: QWidget, option: QStyleOptionViewItem, index: QtCore.QModelIndex) -> None:
+        editor.setGeometry(option.rect)
+
+
+class MerchandiseSearchDialog(QtWidgets.QDialog):
+    def __init__(self, model, parent=None):
+        super().__init__(parent)
+        self.model = model
+
+        self.setWindowTitle(self.tr("Choose merchandise"))
+        self.resize(800, 500)
+        self.vertical_layout = QtWidgets.QVBoxLayout(self)
+
+        self.horizontal_layout = QtWidgets.QHBoxLayout()
+        self.label = QtWidgets.QLabel(self)
+        self.label.setText(self.tr("Filter"))
+        self.horizontal_layout.addWidget(self.label)
+        self.horizontal_layout.addItem(QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
+        self.push_button_close = QtWidgets.QPushButton(self)
+        self.push_button_close.setText(self.tr("Dodaj"))
+        self.push_button_close.clicked.connect(super().accept)
+        self.horizontal_layout.addWidget(self.push_button_close)
+        self.vertical_layout.addLayout(self.horizontal_layout)
+
+        self.line_edit = QtWidgets.QLineEdit(self)
+        self.line_edit.textChanged.connect(self.model.search)
+        self.vertical_layout.addWidget(self.line_edit)
+
+        self.table_view = QtWidgets.QTableView(self)
+        self.table_view.setModel(self.model)
+        self.table_view.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.table_view.setEditTriggers(QtWidgets.QAbstractItemView.AllEditTriggers)
+        self.table_view.horizontalHeader().setDefaultSectionSize(60)
+        self.table_view.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
+        self.table_view.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
+        self.table_view.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
+        self.table_view.horizontalHeader().setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeToContents)
+        self.vertical_layout.addWidget(self.table_view)
+
+
+class MerchandiseSelectionDialog(MerchandiseSearchDialog):
+    def __init__(self, model, parent=None):
+        super().__init__(model, parent)
+        self.table_view.setItemDelegate(MerchandiseSelectionDelegate())
+
+    @property
+    def selected_items(self):
+        return self.model.selected
+
+
+def create_merchandise_selection_dialog(parent):
+    sql_model = Database.get_merchandise_table()
+    selection_model = MerchandiseSelectionModel(parent)
+    selection_model.setSourceModel(sql_model)
+    return MerchandiseSelectionDialog(selection_model, parent)

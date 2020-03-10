@@ -13,7 +13,7 @@
 #
 import logging
 from datetime import date
-from PyQt5.QtSql import QSqlDatabase, QSqlTableModel, QSqlQuery
+from PyQt5.QtSql import QSqlDatabase, QSqlTableModel, QSqlQuery, QSqlQueryModel
 
 
 class Database:
@@ -47,9 +47,17 @@ class Database:
 
     @staticmethod
     def get_merchandise_record(merchandise_id):
-        text = f"select * from merchandise_view({date.today()}) where merchandise_id = '{merchandise_id}'"
+        text = f"select * from merchandise_view('{date.today()}') where merchandise_id = '{merchandise_id}'"
         query = QSqlQuery(text)
         if not query.next():
             logging.error(f"Query failed: {text}")
             logging.error(query.lastError().text())
         return query.record()
+
+    @staticmethod
+    def get_merchandise_table(for_date=date.today()):
+        model = QSqlQueryModel()
+        model.setQuery(f"select * from merchandise_view('{for_date}')")
+        if model.lastError().isValid():
+            raise RuntimeError(model.lastError().text())
+        return model

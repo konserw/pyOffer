@@ -100,7 +100,7 @@ class CustomerSearchModel(QSqlTableModel):
 
     @pyqtSlot("QString")
     def search(self, pattern):
-        self.setFilter("first_name ilike '%{0}%' or full_name ilike '%{0}%' or last_name ilike '%{0}%'".format(pattern))
+        super().setFilter("first_name ilike '%{0}%' or full_name ilike '%{0}%' or last_name ilike '%{0}%'".format(pattern))
 
 
 class CustomerSearchWidget(QWidget):

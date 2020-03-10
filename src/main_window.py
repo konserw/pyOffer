@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QMainWindow, QDialog
 from src.terms import TermChooserDialogFactory, TermType
 from src.database import Database
 from src.customer import CustomerFactory
-from src.merchandise import MerchandiseListModel
+from src.merchandise import MerchandiseListModel, create_merchandise_selection_dialog
 
 from generated.MainWindow_ui import Ui_MainWindow
 
@@ -15,11 +15,12 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
 
         self.db = Database()
-        merchandise_list_model = MerchandiseListModel(self.db, self)
-        self.ui.tableView.setModel(merchandise_list_model)
+        self.merchandise_list_model = MerchandiseListModel(self.db, self)
+        self.ui.tableView.setModel(self.merchandise_list_model)
         self.term_chooser_factory = TermChooserDialogFactory(self.db, self)
         self.customer_factory = CustomerFactory(self)
 
+        self.ui.push_button_add_merchandise.clicked.connect(self.select_merchandise)
         self.ui.command_link_button_cutomer.clicked.connect(self.select_customer)
 
         self.ui.command_link_button_delivery.clicked.connect(self.select_delivery_terms)
@@ -51,3 +52,9 @@ class MainWindow(QMainWindow):
         dialog = self.term_chooser_factory.get_terms_chooser_dialog(TermType.delivery_date)
         if dialog.exec() == QDialog.Accepted and dialog.chosen_item:
             self.ui.plain_text_edit_delivery_date.setPlainText(dialog.chosen_item.long_desc)
+
+    def select_merchandise(self):
+        dialog = create_merchandise_selection_dialog(self)
+        dialog.exec()
+        for item_id, count in dialog.selected_items:
+            self.merchandise_list_model.change_item_count(item_id, count)
