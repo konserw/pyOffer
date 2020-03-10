@@ -42,6 +42,9 @@ class Merchandise(QObject):
         item.by_meter = record.value("unit") == "m"
         return item
 
+    def set_discount(self, value):
+        self.discount = value
+
     def __eq__(self, other):
         return self.id == other.id
 
@@ -63,8 +66,13 @@ class Merchandise(QObject):
         elif col == 7:
             return self.total
 
-    def set_discount(self, value):
-        self.discount = value
+    def __setitem__(self, key, value):
+        if key == 3:
+            self.discount = value
+        elif key == 5:
+            self.count = value
+        else:
+            raise RuntimeError("unexpected assignment")
 
 
 class MerchandiseListModel(QAbstractTableModel):
@@ -175,7 +183,7 @@ class MerchandiseListModel(QAbstractTableModel):
         except ValueError:  # item not on the list
             item = Merchandise.from_sql_record(self.db.get_merchandise_record(merchandise_id))
             item.count = count
-            self.list.append(item)
+            self.add_item(item)
         else:
             self.list[idx].count += count
 
@@ -227,15 +235,16 @@ class MerchandiseListDelegate(QItemDelegate):
         super().__init__(parent)
 
     def createEditor(self, parent: QWidget, _, index: QModelIndex) -> QWidget:
-        editor = QDoubleSpinBox(parent)
-        editor.setSingleStep(1)
-        editor.setMinimum(0)
-        if index.column() == 5:
-            editor.setMaximum(99999)
-            return editor
-        elif index.column() == 3:
-            editor.setMaximum(100)
-            return editor
+        if index.isValid():
+            editor = QDoubleSpinBox(parent)
+            editor.setSingleStep(1)
+            editor.setMinimum(0)
+            if index.column() == 5:
+                editor.setMaximum(99999)
+                return editor
+            elif index.column() == 3:
+                editor.setMaximum(100)
+                return editor
         return QWidget(parent)
 
     def setEditorData(self, editor: QWidget, index: QModelIndex) -> None:
@@ -305,9 +314,14 @@ class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):
 
     def data(self, index: QModelIndex, role: int):
         col = index.column()
+        row = index.row()
+        if index.isValid() and col == 0 and role in (Qt.DisplayRole, Qt.EditRole):
+            item_id = self.get_item_id(row)
+            if item_id in self.selected:
+                return self.selected[item_id]
+            return 0
         if index.isValid() and role == Qt.DisplayRole:
             return self.get_column_value(index, col)
-        #if index.isValid() and role == Qt.EditRole and col == 0:
         return QVariant()
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int = ...) -> typing.Any:
@@ -346,7 +360,7 @@ class MerchandiseSelectionDelegate(QtWidgets.QItemDelegate):
 
     def setEditorData(self, editor: QWidget, index: QtCore.QModelIndex) -> None:
         if index.isValid() and index.column() == 0:
-            editor.setValue(index.model().data(index, Qt.EditRole).toDouble())
+            editor.setValue(index.model().data(index, Qt.EditRole))
 
     def setModelData(self, editor: QWidget, model: QtCore.QAbstractItemModel, index: QtCore.QModelIndex) -> None:
         if index.isValid() and index.column() == 0:
@@ -394,7 +408,7 @@ class MerchandiseSelectionDialog(QtWidgets.QDialog):
         self.vertical_layout.addWidget(self.table_view)
 
     @property
-    def selected_items(self):
+    def selected(self):
         return self.model.selected
 
 
