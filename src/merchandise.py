@@ -279,15 +279,17 @@ class MerchandiseListView(QTableView):
         a0.acceptProposedAction()
 
 
-class MerchandiseSearchModel(QtCore.QSortFilterProxyModel):
+class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.headers = [
+        self.selected = {}
+        self.headers = (
+            self.tr("Count"),
             self.tr("Code"),
             self.tr("Description"),
             self.tr("List price"),
             self.tr("unit"),
-        ]
+        )
 
     def get_item_id(self, row):
         return self.sourceModel().data(self.createIndex(row, 0), Qt.DisplayRole)
@@ -299,12 +301,12 @@ class MerchandiseSearchModel(QtCore.QSortFilterProxyModel):
         return self.get_column_value(left, 1) < self.get_column_value(right, 1)
 
     def columnCount(self, parent: QModelIndex = ...) -> int:
-        return 4
+        return 5
 
     def data(self, index: QModelIndex, role: int):
         col = index.column()
         if index.isValid() and role == Qt.DisplayRole:
-            return self.get_column_value(index, col+1)
+            return self.get_column_value(index, col)
         #if index.isValid() and role == Qt.EditRole and col == 0:
         return QVariant()
 
@@ -315,16 +317,6 @@ class MerchandiseSearchModel(QtCore.QSortFilterProxyModel):
     @pyqtSlot("QString")
     def search(self, ex):
         self.sourceModel().setFilter("code ilike '%{0}%' or description ilike '%{0}%'".format(ex))
-
-
-class MerchandiseSelectionModel(MerchandiseSearchModel):
-    def __init__(self, parent: QWidget = None):
-        super().__init__(parent)
-        self.headers.insert(0, self.tr("Count"))
-        self.selected = {}
-
-    def columnCount(self, parent: QModelIndex = ...) -> int:
-        return 5
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
         if index.isValid() and index.column() == 0:
@@ -365,7 +357,7 @@ class MerchandiseSelectionDelegate(QtWidgets.QItemDelegate):
         editor.setGeometry(option.rect)
 
 
-class MerchandiseSearchDialog(QtWidgets.QDialog):
+class MerchandiseSelectionDialog(QtWidgets.QDialog):
     def __init__(self, model, parent=None):
         super().__init__(parent)
         self.model = model
@@ -398,13 +390,8 @@ class MerchandiseSearchDialog(QtWidgets.QDialog):
         self.table_view.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
         self.table_view.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
         self.table_view.horizontalHeader().setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeToContents)
-        self.vertical_layout.addWidget(self.table_view)
-
-
-class MerchandiseSelectionDialog(MerchandiseSearchDialog):
-    def __init__(self, model, parent=None):
-        super().__init__(model, parent)
         self.table_view.setItemDelegate(MerchandiseSelectionDelegate())
+        self.vertical_layout.addWidget(self.table_view)
 
     @property
     def selected_items(self):
