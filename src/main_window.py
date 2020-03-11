@@ -58,4 +58,3 @@ class MainWindow(QMainWindow):
         dialog.exec()
         for item_id, count in dialog.selected.items():
             self.merchandise_list_model.change_item_count(item_id, count)
-        self.ui.tableView.resizeColumnsToContents()

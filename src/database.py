@@ -56,8 +56,19 @@ class Database:
 
     @staticmethod
     def get_merchandise_table(for_date=date.today()):
-        model = QSqlQueryModel()
-        model.setQuery(f"select * from merchandise_view('{for_date}')")
-        if model.lastError().isValid():
-            raise RuntimeError(model.lastError().text())
-        return model
+        return MerchandiseViewModel(for_date)
+
+
+class MerchandiseViewModel(QSqlQueryModel):
+    def __init__(self, for_date, parent=None):
+        super().__init__(parent)
+        self.for_date = for_date
+        self.update()
+
+    def update(self, ex=""):
+        self.beginResetModel()
+        self.setQuery(f"select * from merchandise_view('{self.for_date}')"
+                      f"where code ilike '%{ex}%' or description ilike '%{ex}%'")
+        if self.lastError().isValid():
+            raise RuntimeError(self.lastError().text())
+        self.endResetModel()

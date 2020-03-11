@@ -1,10 +1,12 @@
 import typing
+from datetime import date
+
 from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtSql import QSqlTableModel
-from PyQt5.QtWidgets import QWidget, QTableView, QItemDelegate, QDoubleSpinBox, QStyleOptionViewItem
 from PyQt5.QtCore import QObject, QAbstractTableModel, QModelIndex, Qt, QVariant, pyqtSlot
+from PyQt5.QtWidgets import QWidget, QTableView, QItemDelegate, QDoubleSpinBox, QStyleOptionViewItem
 
 from src.database import Database
+
 
 class Merchandise(QObject):
     def __init__(self, merchandise_id=None):
@@ -195,18 +197,19 @@ class MerchandiseListModel(QAbstractTableModel):
         super().endRemoveRows()
         return True
 
-    def moveRows(self, sourceParent: QModelIndex, sourceRow: int, count: int, destinationParent: QModelIndex, destinationChild: int) -> bool:
+    def moveRows(self, sourceParent: QModelIndex, sourceRow: int, count: int, destinationParent: QModelIndex,
+                 destinationChild: int) -> bool:
         if destinationChild in range(sourceRow, sourceRow + count):  # +1 ?
             return False
 
         last_row = sourceRow + count - 1
         offset = destinationChild - sourceRow
-#        if destinationChild == len(self.list):
-#            offset -= 1
+        #        if destinationChild == len(self.list):
+        #            offset -= 1
         super().beginMoveRows(sourceParent, sourceRow, last_row, destinationParent, destinationChild)
         for i in range(count):
             self.list.insert(sourceRow + offset + i, self.list.pop(sourceRow + i))
-#TODO: check this
+        # TODO: check this
         super().endMoveRows()
         return True
 
@@ -330,7 +333,7 @@ class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):
 
     @pyqtSlot("QString")
     def search(self, ex):
-        self.sourceModel().setFilter("code ilike '%{0}%' or description ilike '%{0}%'".format(ex))
+        self.sourceModel().update(ex)
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
         if index.isValid() and index.column() == 0:
@@ -384,7 +387,8 @@ class MerchandiseSelectionDialog(QtWidgets.QDialog):
         self.label = QtWidgets.QLabel(self)
         self.label.setText(self.tr("Filter"))
         self.horizontal_layout.addWidget(self.label)
-        self.horizontal_layout.addItem(QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
+        self.horizontal_layout.addItem(
+            QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
         self.push_button_close = QtWidgets.QPushButton(self)
         self.push_button_close.setText(self.tr("Dodaj"))
         self.push_button_close.clicked.connect(super().accept)
