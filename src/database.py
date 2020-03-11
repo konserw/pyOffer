@@ -25,8 +25,9 @@ class Database:
         self.database.setPassword("docker")
         if not self.database.open():
             logging.error("Failed to open database")
-            logging.error(self.database.lastError().text())
-            raise RuntimeError("Failed to connect to db")
+            error = self.database.lastError().text()
+            logging.error(error)
+            raise RuntimeError(f"Failed to connect to db: {error}")
 
     @staticmethod
     def get_customer_record(customer_id):

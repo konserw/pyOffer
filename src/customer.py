@@ -106,21 +106,18 @@ class CustomerSearchModel(QSqlTableModel):
 class CustomerSearchWidget(QWidget):
     def __init__(self, model, parent=None):
         super().__init__(parent)
+        self.model = model
+        self.chosen_item = None
 
-        self.setObjectName("CustomerSearch")
         self.verticalLayout = QtWidgets.QVBoxLayout(self)
         self.line_edit = QtWidgets.QLineEdit(self)
+        self.line_edit.textChanged.connect(self.model.search)
         self.verticalLayout.addWidget(self.line_edit)
         self.table_widget = QtWidgets.QTableView(self)
-        self.verticalLayout.addWidget(self.table_widget)
-
-        self.model = model
+        self.table_widget.clicked.connect(self.selection_changed)
         self.table_widget.setModel(self.model)
         self.table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.line_edit.textChanged.connect(self.model.search)
-
-        self.chosen_item = None
-        self.table_widget.clicked.connect(self.selection_changed)
+        self.verticalLayout.addWidget(self.table_widget)
 
     @pyqtSlot("QModelIndex")
     def selection_changed(self, index):
@@ -130,27 +127,21 @@ class CustomerSearchWidget(QWidget):
 class CustomerSelection(QDialog):
     def __init__(self, customer_search, parent=None):
         super().__init__(parent)
+        self.customer_search = customer_search
 
+        self.setWindowTitle(self.tr("Select customer"))
         self.resize(600, 900)
         self.verticalLayout = QtWidgets.QVBoxLayout(self)
-        self.customer_search = customer_search
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.customer_search.sizePolicy().hasHeightForWidth())
-        self.customer_search.setSizePolicy(sizePolicy)
         self.verticalLayout.addWidget(self.customer_search)
-        self.horizontalLayout = QtWidgets.QHBoxLayout()
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout.addItem(spacerItem)
-        self.push_button_exit = QtWidgets.QPushButton(self)
-        self.push_button_exit.setObjectName("push_button_exit")
-        self.horizontalLayout.addWidget(self.push_button_exit)
-        self.verticalLayout.addLayout(self.horizontalLayout)
 
-        self.setWindowTitle(self.tr("Wyszikwanie klienta"))
-        self.push_button_exit.setText(self.tr("Wybierz"))
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.addItem(QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
+        self.push_button_exit = QtWidgets.QPushButton(self)
+        self.push_button_exit.setText(self.tr("OK"))
         self.push_button_exit.clicked.connect(self.accept)
+        self.horizontalLayout.addWidget(self.push_button_exit)
+
+        self.verticalLayout.addLayout(self.horizontalLayout)
 
     @property
     def chosen_item(self):

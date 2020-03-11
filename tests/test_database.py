@@ -10,21 +10,26 @@
 #   GNU General Public License for more details.
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see http://www.gnu.org/licenses/
+import sys
+
 import pytest
-from hamcrest import assert_that, is_
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QPoint
+from PyQt5.QtWidgets import QApplication, QDialog
+from PyQt5.QtTest import QTest
+from hamcrest import assert_that, is_, not_none
 
+from src.customer import Customer, CustomerSearchModel, CustomerFactory, CustomerSearchWidget
 from src.database import Database
-from src.customer import Customer, CustomerSearchModel
-
 
 try:
     db = Database()
 except:
     pytest.skip("Couldn't connect to database, skipping db tests", allow_module_level=True)
 
+app = QApplication(["-platform offscreen"])
 
-class TestCustomerDB:
+
+class TestCustomer:
     def test_customer_1(self):
         customer_id = 1
         rec = db.get_customer_record(customer_id)
@@ -72,43 +77,39 @@ class TestCustomerDB:
         assert_that(str(customer), is_("Customer 2: Pani Jane Doe; PolImpEx"))
 
 
-class TestCustomerSearchModelDB:
+class TestCustomerSearchModel():
+    def setup_method(self):
+        self.model = CustomerSearchModel()
+
     def test_column_headers(self):
-        model = CustomerSearchModel()
-        assert_that(model.columnCount(), is_(2))
+        assert_that(self.model.columnCount(), is_(2))
         # todo: other localisations
-        assert_that(model.headerData(0, Qt.Horizontal, Qt.DisplayRole), is_("Customer name"))
-        assert_that(model.headerData(1, Qt.Horizontal, Qt.DisplayRole), is_("Company name"))
+        assert_that(self.model.headerData(0, Qt.Horizontal, Qt.DisplayRole), is_("Customer name"))
+        assert_that(self.model.headerData(1, Qt.Horizontal, Qt.DisplayRole), is_("Company name"))
 
     def test_row_headers(self):
-        model = CustomerSearchModel()
-        assert_that(model.rowCount(), is_(2))
-        assert_that(model.headerData(0, Qt.Vertical, Qt.DisplayRole), is_("0"))
-        assert_that(model.headerData(1, Qt.Vertical, Qt.DisplayRole), is_("1"))
+        assert_that(self.model.rowCount(), is_(2))
+        assert_that(self.model.headerData(0, Qt.Vertical, Qt.DisplayRole), is_("0"))
+        assert_that(self.model.headerData(1, Qt.Vertical, Qt.DisplayRole), is_("1"))
 
     def test_data(self):
-        model = CustomerSearchModel()
-        assert_that(model.data(model.index(0, 0), Qt.DisplayRole), is_("Pan Jan Kowalski"))
-        assert_that(model.data(model.index(0, 1), Qt.DisplayRole), is_("PolImpEx"))
-        assert_that(model.data(model.index(1, 0), Qt.DisplayRole), is_("Pani Jane Doe"))
-        assert_that(model.data(model.index(1, 1), Qt.DisplayRole), is_("PolImpEx"))
+        assert_that(self.model.data(self.model.index(0, 0), Qt.DisplayRole), is_("Pan Jan Kowalski"))
+        assert_that(self.model.data(self.model.index(0, 1), Qt.DisplayRole), is_("PolImpEx"))
+        assert_that(self.model.data(self.model.index(1, 0), Qt.DisplayRole), is_("Pani Jane Doe"))
+        assert_that(self.model.data(self.model.index(1, 1), Qt.DisplayRole), is_("PolImpEx"))
 
-    @staticmethod
-    def _test_search_single(pattern):
-        model = CustomerSearchModel()
-        assert_that(model.rowCount(), is_(2))
-        model.search(pattern)
-        assert_that(model.rowCount(), is_(1))
-        assert_that(model.record(0).value("customer_id"), is_(2))
-        model.search("")
-        assert_that(model.rowCount(), is_(2))
+    def _test_search_single(self, pattern):
+        assert_that(self.model.rowCount(), is_(2))
+        self.model.search(pattern)
+        assert_that(self.model.rowCount(), is_(1))
+        assert_that(self.model.record(0).value("customer_id"), is_(2))
+        self.model.search("")
+        assert_that(self.model.rowCount(), is_(2))
 
-    @staticmethod
-    def _test_search_both(pattern):
-        model = CustomerSearchModel()
-        assert_that(model.rowCount(), is_(2))
-        model.search(pattern)
-        assert_that(model.rowCount(), is_(2))
+    def _test_search_both(self, pattern):
+        assert_that(self.model.rowCount(), is_(2))
+        self.model.search(pattern)
+        assert_that(self.model.rowCount(), is_(2))
 
     def test_search_first_name(self):
         pattern = "ne"
@@ -125,3 +126,64 @@ class TestCustomerSearchModelDB:
     def test_search_company(self):
         pattern = "Sp. z o.o."
         self._test_search_both(pattern)
+
+
+class TestCustomerSearch:
+    def setup_method(self):
+        self.model = CustomerSearchModel()
+        self.widget = CustomerSearchWidget(self.model)
+
+    def test_initial_state(self):
+        assert_that(self.widget.line_edit.text(), is_(""))
+        assert_that(self.widget.chosen_item, is_(None))
+
+    def test_selection_changed_0(self):
+        pos = QPoint(self.widget.table_widget.columnViewportPosition(1), self.widget.table_widget.rowViewportPosition(0))
+        QTest.mouseClick(self.widget.table_widget.viewport(), Qt.LeftButton, pos=pos)
+        assert_that(self.widget.chosen_item, is_(not_none()))
+        assert_that(self.widget.chosen_item.concated_name, is_("Pan Jan Kowalski"))
+        assert_that(self.widget.chosen_item.short_name, is_("PolImpEx"))
+
+    def test_selection_changed_1(self):
+        pos = QPoint(self.widget.table_widget.columnViewportPosition(1), self.widget.table_widget.rowViewportPosition(1))
+        QTest.mouseClick(self.widget.table_widget.viewport(), Qt.LeftButton, pos=pos)
+        assert_that(self.widget.chosen_item, is_(not_none()))
+        assert_that(self.widget.chosen_item.concated_name, is_("Pani Jane Doe"))
+        assert_that(self.widget.chosen_item.short_name, is_("PolImpEx"))
+
+    def test_search(self):
+        assert_that(self.model.rowCount(), is_(2))
+        QTest.keyClicks(self.widget.line_edit, "ne")
+
+        assert_that(self.widget.line_edit.text(), is_("ne"))
+        assert_that(self.model.rowCount(), is_(1))
+        assert_that(self.model.record(0).value("customer_id"), is_(2))
+
+
+class TestCustomerSelection:
+    def setup_method(self):
+        self.dialog = CustomerFactory().get_customer_selection()
+
+    def test_initial_state(self):
+        #todo: translations
+        assert_that(self.dialog.push_button_exit.text(), is_("OK"))
+        assert_that(self.dialog.windowTitle(), is_("Select customer"))
+
+    def test_button_accepts(self):
+        QTest.mouseClick(self.dialog.push_button_exit, Qt.LeftButton)
+        assert_that(self.dialog.result(), is_(QDialog.Accepted))
+
+    def test_selection_changed_0(self):
+        pos = QPoint(self.dialog.customer_search.table_widget.columnViewportPosition(1), self.dialog.customer_search.table_widget.rowViewportPosition(0))
+        QTest.mouseClick(self.dialog.customer_search.table_widget.viewport(), Qt.LeftButton, pos=pos)
+        assert_that(self.dialog.chosen_item, is_(not_none()))
+        assert_that(self.dialog.chosen_item.concated_name, is_("Pan Jan Kowalski"))
+        assert_that(self.dialog.chosen_item.short_name, is_("PolImpEx"))
+
+    def test_selection_changed_1(self):
+        pos = QPoint(self.dialog.customer_search.table_widget.columnViewportPosition(1), self.dialog.customer_search.table_widget.rowViewportPosition(1))
+        QTest.mouseClick(self.dialog.customer_search.table_widget.viewport(), Qt.LeftButton, pos=pos)
+        assert_that(self.dialog.customer_search.chosen_item, is_(not_none()))
+        assert_that(self.dialog.customer_search.chosen_item.concated_name, is_("Pani Jane Doe"))
+        assert_that(self.dialog.customer_search.chosen_item.short_name, is_("PolImpEx"))
+
