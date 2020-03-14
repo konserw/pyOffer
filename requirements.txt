@@ -1,4 +1,5 @@
 pytest
+pytest-qt
 PyHamcrest
 PyQt5
 PyQt5-sip

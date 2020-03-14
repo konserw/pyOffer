@@ -12,8 +12,7 @@
 #   along with this program.  If not, see http://www.gnu.org/licenses/
 import pytest
 from PyQt5.QtCore import Qt, QPoint
-from PyQt5.QtWidgets import QApplication, QDialog
-from PyQt5.QtTest import QTest
+from PyQt5.QtWidgets import QDialog
 from hamcrest import assert_that, is_, not_none
 
 from src.customer import Customer, CustomerSearchModel, CustomerFactory, CustomerSearchWidget
@@ -24,14 +23,13 @@ try:
 except:
     pytest.skip("Couldn't connect to database, skipping db tests", allow_module_level=True)
 
-app = QApplication(["-platform offscreen"])
-
 
 class TestCustomer:
     def test_customer_1(self):
         customer_id = 1
         rec = db.get_customer_record(customer_id)
         customer = Customer.from_record(rec)
+
         assert_that(customer.is_valid, is_(True))
         assert_that(customer.id, is_(customer_id))
         assert_that(customer.short_name, is_("PolImpEx"))
@@ -55,6 +53,7 @@ class TestCustomer:
         customer_id = 2
         rec = db.get_customer_record(customer_id)
         customer = Customer.from_record(rec)
+
         assert_that(customer.is_valid, is_(True))
         assert_that(customer.id, is_(customer_id))
         assert_that(customer.short_name, is_("PolImpEx"))
@@ -75,7 +74,7 @@ class TestCustomer:
         assert_that(str(customer), is_("Customer 2: Pani Jane Doe; PolImpEx"))
 
 
-class TestCustomerSearchModel():
+class TestCustomerSearchModel:
     def setup_method(self):
         self.model = CustomerSearchModel()
 
@@ -127,60 +126,85 @@ class TestCustomerSearchModel():
 
 
 class TestCustomerSearch:
-    def setup_method(self):
-        self.model = CustomerSearchModel()
-        self.widget = CustomerSearchWidget(self.model)
+    def test_initial_state(self, qtbot):
+        model = CustomerSearchModel()
+        widget = CustomerSearchWidget(model)
+        qtbot.addWidget(widget)
 
-    def test_initial_state(self):
-        assert_that(self.widget.line_edit.text(), is_(""))
-        assert_that(self.widget.chosen_item, is_(None))
+        assert_that(widget.line_edit.text(), is_(""))
+        assert_that(widget.chosen_item, is_(None))
 
-    def test_selection_changed_0(self):
-        pos = QPoint(self.widget.table_widget.columnViewportPosition(1), self.widget.table_widget.rowViewportPosition(0))
-        QTest.mouseClick(self.widget.table_widget.viewport(), Qt.LeftButton, pos=pos)
-        assert_that(self.widget.chosen_item, is_(not_none()))
-        assert_that(self.widget.chosen_item.concated_name, is_("Pan Jan Kowalski"))
-        assert_that(self.widget.chosen_item.short_name, is_("PolImpEx"))
+    def test_selection_changed_0(self, qtbot):
+        model = CustomerSearchModel()
+        widget = CustomerSearchWidget(model)
+        qtbot.addWidget(widget)
 
-    def test_selection_changed_1(self):
-        pos = QPoint(self.widget.table_widget.columnViewportPosition(1), self.widget.table_widget.rowViewportPosition(1))
-        QTest.mouseClick(self.widget.table_widget.viewport(), Qt.LeftButton, pos=pos)
-        assert_that(self.widget.chosen_item, is_(not_none()))
-        assert_that(self.widget.chosen_item.concated_name, is_("Pani Jane Doe"))
-        assert_that(self.widget.chosen_item.short_name, is_("PolImpEx"))
+        pos = QPoint(widget.table_widget.columnViewportPosition(1), widget.table_widget.rowViewportPosition(0))
+        qtbot.mouseClick(widget.table_widget.viewport(), Qt.LeftButton, pos=pos)
 
-    def test_search(self):
-        assert_that(self.model.rowCount(), is_(2))
-        QTest.keyClicks(self.widget.line_edit, "ne")
+        assert_that(widget.chosen_item, is_(not_none()))
+        assert_that(widget.chosen_item.concated_name, is_("Pan Jan Kowalski"))
+        assert_that(widget.chosen_item.short_name, is_("PolImpEx"))
 
-        assert_that(self.widget.line_edit.text(), is_("ne"))
-        assert_that(self.model.rowCount(), is_(1))
-        assert_that(self.model.record(0).value("customer_id"), is_(2))
+    def test_selection_changed_1(self, qtbot):
+        model = CustomerSearchModel()
+        widget = CustomerSearchWidget(model)
+        qtbot.addWidget(widget)
+
+        pos = QPoint(widget.table_widget.columnViewportPosition(1), widget.table_widget.rowViewportPosition(1))
+        qtbot.mouseClick(widget.table_widget.viewport(), Qt.LeftButton, pos=pos)
+
+        assert_that(widget.chosen_item, is_(not_none()))
+        assert_that(widget.chosen_item.concated_name, is_("Pani Jane Doe"))
+        assert_that(widget.chosen_item.short_name, is_("PolImpEx"))
+
+    def test_search(self, qtbot):
+        model = CustomerSearchModel()
+        widget = CustomerSearchWidget(model)
+        qtbot.addWidget(widget)
+
+        assert_that(model.rowCount(), is_(2))
+        qtbot.keyClicks(widget.line_edit, "ne")
+
+        assert_that(widget.line_edit.text(), is_("ne"))
+        assert_that(model.rowCount(), is_(1))
+        assert_that(model.record(0).value("customer_id"), is_(2))
 
 
 class TestCustomerSelection:
-    def setup_method(self):
-        self.dialog = CustomerFactory().get_customer_selection()
+    def test_initial_state(self, qtbot):
+        dialog = CustomerFactory().get_customer_selection()
+        qtbot.addWidget(dialog)
 
-    def test_initial_state(self):
         # todo: translations
-        assert_that(self.dialog.push_button_exit.text(), is_("OK"))
-        assert_that(self.dialog.windowTitle(), is_("Select customer"))
+        assert_that(dialog.push_button_exit.text(), is_("OK"))
+        assert_that(dialog.windowTitle(), is_("Select customer"))
 
-    def test_button_accepts(self):
-        QTest.mouseClick(self.dialog.push_button_exit, Qt.LeftButton)
-        assert_that(self.dialog.result(), is_(QDialog.Accepted))
+    def test_button_accepts(self, qtbot):
+        dialog = CustomerFactory().get_customer_selection()
+        qtbot.addWidget(dialog)
 
-    def test_selection_changed_0(self):
-        pos = QPoint(self.dialog.customer_search.table_widget.columnViewportPosition(1), self.dialog.customer_search.table_widget.rowViewportPosition(0))
-        QTest.mouseClick(self.dialog.customer_search.table_widget.viewport(), Qt.LeftButton, pos=pos)
-        assert_that(self.dialog.chosen_item, is_(not_none()))
-        assert_that(self.dialog.chosen_item.concated_name, is_("Pan Jan Kowalski"))
-        assert_that(self.dialog.chosen_item.short_name, is_("PolImpEx"))
+        qtbot.mouseClick(dialog.push_button_exit, Qt.LeftButton)
+        assert_that(dialog.result(), is_(QDialog.Accepted))
 
-    def test_selection_changed_1(self):
-        pos = QPoint(self.dialog.customer_search.table_widget.columnViewportPosition(1), self.dialog.customer_search.table_widget.rowViewportPosition(1))
-        QTest.mouseClick(self.dialog.customer_search.table_widget.viewport(), Qt.LeftButton, pos=pos)
-        assert_that(self.dialog.customer_search.chosen_item, is_(not_none()))
-        assert_that(self.dialog.customer_search.chosen_item.concated_name, is_("Pani Jane Doe"))
-        assert_that(self.dialog.customer_search.chosen_item.short_name, is_("PolImpEx"))
+    def test_selection_changed_0(self, qtbot):
+        dialog = CustomerFactory().get_customer_selection()
+        qtbot.addWidget(dialog)
+
+        pos = QPoint(dialog.customer_search.table_widget.columnViewportPosition(1), dialog.customer_search.table_widget.rowViewportPosition(0))
+        qtbot.mouseClick(dialog.customer_search.table_widget.viewport(), Qt.LeftButton, pos=pos)
+
+        assert_that(dialog.chosen_item, is_(not_none()))
+        assert_that(dialog.chosen_item.concated_name, is_("Pan Jan Kowalski"))
+        assert_that(dialog.chosen_item.short_name, is_("PolImpEx"))
+
+    def test_selection_changed_1(self, qtbot):
+        dialog = CustomerFactory().get_customer_selection()
+        qtbot.addWidget(dialog)
+
+        pos = QPoint(dialog.customer_search.table_widget.columnViewportPosition(1), dialog.customer_search.table_widget.rowViewportPosition(1))
+        qtbot.mouseClick(dialog.customer_search.table_widget.viewport(), Qt.LeftButton, pos=pos)
+
+        assert_that(dialog.customer_search.chosen_item, is_(not_none()))
+        assert_that(dialog.customer_search.chosen_item.concated_name, is_("Pani Jane Doe"))
+        assert_that(dialog.customer_search.chosen_item.short_name, is_("PolImpEx"))
