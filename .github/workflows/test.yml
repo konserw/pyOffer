@@ -15,22 +15,30 @@ jobs:
         python-version: 3.8
     - name: Install dependencies
       run: |
+        sudo apt-get install xvfb
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install coveralls coverage flake8
     - name: Lint with flake8
       run: |
-        pip install flake8
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: run docker with test database
-      run: docker run --rm -d --name postgres -e POSTGRES_PASSWORD=docker -e POSTGRES_DB=koferta_test -p 5432:5432 -v $GITHUB_WORKSPACE/db-setup:/docker-entrypoint-initdb.d postgres
     - name: Test with pytest and publish test coverage
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
       run: |
+        docker run --rm -d --name postgres -e POSTGRES_PASSWORD=docker -e POSTGRES_DB=koferta_test -p 5432:5432 -v $GITHUB_WORKSPACE/db-setup:/docker-entrypoint-initdb.d postgres
         pyqt5ac -c pyqt5ac.json
-        pip install coveralls coverage
-        coverage run -m pytest
+        xvfb-run --auto-servernum coverage run -m pytest
         coveralls
+    - name: cleanup xvfb
+      run: |
+        xvfb_pids=`ps aux | grep tmp/xvfb-run | grep -v grep | awk '{print $2}'`
+        if [ "$xvfb_pids" != "" ]; then
+          echo "Killing the following xvfb processes: $xvfb_pids"
+          sudo kill $xvfb_pids
+        else
+          echo "No xvfb processes to kill"
+        fi
