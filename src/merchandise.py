@@ -1,5 +1,4 @@
 import typing
-from datetime import date
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import QObject, QAbstractTableModel, QModelIndex, Qt, QVariant, pyqtSlot
@@ -168,16 +167,16 @@ class MerchandiseListModel(QAbstractTableModel):
         if row > len(self.list):
             return QModelIndex()
         elif row == len(self.list):
-            return super().createIndex(row, column, None)
-        return super().createIndex(row, column, self.list[row])
+            return self.createIndex(row, column, None)
+        return self.createIndex(row, column, self.list[row])
 
     def clear(self):
         if not self.list:
             return
 
-        super().beginRemoveRows(QModelIndex(), 0, len(self.list))
+        self.beginRemoveRows(QModelIndex(), 0, len(self.list))
         self.list.clear()
-        super().endRemoveRows()
+        self.endRemoveRows()
 
     def change_item_count(self, merchandise_id, count):
         try:
@@ -191,10 +190,10 @@ class MerchandiseListModel(QAbstractTableModel):
 
     def removeRows(self, row: int, count: int, parent: QModelIndex = ...) -> bool:
         end = row + count - 1
-        super().beginRemoveRows(QModelIndex(), row, end)
+        self.beginRemoveRows(QModelIndex(), row, end)
         for i in range(row, end):
             self.list.pop(i)
-        super().endRemoveRows()
+        self.endRemoveRows()
         return True
 
     def moveRows(self, sourceParent: QModelIndex, sourceRow: int, count: int, destinationParent: QModelIndex,
@@ -206,25 +205,24 @@ class MerchandiseListModel(QAbstractTableModel):
         offset = destinationChild - sourceRow
         #        if destinationChild == len(self.list):
         #            offset -= 1
-        super().beginMoveRows(sourceParent, sourceRow, last_row, destinationParent, destinationChild)
+        self.beginMoveRows(sourceParent, sourceRow, last_row, destinationParent, destinationChild)
         for i in range(count):
             self.list.insert(sourceRow + offset + i, self.list.pop(sourceRow + i))
         # TODO: check this
-        super().endMoveRows()
+        self.endMoveRows()
         return True
 
     def sort(self, column, order):
         reverse = (order == Qt.DescendingOrder)
-        key = lambda item: item[column]
-        super().beginResetModel()
-        self.list.sort(key=key, reverse=reverse)
-        super().endResetModel()
+        self.beginResetModel()
+        self.list.sort(key=(lambda item: item[column]), reverse=reverse)
+        self.endResetModel()
 
     def add_item(self, item):
         where = len(self.list)
-        super().beginInsertRows(QModelIndex(), where, where)
+        self.beginInsertRows(QModelIndex(), where, where)
         self.list.append(item)
-        super().endInsertRows()
+        self.endInsertRows()
 
     def set_discount(self, ex, value):
         map(lambda item: item.set_discount(value), filter(lambda item: ex in item.code, self.list))
@@ -282,11 +280,11 @@ class MerchandiseListView(QTableView):
 
     def dragEnterEvent(self, a0: QtGui.QDragEnterEvent) -> None:
         if a0.source() is self:
-            self.drag_start_index = super().indexAt(a0.pos())
+            self.drag_start_index = self.indexAt(a0.pos())
             a0.acceptProposedAction()
 
     def dropEvent(self, a0: QtGui.QDropEvent) -> None:
-        drag_end_index = super().indexAt(a0.pos())
+        drag_end_index = self.indexAt(a0.pos())
         self.model().moveRow(QModelIndex(), self.drag_start_index.row(), QModelIndex, drag_end_index.row())
         a0.acceptProposedAction()
 

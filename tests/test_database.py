@@ -10,8 +10,6 @@
 #   GNU General Public License for more details.
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see http://www.gnu.org/licenses/
-import sys
-
 import pytest
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtWidgets import QApplication, QDialog
@@ -165,7 +163,7 @@ class TestCustomerSelection:
         self.dialog = CustomerFactory().get_customer_selection()
 
     def test_initial_state(self):
-        #todo: translations
+        # todo: translations
         assert_that(self.dialog.push_button_exit.text(), is_("OK"))
         assert_that(self.dialog.windowTitle(), is_("Select customer"))
 
@@ -186,4 +184,3 @@ class TestCustomerSelection:
         assert_that(self.dialog.customer_search.chosen_item, is_(not_none()))
         assert_that(self.dialog.customer_search.chosen_item.concated_name, is_("Pani Jane Doe"))
         assert_that(self.dialog.customer_search.chosen_item.short_name, is_("PolImpEx"))
-

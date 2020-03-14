@@ -25,8 +25,9 @@ class Database:
         self.database.setPassword("docker")
         if not self.database.open():
             logging.error("Failed to open database")
-            error = self.database.lastError().text()
-            logging.error(error)
+            logging.error(f"Plugins: {self.database.drivers()}")
+            error = self.database.lastError()
+            logging.error(error.text())
             raise RuntimeError(f"Failed to connect to db: {error}")
 
     @staticmethod
