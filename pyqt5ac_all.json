@@ -1,7 +1,6 @@
 {
   "ioPaths": [
-    ["forms/MainWindow.ui", "generated/%%FILENAME%%_ui.py"],
-    ["forms/TermsChooserDialog.ui", "generated/%%FILENAME%%_ui.py"],
+    ["forms/*.ui", "generated/%%FILENAME%%_ui.py"],
     ["resources/*.qrc", "generated/%%FILENAME%%_rc.py"]
   ],
   "rcc_options": "",
