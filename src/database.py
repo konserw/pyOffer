@@ -13,7 +13,7 @@
 #
 import logging
 from datetime import date
-from PyQt5.QtSql import QSqlDatabase, QSqlTableModel, QSqlQuery, QSqlQueryModel
+from PySide2.QtSql import QSqlDatabase, QSqlTableModel, QSqlQuery, QSqlQueryModel
 
 
 class Database:

@@ -11,8 +11,8 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see http://www.gnu.org/licenses/
 import pytest
-from PyQt5.QtCore import Qt, QPoint
-from PyQt5.QtWidgets import QDialog
+from PySide2.QtCore import Qt, QPoint
+from PySide2.QtWidgets import QDialog
 from hamcrest import assert_that, is_, not_none
 
 from src.customer import Customer, CustomerSearchModel, CustomerFactory, CustomerSearchWidget
