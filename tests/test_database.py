@@ -10,8 +10,6 @@
 #   GNU General Public License for more details.
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see http://www.gnu.org/licenses/
-from sys import platform
-
 import pytest
 from PySide2.QtCore import Qt, QPoint
 from PySide2.QtWidgets import QDialog
@@ -24,10 +22,6 @@ try:
     db = Database()
 except:
     pytest.skip("Couldn't connect to database, skipping db tests", allow_module_level=True)
-
-
-def is_linux():
-    return platform == "linux"
 
 
 class TestCustomer:
@@ -131,7 +125,6 @@ class TestCustomerSearchModel:
         self._test_search_both(pattern)
 
 
-@pytest.mark.skipif(is_linux())
 class TestCustomerSearchWidget:
     def test_initial_state(self, qtbot):
         model = CustomerSearchModel()
@@ -178,7 +171,6 @@ class TestCustomerSearchWidget:
         assert_that(model.record(0).value("customer_id"), is_(2))
 
 
-@pytest.mark.skipif(is_linux())
 class TestCustomerSelectionDialog:
     def test_initial_state(self, qtbot):
         dialog = CustomerFactory().get_customer_selection()

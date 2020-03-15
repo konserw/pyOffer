@@ -34,8 +34,10 @@ jobs:
         python-version: 3.8
     - name: Install dependencies
       run: |
+        sudo apt install -y xvfb libxkbcommon-x11-0
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install coveralls coverage
     - name: Prepare for test
       run: |
         docker run --rm -d --name postgres -e POSTGRES_PASSWORD=docker -e POSTGRES_DB=koferta_test -p 5432:5432 -v $GITHUB_WORKSPACE/db-setup:/docker-entrypoint-initdb.d postgres
@@ -44,7 +46,16 @@ jobs:
         QT_DEBUG_PLUGINS: 1
       run: |
         ulimit -c unlimited
-        sudo catchsegv `which pytest`
+        sudo catchsegv xvfb-run `which coverage` run -m pytest
+    - name: Publish coverage report
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+      run: |
+        if [[ -z "${COVERALLS_REPO_TOKEN}" ]]; then
+          echo "skipping publication of coverage report due to empty token"
+        else
+          coveralls
+        fi
     - name: Cleanup
       if: always()
       run: |
