@@ -32,7 +32,7 @@ jobs:
         python-version: 3.8
     - name: Install dependencies
       run: |
-        sudo apt install -y xvfb herbstluftwm
+        sudo apt install -y xvfb herbstluftwm x11-utils libxkbcommon-x11-0
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install coveralls coverage
@@ -45,7 +45,11 @@ jobs:
         herbstluftwm &
         sleep 1
     - name: Test with pytest and test db
-      run: coverage run -m pytest
+      env:
+        QT_DEBUG_PLUGINS: 1
+      run: |
+        ulimit -c unlimited
+        sudo catchsegv `which coverage` run -m pytest
     - name: Publish coverage report
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
@@ -56,6 +60,14 @@ jobs:
           coveralls
         fi
     - name: Cleanup
+      if: always()
       run: |
         echo "stopping test database container"
         docker stop postgres
+        sudo chmod -R +rwx /var/crash
+    - name: Upload artifacts
+      if: always()
+      uses: actions/upload-artifact@master
+      with:
+        name: crashes
+        path: /var/crash
