@@ -176,37 +176,34 @@ class MerchandiseListModel(QAbstractTableModel):
         self.list.clear()
         self.endRemoveRows()
 
-    def change_item_count(self, merchandise_id, count):
+    def change_item_count(self, item):
         try:
-            idx = self.list.index(Merchandise(merchandise_id))
+            idx = self.list.index(item)
         except ValueError:  # item not on the list
-            item = Merchandise.from_sql_record(self.db.get_merchandise_record(merchandise_id))
-            item.count = count
             self.add_item(item)
         else:
-            self.list[idx].count += count
+            self.list[idx].count += item.count
 
     def removeRows(self, row: int, count: int, parent: QModelIndex = ...) -> bool:
         end = row + count - 1
         self.beginRemoveRows(QModelIndex(), row, end)
-        for i in range(row, end):
+        for i in range(row, end + 1):
             self.list.pop(i)
         self.endRemoveRows()
         return True
 
-    def moveRows(self, sourceParent: QModelIndex, sourceRow: int, count: int, destinationParent: QModelIndex,
-                 destinationChild: int) -> bool:
-        if destinationChild in range(sourceRow, sourceRow + count):  # +1 ?
-            return False
-
+    def moveRows(self, sourceParent: QModelIndex, sourceRow: int, count: int, destinationParent: QModelIndex, destinationChild: int) -> bool:
         last_row = sourceRow + count - 1
         offset = destinationChild - sourceRow
-        #        if destinationChild == len(self.list):
-        #            offset -= 1
+        if destinationChild == len(self.list):
+            offset -= 1
+
+        if destinationChild in range(sourceRow, sourceRow + count + 1):
+            return False
+
         self.beginMoveRows(sourceParent, sourceRow, last_row, destinationParent, destinationChild)
         for i in range(count):
             self.list.insert(sourceRow + offset + i, self.list.pop(sourceRow + i))
-        # TODO: check this
         self.endMoveRows()
         return True
 
@@ -317,7 +314,7 @@ class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):
         if index.isValid() and col == 0 and role in (Qt.DisplayRole, Qt.EditRole):
             item_id = self.get_item_id(row)
             if item_id in self.selected:
-                return self.selected[item_id]
+                return self.selected[item_id].count
             return 0
         if index.isValid() and role == Qt.DisplayRole:
             return self.get_column_value(index, col)
@@ -338,7 +335,12 @@ class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):
     def setData(self, index: QModelIndex, value: typing.Any, role: int = ...) -> bool:
         if role == Qt.EditRole and index.column() == 0:
             item_id = self.get_item_id(index.row())
-            self.selected[item_id] = value
+            if item_id in self.selected.keys():
+                self.selected[item_id].count = value
+            else:
+                item = Merchandise.from_sql_record(self.sourceModel().record(index.row()))
+                item.count = value
+                self.selected[item.id] = item
             return True
         return False
 
@@ -412,7 +414,7 @@ class MerchandiseSelectionDialog(QtWidgets.QDialog):
 
 
 def create_merchandise_selection_dialog(parent):
-    sql_model = Database.get_merchandise_table()
+    sql_model = Database.get_merchandise_view_model()
     selection_model = MerchandiseSelectionModel(parent)
     selection_model.setSourceModel(sql_model)
     return MerchandiseSelectionDialog(selection_model, parent)

@@ -1,8 +1,8 @@
 import pytest
-from PySide2.QtCore import Qt
+from PySide2.QtCore import Qt, QModelIndex, QAbstractItemModel
 from hamcrest import assert_that, is_, greater_than
 
-from src.merchandise import Merchandise, MerchandiseListModel
+from src.merchandise import Merchandise, MerchandiseListModel, MerchandiseSelectionModel
 
 
 def _create_merch(id=1, list_price=9.99, count=1, discount=10):
@@ -103,13 +103,8 @@ class TestMerchandise:
 
 @pytest.fixture
 def sample_model():
-    m = Merchandise(1)
-    m.code = "CODE"
-    m.description = "DESCR"
-    m.list_price = 9.99
-    m.count = 1
     model = MerchandiseListModel()
-    model.add_item(m)
+    model.add_item(_create_merch(discount=0))
     return model
 
 
@@ -228,6 +223,94 @@ class TestMerchandiseListModel:
         assert_that(len(sample_model.list), is_(1))
         assert_that(sample_model.list[0].count, is_(1))
 
-        sample_model.change_item_count(1, 5)
+        sample_model.change_item_count(_create_merch(1, count=5))
         assert_that(len(sample_model.list), is_(1))
         assert_that(sample_model.list[0].count, is_(6))
+
+    def test_change_item_count_different(self, sample_model):
+        assert_that(len(sample_model.list), is_(1))
+        assert_that(sample_model.list[0].count, is_(1))
+
+        sample_model.change_item_count(_create_merch(2, count=5))
+        assert_that(len(sample_model.list), is_(2))
+        assert_that(sample_model.list[0].count, is_(1))
+        assert_that(sample_model.list[1].id, is_(2))
+        assert_that(sample_model.list[1].count, is_(5))
+
+    def test_remove_rows(self, sample_model):
+        assert_that(len(sample_model.list), is_(1))
+        assert_that(sample_model.rowCount(), is_(2))
+        sample_model.removeRows(0, 1)
+        assert_that(len(sample_model.list), is_(0))
+        assert_that(sample_model.rowCount(), is_(1))
+
+    def test_move_rows_0(self, sample_model):
+        sample_model.add_item(_create_merch(2))
+        assert_that(sample_model.list[0].id, is_(1))
+        assert_that(sample_model.list[1].id, is_(2))
+
+        moved = sample_model.moveRows(QModelIndex(), 0, 1, QModelIndex(), 0)
+
+        assert_that(moved, is_(False))
+        assert_that(sample_model.list[0].id, is_(1))
+        assert_that(sample_model.list[1].id, is_(2))
+
+    def test_move_rows_1(self, sample_model):
+        sample_model.add_item(_create_merch(2))
+        assert_that(sample_model.list[0].id, is_(1))
+        assert_that(sample_model.list[1].id, is_(2))
+
+        moved = sample_model.moveRows(QModelIndex(), 0, 1, QModelIndex(), 1)
+
+        assert_that(moved, is_(False))
+        assert_that(sample_model.list[0].id, is_(1))
+        assert_that(sample_model.list[1].id, is_(2))
+
+    def test_move_rows_2(self, sample_model):
+        sample_model.add_item(_create_merch(2))
+        assert_that(sample_model.list[0].id, is_(1))
+        assert_that(sample_model.list[1].id, is_(2))
+
+        moved = sample_model.moveRows(QModelIndex(), 0, 1, QModelIndex(), 2)
+
+        assert_that(moved, is_(True))
+        assert_that(sample_model.list[0].id, is_(2))
+        assert_that(sample_model.list[1].id, is_(1))
+
+# ...
+
+
+class MockSourceModel(QAbstractItemModel):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.list = [
+            _create_merch(1, count=0, discount=0),
+            _create_merch(2, count=0, discount=0)
+        ]
+
+    def data(self, index: QModelIndex, role: int):
+        return self.list[index.row()][index.column()-1]
+
+    def rowCount(self, parent: QModelIndex = ...) -> int:
+        return len(self.list)
+
+    def columnCount(self, parent: QModelIndex = ...) -> int:
+        return 8
+
+
+@pytest.fixture
+def selection_model():
+    source = MockSourceModel()
+    selection = MerchandiseSelectionModel()
+    selection.setSourceModel(source)
+    return selection
+
+
+@pytest.mark.xfail
+class TestMerchandiseSelectionModel:
+    def test_data(self, selection_model):
+        assert_that(selection_model.data(selection_model.index(0, 0, QModelIndex()), Qt.DisplayRole), is_(0))
+        assert_that(selection_model.data(selection_model.index(0, 1, QModelIndex()), Qt.DisplayRole), is_("CODE"))
+        assert_that(selection_model.data(selection_model.index(0, 2, QModelIndex()), Qt.DisplayRole), is_("DESCR"))
+        assert_that(selection_model.data(selection_model.index(0, 3, QModelIndex()), Qt.DisplayRole), is_(9.99))
+        assert_that(selection_model.data(selection_model.index(0, 4, QModelIndex()), Qt.DisplayRole), is_("pc."))

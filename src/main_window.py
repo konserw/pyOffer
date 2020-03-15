@@ -55,5 +55,5 @@ class MainWindow(QMainWindow):
     def select_merchandise(self):
         dialog = create_merchandise_selection_dialog(self)
         dialog.exec()
-        for item_id, count in dialog.selected.items():
-            self.merchandise_list_model.change_item_count(item_id, count)
+        for item in dialog.selected.values():
+            self.merchandise_list_model.change_item_count(item)

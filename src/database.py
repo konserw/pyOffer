@@ -57,7 +57,7 @@ class Database:
         return query.record()
 
     @staticmethod
-    def get_merchandise_table(for_date=date.today()):
+    def get_merchandise_view_model(for_date=date.today()):
         return MerchandiseViewModel(for_date)
 
 
