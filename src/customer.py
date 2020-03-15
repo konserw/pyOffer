@@ -10,10 +10,10 @@
 #  GNU General Public License for more details.
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QWidget, QDialog, QHeaderView
-from PyQt5.QtSql import QSqlTableModel
-from PyQt5.QtCore import QModelIndex, Qt, pyqtSlot
+from PySide2 import QtWidgets
+from PySide2.QtWidgets import QWidget, QDialog, QHeaderView
+from PySide2.QtSql import QSqlTableModel
+from PySide2.QtCore import QModelIndex, Qt, Slot
 
 
 class CustomerFactory:
@@ -98,7 +98,7 @@ class CustomerSearchModel(QSqlTableModel):
             return self.headers[section]
         return super().headerData(section, orientation, role)
 
-    @pyqtSlot("QString")
+    @Slot("QString")
     def search(self, pattern):
         super().setFilter("first_name ilike '%{0}%' or full_name ilike '%{0}%' or last_name ilike '%{0}%'".format(pattern))
 
@@ -119,7 +119,7 @@ class CustomerSearchWidget(QWidget):
         self.table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.verticalLayout.addWidget(self.table_widget)
 
-    @pyqtSlot("QModelIndex")
+    @Slot("QModelIndex")
     def selection_changed(self, index):
         self.chosen_item = Customer.from_record(self.model.record(index.row())) if index.isValid() else None
 

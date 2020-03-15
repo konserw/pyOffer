@@ -1,8 +1,8 @@
 import typing
 
-from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtCore import QObject, QAbstractTableModel, QModelIndex, Qt, QVariant, pyqtSlot
-from PyQt5.QtWidgets import QWidget, QTableView, QItemDelegate, QDoubleSpinBox, QStyleOptionViewItem
+from PySide2 import QtGui, QtCore, QtWidgets
+from PySide2.QtCore import QObject, QAbstractTableModel, QModelIndex, Qt, Slot
+from PySide2.QtWidgets import QWidget, QTableView, QItemDelegate, QDoubleSpinBox, QStyleOptionViewItem
 
 from src.database import Database
 
@@ -104,7 +104,6 @@ class MerchandiseListModel(QAbstractTableModel):
                 return str(section + 1)
         elif orientation == Qt.Horizontal and role == Qt.DisplayRole and section < len(self.headers):
             return self.headers[section]
-        return QVariant()
 
     def setData(self, index: QModelIndex, value: typing.Any, role: int = ...) -> bool:
         row = index.row()
@@ -117,7 +116,7 @@ class MerchandiseListModel(QAbstractTableModel):
 
     def data(self, index: QModelIndex, role: int = ...) -> typing.Any:
         if not index.isValid():
-            return QVariant()
+            return None
 
         row = index.row()
         col = index.column()
@@ -138,8 +137,6 @@ class MerchandiseListModel(QAbstractTableModel):
                     return str(self.calculate_grand_total())
             elif row < len(self.list):
                 return self.list[row][col]
-
-        return QVariant()
 
     def calculate_grand_total(self):
         sum = 0
@@ -323,13 +320,12 @@ class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):
             return 0
         if index.isValid() and role == Qt.DisplayRole:
             return self.get_column_value(index, col)
-        return QVariant()
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int = ...) -> typing.Any:
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             return self.headers[section]
 
-    @pyqtSlot("QString")
+    @Slot("QString")
     def search(self, ex):
         self.sourceModel().update(ex)
 

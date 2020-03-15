@@ -13,10 +13,10 @@
 import typing
 from enum import Enum, unique
 
-from PyQt5.QtCore import QAbstractTableModel, QModelIndex, Qt, pyqtSlot, QVariant
-from PyQt5.QtWidgets import QDialog
+from PySide2.QtCore import QAbstractTableModel, QModelIndex, Qt, Slot
+from PySide2.QtWidgets import QDialog
 
-from generated.TermsChooserDialog_ui import Ui_TermsChooserDialog
+from forms.ui_terms_chooser_dialog import Ui_TermsChooserDialog
 
 
 @unique
@@ -75,7 +75,6 @@ class TermModel(QAbstractTableModel):
                 return t.short_desc
             elif column == 2:
                 return t.long_desc
-        return QVariant()
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int = ...) -> typing.Any:
         if role == Qt.DisplayRole:
@@ -127,7 +126,7 @@ class TermsChooserDialog(QDialog):
         self.ui.listView.setModelColumn(1)
         self.ui.listView.clicked.connect(self.selection_changed)
 
-    @pyqtSlot("QModelIndex")
+    @Slot("QModelIndex")
     def selection_changed(self, index):
         self.chosen_item = index.internalPointer()
         self.ui.plainTextEdit.setPlainText(self.chosen_item.long_desc)

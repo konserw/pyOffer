@@ -1,5 +1,5 @@
 from hamcrest import assert_that, is_
-from PyQt5.QtCore import Qt, QModelIndex
+from PySide2.QtCore import Qt, QModelIndex
 
 from src.terms import TermItem, TermType, TermModel
 
