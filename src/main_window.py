@@ -14,7 +14,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
 
         self.db = Database()
-        self.merchandise_list_model = MerchandiseListModel(self.db, self)
+        self.merchandise_list_model = MerchandiseListModel(self)
         self.ui.tableView.setModel(self.merchandise_list_model)
         self.term_chooser_factory = TermChooserDialogFactory(self.db, self)
         self.customer_factory = CustomerFactory(self)

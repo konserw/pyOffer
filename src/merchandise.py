@@ -77,9 +77,8 @@ class Merchandise(QObject):
 
 
 class MerchandiseListModel(QAbstractTableModel):
-    def __init__(self, db, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self.db = db
         self.list = []
         self.headers = (
             self.tr("Code"),
@@ -102,6 +101,7 @@ class MerchandiseListModel(QAbstractTableModel):
         if orientation == Qt.Vertical and role == Qt.DisplayRole:
             if section < len(self.list):
                 return str(section + 1)
+            return ""
         elif orientation == Qt.Horizontal and role == Qt.DisplayRole and section < len(self.headers):
             return self.headers[section]
 
@@ -134,11 +134,12 @@ class MerchandiseListModel(QAbstractTableModel):
                 if col == 6:
                     return self.tr("Total:")
                 elif col == 7:
-                    return str(self.calculate_grand_total())
+                    return str(self.grand_total)
             elif row < len(self.list):
                 return self.list[row][col]
 
-    def calculate_grand_total(self):
+    @property
+    def grand_total(self):
         sum = 0
         for item in self.list:
             sum += item.total
@@ -260,12 +261,12 @@ class MerchandiseListView(QTableView):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.drag_start_index = None
-        super().setItemDelegate(MerchandiseListDelegate(self))
-        super().setSortingEnabled(True)
-        super().setAcceptDrops(True)
-        super().setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
-        super().setDropIndicatorShown(True)
-        super().setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.setItemDelegate(MerchandiseListDelegate(self))
+        self.setSortingEnabled(True)
+        self.setAcceptDrops(True)
+        self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
+        self.setDropIndicatorShown(True)
+        self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
 
         self.header = super().horizontalHeader()
         self.header.setSortIndicatorShown(False)
