@@ -1,0 +1,61 @@
+name: linux
+on: [push]
+jobs:
+# lint job
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install flake8
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=forms,resources
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=forms,resources
+# Test job
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Prepare for test
+      run: |
+        docker run --rm -d --name postgres -e POSTGRES_PASSWORD=docker -e POSTGRES_DB=koferta_test -p 5432:5432 -v $GITHUB_WORKSPACE/db-setup:/docker-entrypoint-initdb.d postgres
+    - name: Test with pytest and test db
+      env:
+        QT_DEBUG_PLUGINS: 1
+      run: |
+        ulimit -c unlimited
+        sudo catchsegv `which pytest`
+    - name: Cleanup
+      if: always()
+      run: |
+        echo "stopping test database container"
+        docker stop postgres
+        if [[ -d "$DIRECTORY" ]]; then
+          sudo chmod -R +rwx /var/crash
+        fi
+    - name: Upload artifacts
+      if: always()
+      uses: actions/upload-artifact@master
+      with:
+        name: crashes
+        path: /var/crash

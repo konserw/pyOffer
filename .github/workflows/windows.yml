@@ -1,8 +1,9 @@
-name: push
+name: windows
 on: [push]
 jobs:
+# lint job
   lint:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -21,8 +22,9 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=forms,resources
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=forms,resources
+# Test job
   test:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -32,24 +34,17 @@ jobs:
         python-version: 3.8
     - name: Install dependencies
       run: |
-        sudo apt install -y xvfb herbstluftwm x11-utils libxkbcommon-x11-0
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install coveralls coverage
     - name: Prepare for test
-      env:
-        DISPLAY: ":99.0"
       run: |
-        Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-        docker run --rm -d --name postgres -e POSTGRES_PASSWORD=docker -e POSTGRES_DB=koferta_test -p 5432:5432 -v $GITHUB_WORKSPACE/db-setup:/docker-entrypoint-initdb.d postgres
-        herbstluftwm &
-        sleep 1
+        docker run --experimental --platform linux --rm -d --name postgres -e POSTGRES_PASSWORD=docker -e POSTGRES_DB=koferta_test -p 5432:5432 -v $GITHUB_WORKSPACE/db-setup:/docker-entrypoint-initdb.d postgres
     - name: Test with pytest and test db
       env:
         QT_DEBUG_PLUGINS: 1
       run: |
-        ulimit -c unlimited
-        sudo catchsegv `which coverage` run -m pytest
+        coverage run -m pytest
     - name: Publish coverage report
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
@@ -64,10 +59,3 @@ jobs:
       run: |
         echo "stopping test database container"
         docker stop postgres
-        sudo chmod -R +rwx /var/crash
-    - name: Upload artifacts
-      if: always()
-      uses: actions/upload-artifact@master
-      with:
-        name: crashes
-        path: /var/crash
