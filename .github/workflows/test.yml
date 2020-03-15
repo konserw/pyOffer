@@ -29,7 +29,6 @@ jobs:
     - name: Prepare for test
       run: |
         docker run --rm -d --name postgres -e POSTGRES_PASSWORD=docker -e POSTGRES_DB=koferta_test -p 5432:5432 -v $GITHUB_WORKSPACE/db-setup:/docker-entrypoint-initdb.d postgres
-        pyqt5ac -c pyqt5ac.json
     - name: Test with pytest and test db
       run: xvfb-run --auto-servernum coverage run -m pytest
     - name: Publish coverage report

@@ -16,7 +16,7 @@ from enum import Enum, unique
 from PySide2.QtCore import QAbstractTableModel, QModelIndex, Qt, Slot
 from PySide2.QtWidgets import QDialog
 
-from generated.ui_terms_chooser_dialog import Ui_TermsChooserDialog
+from forms.ui_terms_chooser_dialog import Ui_TermsChooserDialog
 
 
 @unique

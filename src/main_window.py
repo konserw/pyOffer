@@ -1,6 +1,6 @@
 from PySide2.QtWidgets import QMainWindow, QDialog
 
-from generated.ui_mainwindow import Ui_MainWindow
+from forms.ui_mainwindow import Ui_MainWindow
 from src.customer import CustomerFactory
 from src.database import Database
 from src.merchandise import MerchandiseListModel, create_merchandise_selection_dialog
