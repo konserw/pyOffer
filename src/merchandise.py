@@ -220,7 +220,9 @@ class MerchandiseListModel(QAbstractTableModel):
         self.endInsertRows()
 
     def set_discount(self, ex, value):
-        map(lambda item: item.set_discount(value), filter(lambda item: ex in item.code, self.list))
+        for item in filter(lambda item: ex in item.code, self.list):
+            item.set_discount(value)
+        # map(lambda item: item.set_discount(value), filter(lambda item: ex in item.code, self.list))
 
     def print(self):
         raise NotImplementedError()
@@ -292,8 +294,8 @@ class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):
             self.tr("Count"),
             self.tr("Code"),
             self.tr("Description"),
+            self.tr("Unit"),
             self.tr("List price"),
-            self.tr("unit"),
         )
 
     def get_item_id(self, row):
