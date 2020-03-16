@@ -4,7 +4,7 @@ from PySide2 import QtGui, QtCore, QtWidgets
 from PySide2.QtCore import QObject, QAbstractTableModel, QModelIndex, Qt, Slot
 from PySide2.QtWidgets import QWidget, QTableView, QItemDelegate, QDoubleSpinBox, QStyleOptionViewItem
 
-from src.database import Database
+from src.database import get_merchandise_view_model
 
 
 class Merchandise(QObject):
@@ -416,7 +416,7 @@ class MerchandiseSelectionDialog(QtWidgets.QDialog):
 
 
 def create_merchandise_selection_dialog(parent):
-    sql_model = Database.get_merchandise_view_model()
+    sql_model = get_merchandise_view_model()
     selection_model = MerchandiseSelectionModel(parent)
     selection_model.setSourceModel(sql_model)
     return MerchandiseSelectionDialog(selection_model, parent)

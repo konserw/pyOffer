@@ -2,7 +2,6 @@ from PySide2.QtWidgets import QMainWindow, QDialog
 
 from forms.ui_mainwindow import Ui_MainWindow
 from src.customer import CustomerFactory
-from src.database import Database
 from src.merchandise import MerchandiseListModel, create_merchandise_selection_dialog
 from src.terms import TermChooserDialogFactory, TermType
 
@@ -13,10 +12,9 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        self.db = Database()
         self.merchandise_list_model = MerchandiseListModel(self)
         self.ui.tableView.setModel(self.merchandise_list_model)
-        self.term_chooser_factory = TermChooserDialogFactory(self.db, self)
+        self.term_chooser_factory = TermChooserDialogFactory(self)
         self.customer_factory = CustomerFactory(self)
 
         self.ui.push_button_add_merchandise.clicked.connect(self.select_merchandise)

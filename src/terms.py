@@ -17,6 +17,7 @@ from PySide2.QtCore import QAbstractTableModel, QModelIndex, Qt, Slot
 from PySide2.QtWidgets import QDialog
 
 from forms.ui_terms_chooser_dialog import Ui_TermsChooserDialog
+from src.database import get_terms_table
 
 
 @unique
@@ -93,12 +94,11 @@ class TermModel(QAbstractTableModel):
 
 
 class TermChooserDialogFactory:
-    def __init__(self, db, parent=None):
+    def __init__(self, parent=None):
         self.parent = parent
-        self.db = db
 
     def get_terms_chooser_dialog(self, term_type):
-        table = self.db.get_terms_table(term_type)
+        table = get_terms_table(term_type)
         model = TermModel(self.parent)
         for i in range(table.rowCount()):
             model.add(TermItem.from_record(term_type, table.record(i)))
