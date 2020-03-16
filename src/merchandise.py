@@ -323,7 +323,7 @@ class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             return self.headers[section]
 
-    @Slot("QString")
+    @Slot(str)
     def search(self, ex):
         self.sourceModel().update(ex)
 

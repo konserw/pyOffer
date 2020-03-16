@@ -98,7 +98,7 @@ class CustomerSearchModel(QSqlTableModel):
             return self.headers[section]
         return super().headerData(section, orientation, role)
 
-    @Slot("QString")
+    @Slot(str)
     def search(self, pattern):
         super().setFilter("first_name ilike '%{0}%' or full_name ilike '%{0}%' or last_name ilike '%{0}%'".format(pattern))
 
@@ -119,7 +119,7 @@ class CustomerSearchWidget(QWidget):
         self.table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.verticalLayout.addWidget(self.table_widget)
 
-    @Slot("QModelIndex")
+    @Slot(QModelIndex)
     def selection_changed(self, index):
         self.chosen_item = Customer.from_record(self.model.record(index.row())) if index.isValid() else None
 

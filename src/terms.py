@@ -126,7 +126,7 @@ class TermsChooserDialog(QDialog):
         self.ui.listView.setModelColumn(1)
         self.ui.listView.clicked.connect(self.selection_changed)
 
-    @Slot("QModelIndex")
+    @Slot(QModelIndex)
     def selection_changed(self, index):
         self.chosen_item = index.internalPointer()
         self.ui.plainTextEdit.setPlainText(self.chosen_item.long_desc)
