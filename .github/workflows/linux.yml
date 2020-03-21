@@ -38,13 +38,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install coveralls coverage
-    - name: Prepare for test
-      run: |
-        docker run --rm -d --name postgres -e POSTGRES_PASSWORD=docker -e POSTGRES_DB=koferta_test -p 5432:5432 -v $GITHUB_WORKSPACE/db-setup:/docker-entrypoint-initdb.d postgres
     - name: Test with pytest and test db
       env:
         QT_DEBUG_PLUGINS: 1
       run: |
+        docker run --rm -d --name postgres -e POSTGRES_PASSWORD=docker -e POSTGRES_DB=koferta_test -p 5432:5432 -v $GITHUB_WORKSPACE/db-setup:/docker-entrypoint-initdb.d postgres
+        sleep 5
         ulimit -c unlimited
         sudo catchsegv xvfb-run `which coverage` run -m pytest
     - name: Publish coverage report
