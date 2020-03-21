@@ -37,15 +37,25 @@ jobs:
         sudo apt install -y xvfb libxkbcommon-x11-0
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install coveralls coverage
+        pip install coveralls coverage pytest-html
     - name: Test with pytest and test db
-      env:
-        QT_DEBUG_PLUGINS: 1
       run: |
         docker run --rm -d --name postgres -e POSTGRES_PASSWORD=docker -e POSTGRES_DB=koferta_test -p 5432:5432 -v $GITHUB_WORKSPACE/db-setup:/docker-entrypoint-initdb.d postgres
         sleep 5
         ulimit -c unlimited
-        sudo catchsegv xvfb-run `which coverage` run -m pytest
+        sudo catchsegv xvfb-run `which coverage` run -m pytest --html=test_report.html --self-contained-html
+    - name: Upload crash dumps
+      if: failure()
+      uses: actions/upload-artifact@master
+      with:
+        name: crashes
+        path: /var/crash
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@master
+      with:
+        name: test_report.html
+        path: test_report.html
     - name: Publish coverage report
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
@@ -63,9 +73,3 @@ jobs:
         if [[ -d "$DIRECTORY" ]]; then
           sudo chmod -R +rwx /var/crash
         fi
-    - name: Upload artifacts
-      if: always()
-      uses: actions/upload-artifact@master
-      with:
-        name: crashes
-        path: /var/crash
