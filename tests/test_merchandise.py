@@ -147,15 +147,15 @@ class TestMerchandiseListModel:
         m = MerchandiseListModel()
         assert_that(m.columnCount(), is_(8))
 
-    def test_set_discount(self, sample_model):
-        assert_that(sample_model.list[0].discount, is_(0))
-        sample_model.setData(sample_model.index(0, 3), 10, Qt.EditRole)
-        assert_that(sample_model.list[0].discount, is_(10))
-
-    def test_set_count(self, sample_model):
-        assert_that(sample_model.list[0].count, is_(1))
-        sample_model.setData(sample_model.index(0, 5), 10, Qt.EditRole)
-        assert_that(sample_model.list[0].count, is_(10))
+    @pytest.mark.parametrize("col, initial_value", [
+        pytest.param(3, 0),
+        pytest.param(5, 1),
+    ])
+    def test_set_data(self, sample_model, col, initial_value):
+        value = 50
+        assert_that(sample_model.list[0][col], is_(initial_value))
+        sample_model.setData(sample_model.index(0, col), value, Qt.EditRole)
+        assert_that(sample_model.list[0][col], is_(value))
 
     def test_data_display_role(self, sample_model):
         for key, val in enumerate(("CODE", "DESCR", 9.99, 0, 9.99, 1, "pc.", 9.99)):
