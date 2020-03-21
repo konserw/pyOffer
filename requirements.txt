@@ -1,4 +1,5 @@
 pytest
 pytest-qt
 PyHamcrest
+pyhamcrest-qt
 pyside2

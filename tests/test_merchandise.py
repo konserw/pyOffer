@@ -2,6 +2,7 @@ import pytest
 from PySide2.QtCore import Qt, QModelIndex, QAbstractItemModel
 from PySide2.QtSql import QSqlField, QSqlRecord
 from hamcrest import assert_that, is_, greater_than
+from qtmatchers import has_item_flags
 
 from src.merchandise import Merchandise, MerchandiseListModel, MerchandiseSelectionModel
 
@@ -190,8 +191,8 @@ class TestMerchandiseListModel:
         pytest.param(7, Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled | Qt.ItemIsEnabled | Qt.ItemIsSelectable),
         pytest.param(8, Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled | Qt.ItemIsEnabled | Qt.ItemIsSelectable),
     ])
-    def test_normal_flags(self, sample_model, col, expected):
-        assert_that(sample_model.flags(sample_model.index(0, col)), is_(expected))
+    def test_normal_flags(self, sample_model, col: int, expected: Qt.ItemFlag):
+        assert_that(sample_model.flags(sample_model.index(0, col)), has_item_flags(expected))
 
     @pytest.mark.parametrize("col", [
         pytest.param(0),
@@ -205,7 +206,7 @@ class TestMerchandiseListModel:
         pytest.param(8),
     ])
     def test_last_row_flags(self, sample_model, col):
-        assert_that(sample_model.flags(sample_model.index(1, col)), is_(Qt.ItemIsEnabled | Qt.ItemIsDropEnabled))
+        assert_that(sample_model.flags(sample_model.index(1, col)), has_item_flags(Qt.ItemIsEnabled | Qt.ItemIsDropEnabled))
 
     @pytest.mark.parametrize("col", [
         pytest.param(0),
@@ -220,7 +221,7 @@ class TestMerchandiseListModel:
     ])
     def test_only_row_flags(self, col):
         empty_model = MerchandiseListModel()
-        assert_that(empty_model.flags(empty_model.index(0, col)), is_(Qt.ItemIsEnabled | Qt.ItemIsDropEnabled))
+        assert_that(empty_model.flags(empty_model.index(0, col)), has_item_flags(Qt.ItemIsEnabled | Qt.ItemIsDropEnabled))
 
     def test_clear(self, sample_model):
         assert_that(len(sample_model.list), is_(greater_than(0)))
@@ -408,7 +409,7 @@ class TestMerchandiseSelectionModel:
         pytest.param(4, Qt.ItemIsEnabled),
     ])
     def test_flags(self, selection_model, col, expected):
-        assert_that(selection_model.flags(selection_model.index(0, col)), is_(expected))
+        assert_that(selection_model.flags(selection_model.index(0, col)), has_item_flags(expected))
 
     def test_set_data(self, selection_model):
         assert_that(selection_model.selected, is_({}))
