@@ -8,10 +8,11 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 #
-from hamcrest import assert_that, is_
+import pytest
+from hamcrest import assert_that, is_, none
 from PySide2.QtCore import Qt, QModelIndex
 
-from src.terms import TermItem, TermType, TermModel
+from src.terms import TermItem, TermType, TermModel, TermChooserDialogFactory
 
 SHORT_DESCRIPTION = "short description"
 LONG_DESCRIPTION = "long description"
@@ -76,3 +77,28 @@ class TestTermModel:
         assert_that(model.data(model.index(0, 0), Qt.DisplayRole), is_("0"))
         assert_that(model.data(model.index(0, 1), Qt.DisplayRole), is_(SHORT_DESCRIPTION))
         assert_that(model.data(model.index(0, 2), Qt.DisplayRole), is_(LONG_DESCRIPTION))
+
+
+class TestTermsChhoserDialog:
+    @pytest.mark.parametrize("type", [
+        pytest.param(TermType.billing),
+        pytest.param(TermType.delivery),
+        pytest.param(TermType.delivery_date),
+        pytest.param(TermType.offer)
+    ])
+    def test_initial_state(self, qtbot, type):
+        factory = TermChooserDialogFactory()
+        dialog = factory.get_terms_chooser_dialog(type)
+        qtbot.addWidget(dialog)
+
+        # todo: other translations
+        expected_titles = {
+            TermType.billing: "Choose billing terms",
+            TermType.delivery: "Choose delivery terms",
+            TermType.delivery_date: "Choose delivery date terms",
+            TermType.offer: "Choose offer terms"
+        }
+        assert_that(dialog.windowTitle(), is_(expected_titles[type]))
+        assert_that(dialog.chosen_item, is_(none()))
+        assert_that(dialog.ui.plainTextEdit.toPlainText(), is_(""))
+
