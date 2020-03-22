@@ -9,12 +9,14 @@
 # If not, see <http://www.gnu.org/licenses/>.
 #
 import pytest
-from PySide2.QtCore import Qt, QModelIndex, QAbstractItemModel
+from PySide2 import QtWidgets
+from PySide2.QtCore import Qt, QModelIndex, QAbstractItemModel, QPoint, QSize
 from PySide2.QtSql import QSqlField, QSqlRecord
-from hamcrest import assert_that, is_, greater_than
+from hamcrest import assert_that, is_, greater_than, instance_of
 from qtmatchers import has_item_flags
 
-from src.merchandise import Merchandise, MerchandiseListModel, MerchandiseSelectionModel
+from src.merchandise import Merchandise, MerchandiseListModel, MerchandiseSelectionModel, MerchandiseListDelegate, MerchandiseListView, MerchandiseSelectionDelegate, \
+    MerchandiseSelectionDialog
 
 
 def _create_merch(id=1, list_price=9.99, count=1, discount=10):
@@ -340,13 +342,73 @@ class TestMerchandiseListModel:
             assert_that(sample_model.list[1].discount, is_(0))
 
 
+class TestMerchandiseListDelegate:
+    @pytest.mark.parametrize("col, maximum", [
+        pytest.param(3, 100),
+        pytest.param(5, 999999)
+    ])
+    def test_create_editor(self, qtbot, sample_model, col, maximum):
+        delegate = MerchandiseListDelegate(sample_model)
+        widget = QtWidgets.QWidget()
+        qtbot.addWidget(widget)
+        editor = delegate.createEditor(widget, None, sample_model.index(0, col))
+
+        assert_that(editor, is_(instance_of(QtWidgets.QDoubleSpinBox)))
+        assert_that(editor.singleStep(), is_(1))
+        assert_that(editor.minimum(), is_(0))
+        assert_that(editor.maximum(), is_(maximum))
+
+    @pytest.mark.parametrize("col, base", [
+        pytest.param(3, 0),
+        pytest.param(5, 1)
+    ])
+    def test_update_data(self, qtbot, sample_model, col, base):
+        delegate = MerchandiseListDelegate(sample_model)
+        widget = QtWidgets.QWidget()
+        qtbot.addWidget(widget)
+        index = sample_model.index(0, col)
+        editor = delegate.createEditor(widget, None, index)
+        assert_that(sample_model.data(index, Qt.DisplayRole), is_(base))
+
+        delegate.setEditorData(editor, index)
+        assert_that(editor.value(), is_(base))
+
+        target = 50
+        editor.setValue(target)
+        delegate.setModelData(editor, sample_model, index)
+        assert_that(sample_model.data(index, Qt.DisplayRole), is_(target))
+
+
+@pytest.mark.xfail  # Events are not processed correctly in QTest
+class TestMerchandiseListView:
+    def test_drag_and_drop(self, qtbot, sample_model):
+        sample_model.add_item(_create_merch(2))
+        view = MerchandiseListView()
+        qtbot.addWidget(view)
+        #view.show()
+        view.setModel(sample_model)
+        pos0 = QPoint(view.columnViewportPosition(1), view.rowViewportPosition(0))
+        assert_that(view.indexAt(pos0).data(Qt.UserRole), is_(1))
+        pos1 = QPoint(view.columnViewportPosition(1), view.rowViewportPosition(1))
+        assert_that(view.indexAt(pos1).data(Qt.UserRole), is_(2))
+        pos2 = QPoint(view.columnViewportPosition(1), view.rowViewportPosition(2))
+
+        qtbot.mousePress(view, Qt.LeftButton, pos=pos0)
+        qtbot.mouseMove(view, pos2)
+        qtbot.mouseRelease(view, Qt.LeftButton, delay=15)
+
+        assert_that(view.indexAt(pos0).data(Qt.UserRole), is_(2))
+        assert_that(view.indexAt(pos1).data(Qt.UserRole), is_(1))
+
+
 class MockSourceModel(QAbstractItemModel):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.list = [
+        self.list_all = [
             _create_merch(1, count=0, discount=0),
             _create_merch(2, count=0, discount=0)
         ]
+        self.list = self.list_all
 
     def _value(self, row, col):
         item = self.list[row]
@@ -378,6 +440,16 @@ class MockSourceModel(QAbstractItemModel):
             f.setValue(self._value(row, i))
             rec.append(f)
         return rec
+
+    def update(self, ex):
+        self.beginResetModel()
+        if ex in (0, 1):
+            self.list = [self.list_all[ex]]
+        elif ex is None:
+            self.list = self.list_all
+        else:
+            self.list = []
+        self.endResetModel()
 
 
 @pytest.fixture
@@ -421,7 +493,80 @@ class TestMerchandiseSelectionModel:
     def test_flags(self, selection_model, col, expected):
         assert_that(selection_model.flags(selection_model.index(0, col)), has_item_flags(expected))
 
-    def test_set_data(self, selection_model):
+    @pytest.mark.parametrize("loops", [
+        pytest.param(1),
+        pytest.param(3),
+        pytest.param(5),
+    ])
+    def test_set_data(self, selection_model, loops):
         assert_that(selection_model.selected, is_({}))
-        selection_model.setData(selection_model.index(0, 0), 1, Qt.EditRole)
-        assert_that(selection_model.selected, is_({1: _create_merch(1, count=1)}))
+        for i in range(1, loops+1):
+            selection_model.setData(selection_model.index(0, 0), i, Qt.EditRole)
+            assert_that(selection_model.selected, is_({1: _create_merch(1, count=i)}))
+
+    @pytest.mark.parametrize("ex, expected", [
+        pytest.param(0, 1),
+        pytest.param(1, 1),
+        pytest.param(None, 2),
+        pytest.param(2, 0)
+    ])
+    def test_search(self, selection_model, ex, expected):
+        assert_that(selection_model.rowCount(), is_(2))
+        selection_model.search(ex)
+        assert_that(selection_model.rowCount(), is_(expected))
+
+
+class TestMerchandiseSelectoinDelegate:
+    def test_create_editor(self, qtbot, selection_model):
+        delegate = MerchandiseSelectionDelegate(selection_model)
+        widget = QtWidgets.QWidget()
+        qtbot.addWidget(widget)
+        editor = delegate.createEditor(widget, None, selection_model.index(0, 0))
+
+        assert_that(editor, is_(instance_of(QtWidgets.QDoubleSpinBox)))
+        assert_that(editor.singleStep(), is_(1))
+        assert_that(editor.minimum(), is_(0))
+        assert_that(editor.maximum(), is_(999999))
+
+    def test_update_data(self, qtbot, selection_model):
+        delegate = MerchandiseSelectionDelegate(selection_model)
+        widget = QtWidgets.QWidget()
+        qtbot.addWidget(widget)
+        index = selection_model.index(0, 0)
+        editor = delegate.createEditor(widget, None, index)
+        base = 0
+        assert_that(selection_model.data(index, Qt.DisplayRole), is_(base))
+
+        delegate.setEditorData(editor, index)
+        assert_that(editor.value(), is_(base))
+
+        target = 50
+        editor.setValue(target)
+        delegate.setModelData(editor, selection_model, index)
+        assert_that(selection_model.data(index, Qt.DisplayRole), is_(target))
+
+
+class TestMerchandiseSelectionDialog:
+    def test_initial_state(self, qtbot, selection_model):
+        dialog = MerchandiseSelectionDialog(selection_model)
+        qtbot.addWidget(dialog)
+
+        # todo: other translations
+        assert_that(dialog.windowTitle(), is_("Choose merchandise"))
+        assert_that(dialog.size(), is_(QSize(800, 500)))
+        assert_that(dialog.label.text(), is_("Filter"))
+        assert_that(dialog.push_button_close.text(), is_("Add"))
+        assert_that(dialog.line_edit.text(), is_(""))
+
+    @pytest.mark.parametrize("loops", [
+        pytest.param(1),
+        pytest.param(3),
+        pytest.param(5),
+    ])
+    def test_selected(self, qtbot, selection_model, loops):
+        dialog = MerchandiseSelectionDialog(selection_model)
+        qtbot.addWidget(dialog)
+        assert_that(dialog.selected, is_({}))
+        for i in range(1, loops + 1):
+            selection_model.setData(selection_model.index(0, 0), i, Qt.EditRole)
+            assert_that(dialog.selected, is_({1: _create_merch(1, count=i)}))

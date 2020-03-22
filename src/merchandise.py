@@ -131,6 +131,9 @@ class MerchandiseListModel(QAbstractTableModel):
         row = index.row()
         col = index.column()
 
+        if role == Qt.UserRole:
+            return self.list[row].id
+
         if role == Qt.TextAlignmentRole:
             if col > 1:
                 return Qt.AlignRight
@@ -248,7 +251,7 @@ class MerchandiseListDelegate(QItemDelegate):
             editor.setSingleStep(1)
             editor.setMinimum(0)
             if index.column() == 5:
-                editor.setMaximum(99999)
+                editor.setMaximum(999999)
                 return editor
             elif index.column() == 3:
                 editor.setMaximum(100)
@@ -399,7 +402,7 @@ class MerchandiseSelectionDialog(QtWidgets.QDialog):
         self.horizontal_layout.addItem(
             QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
         self.push_button_close = QtWidgets.QPushButton(self)
-        self.push_button_close.setText(self.tr("Dodaj"))
+        self.push_button_close.setText(self.tr("Add"))
         self.push_button_close.clicked.connect(super().accept)
         self.horizontal_layout.addWidget(self.push_button_close)
         self.vertical_layout.addLayout(self.horizontal_layout)
