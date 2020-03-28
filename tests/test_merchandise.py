@@ -15,8 +15,9 @@ from PySide2.QtSql import QSqlField, QSqlRecord
 from hamcrest import assert_that, is_, greater_than, instance_of
 from qtmatchers import has_item_flags
 
-from src.merchandise import Merchandise, MerchandiseListModel, MerchandiseSelectionModel, MerchandiseListDelegate, MerchandiseListView, MerchandiseSelectionDelegate, \
-    MerchandiseSelectionDialog
+from src.database import get_merchandise_sql_model
+from src.merchandise import Merchandise, MerchandiseListModel, MerchandiseSelectionModel, MerchandiseListDelegate, \
+    MerchandiseListView, MerchandiseSelectionDelegate, MerchandiseSelectionDialog
 
 
 def _create_merch(id=1, list_price=9.99, count=1, discount=10):
@@ -441,16 +442,6 @@ class MockSourceModel(QAbstractItemModel):
             rec.append(f)
         return rec
 
-    def update(self, ex):
-        self.beginResetModel()
-        if ex in (0, 1):
-            self.list = [self.list_all[ex]]
-        elif ex is None:
-            self.list = self.list_all
-        else:
-            self.list = []
-        self.endResetModel()
-
 
 @pytest.fixture
 def selection_model():
@@ -503,17 +494,6 @@ class TestMerchandiseSelectionModel:
         for i in range(1, loops+1):
             selection_model.setData(selection_model.index(0, 0), i, Qt.EditRole)
             assert_that(selection_model.selected, is_({1: _create_merch(1, count=i)}))
-
-    @pytest.mark.parametrize("ex, expected", [
-        pytest.param(0, 1),
-        pytest.param(1, 1),
-        pytest.param(None, 2),
-        pytest.param(2, 0)
-    ])
-    def test_search(self, selection_model, ex, expected):
-        assert_that(selection_model.rowCount(), is_(2))
-        selection_model.search(ex)
-        assert_that(selection_model.rowCount(), is_(expected))
 
 
 class TestMerchandiseSelectoinDelegate:
@@ -570,3 +550,58 @@ class TestMerchandiseSelectionDialog:
         for i in range(1, loops + 1):
             selection_model.setData(selection_model.index(0, 0), i, Qt.EditRole)
             assert_that(dialog.selected, is_({1: _create_merch(1, count=i)}))
+
+
+@pytest.fixture
+def selection_model_with_db():
+    source = get_merchandise_sql_model()
+    selection = MerchandiseSelectionModel()
+    selection.setSourceModel(source)
+    return selection
+
+
+@pytest.mark.usefixtures("db")
+class TestMerchandiseSelectionModelWithDB:
+    def test_header_data(self, selection_model_with_db):
+        assert_that(selection_model_with_db.headerData(0, Qt.Vertical), is_(None))
+        # todo: other translations
+        assert_that(selection_model_with_db.headerData(0, Qt.Horizontal, Qt.DisplayRole), is_("Count"))
+        assert_that(selection_model_with_db.headerData(1, Qt.Horizontal, Qt.DisplayRole), is_("Code"))
+        assert_that(selection_model_with_db.headerData(2, Qt.Horizontal, Qt.DisplayRole), is_("Description"))
+        assert_that(selection_model_with_db.headerData(3, Qt.Horizontal, Qt.DisplayRole), is_("Unit"))
+        assert_that(selection_model_with_db.headerData(4, Qt.Horizontal, Qt.DisplayRole), is_("List price"))
+
+    def test_data_1(self, selection_model_with_db):
+        assert_that(selection_model_with_db.data(selection_model_with_db.index(0, 0, QModelIndex()), Qt.DisplayRole), is_(0))  # count
+        assert_that(selection_model_with_db.data(selection_model_with_db.index(0, 1, QModelIndex()), Qt.DisplayRole), is_("CODE123"))
+        assert_that(selection_model_with_db.data(selection_model_with_db.index(0, 2, QModelIndex()), Qt.DisplayRole), is_("some description"))
+        assert_that(selection_model_with_db.data(selection_model_with_db.index(0, 3, QModelIndex()), Qt.DisplayRole), is_("pc."))
+        assert_that(selection_model_with_db.data(selection_model_with_db.index(0, 4, QModelIndex()), Qt.DisplayRole), is_(19.99))
+
+    def test_data_2(self, selection_model_with_db):
+        assert_that(selection_model_with_db.data(selection_model_with_db.index(1, 0, QModelIndex()), Qt.DisplayRole), is_(0))  # count
+        assert_that(selection_model_with_db.data(selection_model_with_db.index(1, 1, QModelIndex()), Qt.DisplayRole), is_("CODE456"))
+        assert_that(selection_model_with_db.data(selection_model_with_db.index(1, 2, QModelIndex()), Qt.DisplayRole), is_("some other description"))
+        assert_that(selection_model_with_db.data(selection_model_with_db.index(1, 3, QModelIndex()), Qt.DisplayRole), is_("m"))
+        assert_that(selection_model_with_db.data(selection_model_with_db.index(1, 4, QModelIndex()), Qt.DisplayRole), is_(5.49))
+
+    def test_row_count(self, selection_model_with_db):
+        assert_that(selection_model_with_db.rowCount(), is_(2))
+
+    def test_column_count(self, selection_model_with_db):
+        assert_that(selection_model_with_db.columnCount(), is_(5))
+
+    @pytest.mark.parametrize("ex, expected", [
+        pytest.param("some desc", 1),
+        pytest.param("other", 1),
+        pytest.param("123", 1),
+        pytest.param("456", 1),
+        pytest.param("", 2),
+        pytest.param("CODE", 2),
+        pytest.param("escr", 2),
+        pytest.param("Not found", 0)
+    ])
+    def test_search(self, selection_model_with_db, ex, expected):
+        assert_that(selection_model_with_db.rowCount(), is_(2))
+        selection_model_with_db.search(ex)
+        assert_that(selection_model_with_db.rowCount(), is_(expected))

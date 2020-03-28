@@ -53,6 +53,7 @@ def get_merchandise_record(merchandise_id):
     if not query.next():
         logging.error(f"Query failed: {text}")
         logging.error(query.lastError().text())
+        return None
     return query.record()
 
 
