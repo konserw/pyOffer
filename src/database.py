@@ -56,8 +56,8 @@ def get_merchandise_record(merchandise_id):
     return query.record()
 
 
-def get_merchandise_view_model(for_date=date.today()):
-    class MerchandiseViewModel(QSqlQueryModel):
+def get_merchandise_sql_model(for_date=date.today()):
+    class MerchandiseSqlModel(QSqlQueryModel):
         def __init__(self, for_date, parent=None):
             super().__init__(parent)
             self.for_date = for_date
@@ -71,4 +71,4 @@ def get_merchandise_view_model(for_date=date.today()):
                 raise RuntimeError(self.lastError().text())
             self.endResetModel()
 
-    return MerchandiseViewModel(for_date)
+    return MerchandiseSqlModel(for_date)
