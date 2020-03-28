@@ -38,10 +38,10 @@ INSERT INTO public.price(
 -- users
 
 INSERT INTO public.users(
-	name, mail, male, phone, current_offer_number, current_offer_date, char_for_offer_symbol)
-	VALUES ('Mark Salesman', 'mark@salesman.com', TRUE, '555 55 55', 22, '1999-01-01', 'M');
+	name, mail, male, phone, current_offer_number, current_offer_date, char_for_offer_symbol, business_symbol )
+	VALUES ('Mark Salesman', 'mark@salesman.com', TRUE, '555 55 55', 22, '1999-01-01', 'M', 'I');
 
 INSERT INTO public.users(
-	name, mail, male, phone, current_offer_number, current_offer_date, char_for_offer_symbol)
-	VALUES ('Agatha Salesman', 'agatha@salesman.com', FALSE, '555 55 50', 2322, '2020-03-28', 'A');
+	name, mail, male, phone, current_offer_number, current_offer_date, char_for_offer_symbol, business_symbol )
+	VALUES ('Agatha Salesman', 'agatha@salesman.com', FALSE, '555 55 50', 2322, '2020-03-28', 'A', 'X');
 
