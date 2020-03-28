@@ -8,14 +8,32 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 #
-from src.merchandise import MerchandiseList
+from PySide2.QtCore import QObject
+from datetime import date
+
+from src.customer import Customer
+from src.merchandise import MerchandiseListModel
 
 
-class OfferFactory(object):
-    def create_empty_offer(self):
-        return Offer(MerchandiseList())
+class OfferFactory:
+    def create_empty_offer(self, author, parent=None):
+        offer = Offer(parent)
+        offer.merchandise_list = MerchandiseListModel(offer)
+        offer.customer = Customer()
+        offer.date = date.today()
+        offer.author = author
+        return offer
 
 
-class Offer(object):
-    def __init__(self, merchandise_list):
-        self.merchandise_list = merchandise_list
+class Offer(QObject):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.merchandise_list = None
+        self.customer = None
+        self.terms = {}
+        self.date = None
+        self.inquiry_date = None
+        self.inquiry_number = None
+        self.offer_id = None
+        self.offer_symbol = None
+        self.author = None

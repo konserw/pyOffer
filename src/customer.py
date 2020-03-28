@@ -27,12 +27,12 @@ class CustomerFactory:
 class Customer:
     def __init__(self):
         self.id = None
-        self.short_name = None
-        self.full_name = None
-        self.title = None
-        self.first_name = None
-        self.last_name = None
-        self.address = None
+        self.short_name = ""
+        self.full_name = ""
+        self.title = ""
+        self.first_name = ""
+        self.last_name = ""
+        self.address = ""
 
     @property
     def concated_name(self):
