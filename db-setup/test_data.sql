@@ -35,4 +35,13 @@ INSERT INTO public.price(
 	merchandise_id, value, valid_from, valid_to)
 	VALUES (2, 5.49, '2016-01-01', '9999-12-31');
 
+-- users
+
+INSERT INTO public.users(
+	name, mail, male, phone, current_offer_number, current_offer_date, char_for_offer_symbol)
+	VALUES ('Mark Salesman', 'mark@salesman.com', TRUE, '555 55 55', 22, '1999-01-01', 'M');
+
+INSERT INTO public.users(
+	name, mail, male, phone, current_offer_number, current_offer_date, char_for_offer_symbol)
+	VALUES ('Agatha Salesman', 'agatha@salesman.com', FALSE, '555 55 50', 2322, '2020-03-28', 'A');
 
