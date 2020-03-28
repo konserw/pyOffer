@@ -17,7 +17,7 @@ INSERT INTO public.customers(
 
 INSERT INTO public.merchandise(
 	code, description, unit)
-	VALUES ('CODE123', 'some description', 'szt.');
+	VALUES ('CODE123', 'some description', 'pc.');
 
 INSERT INTO public.price(
 	merchandise_id, value, valid_from, valid_to)
