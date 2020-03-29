@@ -8,11 +8,13 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 #
+from PySide2.QtCore import Slot
 from PySide2.QtWidgets import QMainWindow, QDialog
 
 from forms.ui_mainwindow import Ui_MainWindow
 from src.customer import CustomerFactory
-from src.merchandise import MerchandiseListModel, create_merchandise_selection_dialog
+from src.merchandise import create_merchandise_selection_dialog
+from src.offer import Offer
 from src.terms import TermsChooserDialog, TermType
 
 
@@ -21,9 +23,14 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.set_offer_ui_enabled(False)
 
-        self.merchandise_list_model = MerchandiseListModel(self)
-        self.ui.tableView.setModel(self.merchandise_list_model)
+        self.offer = None
+        self.user = user
+
+        self.ui.action_new.triggered.connect(self.new_offer)
+        self.ui.action_new_number.triggered.connect(self.new_offer_symbol)
+
         self.customer_factory = CustomerFactory(self)
 
         self.ui.push_button_add_merchandise.clicked.connect(self.select_merchandise)
@@ -33,34 +40,75 @@ class MainWindow(QMainWindow):
         self.ui.command_link_button_offer.clicked.connect(self.select_offer_terms)
         self.ui.command_link_button_billing.clicked.connect(self.select_billing_terms)
         self.ui.command_link_button_delivery_date.clicked.connect(self.select_delivery_date_terms)
+        self.ui.plain_text_edit_remarks.textChanged.connect(self.update_remarks)
 
+    def set_offer_ui_enabled(self, enable):
+        # menus
+        self.ui.menu_export.setEnabled(enable)
+        self.ui.action_save.setEnabled(enable)
+        self.ui.action_new_number.setEnabled(enable)
+        # tabs
+        self.ui.tab.setEnabled(enable)
+        self.ui.tab_2.setEnabled(enable)
+
+    @Slot()
+    def new_offer(self):
+        self.offer = Offer.create_empty(self.user, self)
+        self.set_offer_ui_enabled(True)
+        self.setWindowTitle(f"pyOffer - {self.offer.symbol}")
+        self.ui.tableView.setModel(self.offer.merchandise_list)
+
+    @Slot()
+    def new_offer_symbol(self):
+        self.offer.new_symbol()
+        self.setWindowTitle(f"pyOffer - {self.offer.symbol}")
+
+    @Slot()
     def select_customer(self):
         dialog = self.customer_factory.get_customer_selection()
         if dialog.exec() == QDialog.Accepted and dialog.chosen_item:
             self.ui.plain_text_edit_customer.setPlainText(dialog.chosen_item.description)
+            self.offer.customer = dialog.chosen_item
 
+    @Slot()
+    def update_remarks(self):
+        self.offer.remarks = self.ui.plain_text_edit_remarks.toPlainText()
+
+    @Slot()
     def select_delivery_terms(self):
-        dialog = TermsChooserDialog.make(TermType.delivery, self)
+        term_type = TermType.delivery
+        dialog = TermsChooserDialog.make(term_type, self)
         if dialog.exec() == QDialog.Accepted and dialog.chosen_item:
             self.ui.plain_text_edit_delivery.setPlainText(dialog.chosen_item.long_desc)
+            self.offer.terms[term_type] = dialog.chosen_item
 
+    @Slot()
     def select_offer_terms(self):
-        dialog = TermsChooserDialog.make(TermType.offer, self)
+        term_type = TermType.offer
+        dialog = TermsChooserDialog.make(term_type, self)
         if dialog.exec() == QDialog.Accepted and dialog.chosen_item:
             self.ui.plain_text_edit_offer.setPlainText(dialog.chosen_item.long_desc)
+            self.offer.terms[term_type] = dialog.chosen_item
 
+    @Slot()
     def select_billing_terms(self):
-        dialog = TermsChooserDialog.make(TermType.billing, self)
+        term_type = TermType.billing
+        dialog = TermsChooserDialog.make(term_type, self)
         if dialog.exec() == QDialog.Accepted and dialog.chosen_item:
             self.ui.plain_text_edit_billing.setPlainText(dialog.chosen_item.long_desc)
+            self.offer.terms[term_type] = dialog.chosen_item
 
+    @Slot()
     def select_delivery_date_terms(self):
-        dialog = TermsChooserDialog.make(TermType.delivery_date, self)
+        term_type = TermType.delivery_date
+        dialog = TermsChooserDialog.make(term_type, self)
         if dialog.exec() == QDialog.Accepted and dialog.chosen_item:
             self.ui.plain_text_edit_delivery_date.setPlainText(dialog.chosen_item.long_desc)
+            self.offer.terms[term_type] = dialog.chosen_item
 
+    @Slot()
     def select_merchandise(self):
         dialog = create_merchandise_selection_dialog(self)
         dialog.exec()
         for item in dialog.selected.values():
-            self.merchandise_list_model.change_item_count(item)
+            self.offer.merchandise_list.change_item_count(item)

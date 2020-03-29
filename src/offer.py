@@ -24,9 +24,13 @@ class Offer(QObject):
         self.date = None
         self.inquiry_date = None
         self.inquiry_number = None
-        self.offer_id = None
-        self.offer_symbol = None
+        self.id = None
+        self.symbol = None
         self.author = None
+        self.remarks = ""
+
+    def new_symbol(self):
+        self.symbol = self.author.new_offer_symbol()
 
     @classmethod
     def create_empty(cls, author, parent=None):
@@ -35,4 +39,5 @@ class Offer(QObject):
         offer.customer = Customer()
         offer.date = date.today()
         offer.author = author
+        offer.new_symbol()
         return offer

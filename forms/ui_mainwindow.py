@@ -20,7 +20,7 @@ class Ui_MainWindow(object):
         if MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(1134, 1045)
-        MainWindow.setWindowTitle(u"kOferta")
+        MainWindow.setWindowTitle(u"pyOffer")
         icon = QIcon()
         icon.addFile(u":/ico", QSize(), QIcon.Normal, QIcon.Off)
         MainWindow.setWindowIcon(icon)
