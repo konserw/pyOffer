@@ -43,9 +43,9 @@ class User:
         number = get_new_offer_number(self.id)
         return f"{self.business_symbol}{year_and_month}{self.char_for_offer_symbol}{number:02}"
 
-    @staticmethod
-    def from_sql_record(rec):
-        user = User()
+    @classmethod
+    def from_sql_record(cls, rec):
+        user = cls()
         user.id = rec.value("user_id")
         user.name = rec.value("name")
         user.phone = rec.value("phone")

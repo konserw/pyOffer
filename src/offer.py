@@ -15,16 +15,6 @@ from src.customer import Customer
 from src.merchandise import MerchandiseListModel
 
 
-class OfferFactory:
-    def create_empty_offer(self, author, parent=None):
-        offer = Offer(parent)
-        offer.merchandise_list = MerchandiseListModel(offer)
-        offer.customer = Customer()
-        offer.date = date.today()
-        offer.author = author
-        return offer
-
-
 class Offer(QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -37,3 +27,12 @@ class Offer(QObject):
         self.offer_id = None
         self.offer_symbol = None
         self.author = None
+
+    @classmethod
+    def create_empty(cls, author, parent=None):
+        offer = cls(parent)
+        offer.merchandise_list = MerchandiseListModel(offer)
+        offer.customer = Customer()
+        offer.date = date.today()
+        offer.author = author
+        return offer
