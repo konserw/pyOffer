@@ -10,6 +10,12 @@
 #
 from datetime import date
 
+from PySide2 import QtWidgets
+from PySide2.QtCore import QSize
+from PySide2.QtGui import QPixmap, QIcon
+
+# noinspection PyUnresolvedReferences
+import resources.all  # noqa: F401
 from src.database import get_new_offer_number
 
 
@@ -54,3 +60,38 @@ class User:
         user.char_for_offer_symbol = rec.value("char_for_offer_symbol")
         user.business_symbol = rec.value("business_symbol")
         return user
+
+
+class UserSelectionDialog(QtWidgets.QDialog):
+    def __init__(self, model, default_user=0, parent=None):
+        super().__init__(parent)
+        self.model = model
+
+        self.setWindowTitle(self.tr("pyOffer - Choose user"))
+        icon = QIcon()
+        icon.addFile(u":/ico", QSize(), QIcon.Normal, QIcon.Off)
+        self.setWindowIcon(icon)
+        self.resize(400, 400)
+        self.vertical_layout = QtWidgets.QVBoxLayout(self)
+
+        self.label = QtWidgets.QLabel(self)
+        logo = QPixmap()
+        logo.load(u":/klog")
+        self.label.setPixmap(logo)
+        self.vertical_layout.addWidget(self.label)
+
+        self.label2 = QtWidgets.QLabel(self)
+        self.label.setText(self.tr("Please choose user:"))
+        self.vertical_layout.addWidget(self.label2)
+
+        self.list = QtWidgets.QListView(self)
+        self.list.setModel(self.model)
+        self.list.setModelColumn(1)
+        self.list.setSelectionBehavior(QtWidgets.QListView.SelectRows)
+        self.list.setCurrentIndex(self.model.index(default_user, 1))
+        self.vertical_layout.addWidget(self.list)
+
+        self.buttons = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+        self.buttons.accepted.connect(self.accept)
+        self.buttons.rejected.connect(self.reject)
+        self.vertical_layout.addWidget(self.buttons)

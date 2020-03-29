@@ -17,7 +17,7 @@ from src.terms import TermsChooserDialog, TermType
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, user):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)

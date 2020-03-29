@@ -12,19 +12,34 @@ import logging
 import sys
 from datetime import datetime
 
-from PySide2.QtWidgets import QApplication
-
+from PySide2.QtWidgets import QApplication, QDialog
+from PySide2.QtCore import QSettings
+from src.user import User, UserSelectionDialog
 from src import database
 from src.main_window import MainWindow
 
 VERSION = 0.1
 
 if __name__ == '__main__':
-    logging.info("koferta version {} started at {}", VERSION, datetime.now())
+    logging.info("pyOffer version {} started at {}", VERSION, datetime.now())
 
     app = QApplication(sys.argv)
-    database.connect()
+    app.setOrganizationName("KonserwSoft")
+    app.setApplicationName("pyOffer")
 
-    main_window = MainWindow()
-    main_window.show()
-    sys.exit(app.exec_())
+    settings = QSettings()
+    default_user = settings.value("default_user", 0)
+
+    database.connect()
+    user_model = database.get_users_table()
+    user_dialog = UserSelectionDialog(user_model, default_user)
+    if user_dialog.exec_() == QDialog.Accepted:
+        user_row = user_dialog.list.currentIndex().row()
+        settings.setValue("default_user", user_row)
+        user = User.from_sql_record(user_model.record(user_row))
+        main_window = MainWindow(user)
+        main_window.show()
+        sys.exit(app.exec_())
+
+    sys.exit(0)
+

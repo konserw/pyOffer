@@ -38,11 +38,16 @@ def get_customer_record(customer_id):
     return model.record(0)
 
 
-def get_user_record(user_id):
+def get_users_table():
     model = QSqlTableModel()
     model.setTable("users")
-    model.setFilter(F"user_id = '{user_id}'")
     model.select()
+    return model
+
+
+def get_user_record(user_id):
+    model = get_users_table()
+    model.setFilter(F"user_id = '{user_id}'")
     return model.record(0)
 
 
