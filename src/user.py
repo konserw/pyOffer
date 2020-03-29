@@ -11,7 +11,7 @@
 from datetime import date
 
 from PySide2 import QtWidgets
-from PySide2.QtCore import Qt
+from PySide2.QtCore import Qt, Slot, QSettings
 from PySide2.QtGui import QPixmap, QIcon
 
 # noinspection PyUnresolvedReferences
@@ -63,9 +63,12 @@ class User:
 
 
 class UserSelectionDialog(QtWidgets.QDialog):
-    def __init__(self, model, default_user=0, parent=None):
+    def __init__(self, model, parent=None):
         super().__init__(parent)
         self.model = model
+        self.chosen_user_record = None
+        self.settings = QSettings()
+        default_user = self.settings.value("default_user", 0)
 
         self.setWindowTitle(self.tr("pyOffer - Choose user"))
         icon = QIcon()
@@ -100,9 +103,16 @@ class UserSelectionDialog(QtWidgets.QDialog):
         vertical_layout.addWidget(self.list_view)
 
         buttons = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
-        buttons.accepted.connect(self.accept)
+        buttons.accepted.connect(self.ok)
         buttons.rejected.connect(self.reject)
         vertical_layout.addWidget(buttons)
 
         horizontal_layout.addLayout(vertical_layout)
         top_level_layout.addLayout(horizontal_layout)
+
+    @Slot()
+    def ok(self):
+        row = self.list_view.currentIndex().row()
+        self.chosen_user_record = self.model.record(row)
+        self.settings.setValue("default_user", row)
+        self.accept()

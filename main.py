@@ -13,10 +13,10 @@ import sys
 from datetime import datetime
 
 from PySide2.QtWidgets import QApplication, QDialog
-from PySide2.QtCore import QSettings
-from src.user import User, UserSelectionDialog
+
 from src import database
 from src.main_window import MainWindow
+from src.user import User, UserSelectionDialog
 
 VERSION = 0.1
 
@@ -27,19 +27,13 @@ if __name__ == '__main__':
     app.setOrganizationName("KonserwSoft")
     app.setApplicationName("pyOffer")
 
-    settings = QSettings()
-    default_user = settings.value("default_user", 0)
-
     database.connect()
     user_model = database.get_users_table()
-    user_dialog = UserSelectionDialog(user_model, default_user)
+    user_dialog = UserSelectionDialog(user_model)
     if user_dialog.exec_() == QDialog.Accepted:
-        user_row = user_dialog.list_view.currentIndex().row()
-        settings.setValue("default_user", user_row)
-        user = User.from_sql_record(user_model.record(user_row))
+        user = User.from_sql_record(user_dialog.chosen_user_record)
         main_window = MainWindow(user)
         main_window.show()
         sys.exit(app.exec_())
 
     sys.exit(0)
-
