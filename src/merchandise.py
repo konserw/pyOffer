@@ -156,7 +156,7 @@ class MerchandiseListModel(QAbstractTableModel):
         sum = 0
         for item in self.list:
             sum += item.total
-        return sum
+        return round(sum, 2)
 
     def supportedDropActions(self) -> Qt.DropActions:
         return Qt.MoveAction
@@ -352,7 +352,7 @@ class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):
             item_id = self.get_item_id(index.row())
             if item_id in self.selected.keys():
                 self.selected[item_id].count = value
-            else:
+            elif value > 0:
                 item = Merchandise.from_sql_record(self.sourceModel().record(index.row()))
                 item.count = value
                 self.selected[item.id] = item
