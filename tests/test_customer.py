@@ -13,7 +13,7 @@ from PySide2.QtCore import Qt, QPoint
 from PySide2.QtWidgets import QDialog
 from hamcrest import assert_that, is_, not_none
 
-from src.customer import Customer, CustomerSearchModel, CustomerFactory, CustomerSearchWidget
+from src.customer import Customer, CustomerSearchModel, CustomerSelectionDialog, CustomerSearchWidget
 
 CUSTOMER_ID = 1
 SHORT_NAME = "short name"
@@ -196,7 +196,7 @@ class TestCustomerSearchWidget:
         qtbot.addWidget(widget)
 
         assert_that(widget.line_edit.text(), is_(""))
-        assert_that(widget.chosen_item, is_(None))
+        assert_that(widget.chosen_customer, is_(None))
 
     @pytest.mark.parametrize("row, expected", [
         pytest.param(0, "Pan Jan Kowalski"),
@@ -210,9 +210,9 @@ class TestCustomerSearchWidget:
         pos = QPoint(widget.table_widget.columnViewportPosition(1), widget.table_widget.rowViewportPosition(row))
         qtbot.mouseClick(widget.table_widget.viewport(), Qt.LeftButton, pos=pos)
 
-        assert_that(widget.chosen_item, is_(not_none()))
-        assert_that(widget.chosen_item.concated_name, is_(expected))
-        assert_that(widget.chosen_item.short_name, is_("PolImpEx"))
+        assert_that(widget.chosen_customer, is_(not_none()))
+        assert_that(widget.chosen_customer.concated_name, is_(expected))
+        assert_that(widget.chosen_customer.short_name, is_("PolImpEx"))
 
     def test_search(self, qtbot):
         model = CustomerSearchModel()
@@ -230,7 +230,7 @@ class TestCustomerSearchWidget:
 @pytest.mark.usefixtures("db")
 class TestCustomerSelectionDialog:
     def test_initial_state(self, qtbot):
-        dialog = CustomerFactory().get_customer_selection()
+        dialog = CustomerSelectionDialog.make()
         qtbot.addWidget(dialog)
 
         # todo: translations
@@ -238,7 +238,7 @@ class TestCustomerSelectionDialog:
         assert_that(dialog.windowTitle(), is_("Select customer"))
 
     def test_button_accepts(self, qtbot):
-        dialog = CustomerFactory().get_customer_selection()
+        dialog = CustomerSelectionDialog.make()
         qtbot.addWidget(dialog)
 
         qtbot.mouseClick(dialog.push_button_exit, Qt.LeftButton)
@@ -249,12 +249,12 @@ class TestCustomerSelectionDialog:
         pytest.param(1, "Pani Jane Doe")
     ])
     def test_selection_changed(self, qtbot, row, expected):
-        dialog = CustomerFactory().get_customer_selection()
+        dialog = CustomerSelectionDialog.make()
         qtbot.addWidget(dialog)
 
         pos = QPoint(dialog.customer_search.table_widget.columnViewportPosition(1), dialog.customer_search.table_widget.rowViewportPosition(row))
         qtbot.mouseClick(dialog.customer_search.table_widget.viewport(), Qt.LeftButton, pos=pos)
 
-        assert_that(dialog.chosen_item, is_(not_none()))
-        assert_that(dialog.chosen_item.concated_name, is_(expected))
-        assert_that(dialog.chosen_item.short_name, is_("PolImpEx"))
+        assert_that(dialog.chosen_customer, is_(not_none()))
+        assert_that(dialog.chosen_customer.concated_name, is_(expected))
+        assert_that(dialog.chosen_customer.short_name, is_("PolImpEx"))

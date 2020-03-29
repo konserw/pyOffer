@@ -14,16 +14,6 @@ from PySide2.QtSql import QSqlTableModel
 from PySide2.QtCore import QModelIndex, Qt, Slot
 
 
-class CustomerFactory:
-    def __init__(self, parent=None):
-        self.parent = parent
-
-    def get_customer_selection(self):
-        model = CustomerSearchModel(self.parent)
-        search = CustomerSearchWidget(model, self.parent)
-        return CustomerSelection(search, self.parent)
-
-
 class Customer:
     def __init__(self):
         self.id = None
@@ -105,7 +95,7 @@ class CustomerSearchWidget(QWidget):
     def __init__(self, model, parent=None):
         super().__init__(parent)
         self.model = model
-        self.chosen_item = None
+        self.chosen_customer = None
 
         self.verticalLayout = QtWidgets.QVBoxLayout(self)
         self.line_edit = QtWidgets.QLineEdit(self)
@@ -115,17 +105,18 @@ class CustomerSearchWidget(QWidget):
         self.table_widget.clicked.connect(self.selection_changed)
         self.table_widget.setModel(self.model)
         self.table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.table_widget.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
         self.verticalLayout.addWidget(self.table_widget)
 
     @Slot(QModelIndex)
     def selection_changed(self, index):
-        self.chosen_item = Customer.from_record(self.model.record(index.row())) if index.isValid() else None
+        self.chosen_customer = Customer.from_record(self.model.record(index.row())) if index.isValid() else None
 
 
-class CustomerSelection(QDialog):
-    def __init__(self, customer_search, parent=None):
+class CustomerSelectionDialog(QDialog):
+    def __init__(self, model, parent=None):
         super().__init__(parent)
-        self.customer_search = customer_search
+        self.customer_search = CustomerSearchWidget(model)
 
         self.setWindowTitle(self.tr("Select customer"))
         self.resize(600, 900)
@@ -142,5 +133,10 @@ class CustomerSelection(QDialog):
         self.verticalLayout.addLayout(self.horizontalLayout)
 
     @property
-    def chosen_item(self):
-        return self.customer_search.chosen_item
+    def chosen_customer(self):
+        return self.customer_search.chosen_customer
+
+    @classmethod
+    def make(cls, parent=None):
+        model = CustomerSearchModel(parent)
+        return cls(model, parent)

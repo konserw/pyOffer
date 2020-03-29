@@ -12,7 +12,7 @@ from PySide2.QtCore import Slot
 from PySide2.QtWidgets import QMainWindow, QDialog
 
 from forms.ui_mainwindow import Ui_MainWindow
-from src.customer import CustomerFactory
+from src.customer import CustomerSelectionDialog
 from src.merchandise import create_merchandise_selection_dialog
 from src.offer import Offer
 from src.terms import TermsChooserDialog, TermType
@@ -30,8 +30,6 @@ class MainWindow(QMainWindow):
 
         self.ui.action_new.triggered.connect(self.new_offer)
         self.ui.action_new_number.triggered.connect(self.new_offer_symbol)
-
-        self.customer_factory = CustomerFactory(self)
 
         self.ui.push_button_add_merchandise.clicked.connect(self.select_merchandise)
         self.ui.command_link_button_cutomer.clicked.connect(self.select_customer)
@@ -65,10 +63,10 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def select_customer(self):
-        dialog = self.customer_factory.get_customer_selection()
-        if dialog.exec() == QDialog.Accepted and dialog.chosen_item:
-            self.ui.plain_text_edit_customer.setPlainText(dialog.chosen_item.description)
-            self.offer.customer = dialog.chosen_item
+        dialog = CustomerSelectionDialog.make(self)
+        if dialog.exec() == QDialog.Accepted and dialog.chosen_customer:
+            self.ui.plain_text_edit_customer.setPlainText(dialog.chosen_customer.description)
+            self.offer.customer = dialog.chosen_customer
 
     @Slot()
     def update_remarks(self):
