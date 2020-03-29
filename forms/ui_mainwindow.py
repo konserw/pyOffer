@@ -12,7 +12,7 @@ from PySide2.QtWidgets import *
 
 from src.merchandise import MerchandiseListView
 # noinspection PyUnresolvedReferences
-import resources.mainwindow_rc  # noqa: F401
+import resources.all  # noqa: F401
 
 
 class Ui_MainWindow(object):
@@ -405,7 +405,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
