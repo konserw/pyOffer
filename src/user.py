@@ -11,6 +11,7 @@
 from datetime import date
 
 from PySide2 import QtWidgets
+from PySide2.QtCore import Qt
 from PySide2.QtGui import QPixmap, QIcon
 
 # noinspection PyUnresolvedReferences
@@ -70,27 +71,38 @@ class UserSelectionDialog(QtWidgets.QDialog):
         icon = QIcon()
         icon.addFile(u":/ico")
         self.setWindowIcon(icon)
-        self.resize(400, 400)
-        self.vertical_layout = QtWidgets.QVBoxLayout(self)
 
-        self.label = QtWidgets.QLabel(self)
+        top_level_layout = QtWidgets.QVBoxLayout(self)
+        logo_label = QtWidgets.QLabel(self)
         logo = QPixmap()
         logo.load(u":/klog")
-        self.label.setPixmap(logo)
-        self.vertical_layout.addWidget(self.label)
+        logo_label.setPixmap(logo)
+        logo_label.setAlignment(Qt.AlignCenter)
+        top_level_layout.addWidget(logo_label)
 
-        self.label2 = QtWidgets.QLabel(self)
-        self.label2.setText(self.tr("Please choose user:"))
-        self.vertical_layout.addWidget(self.label2)
+        horizontal_layout = QtWidgets.QHBoxLayout(self)
+        icon_label = QtWidgets.QLabel(self)
+        pixmap = QPixmap(":/user").scaled(128, 128, Qt.KeepAspectRatio)
+        icon_label.setPixmap(pixmap)
+        icon_label.setAlignment(Qt.AlignCenter)
+        horizontal_layout.addWidget(icon_label)
 
-        self.list = QtWidgets.QListView(self)
-        self.list.setModel(self.model)
-        self.list.setModelColumn(1)
-        self.list.setSelectionBehavior(QtWidgets.QListView.SelectRows)
-        self.list.setCurrentIndex(self.model.index(default_user, 1))
-        self.vertical_layout.addWidget(self.list)
+        vertical_layout = QtWidgets.QVBoxLayout(self)
+        label_description = QtWidgets.QLabel(self)
+        label_description.setText(self.tr("Please choose user:"))
+        vertical_layout.addWidget(label_description)
 
-        self.buttons = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
-        self.buttons.accepted.connect(self.accept)
-        self.buttons.rejected.connect(self.reject)
-        self.vertical_layout.addWidget(self.buttons)
+        self.list_view = QtWidgets.QListView(self)
+        self.list_view.setModel(self.model)
+        self.list_view.setModelColumn(1)
+        self.list_view.setSelectionBehavior(QtWidgets.QListView.SelectRows)
+        self.list_view.setCurrentIndex(self.model.index(default_user, 1))
+        vertical_layout.addWidget(self.list_view)
+
+        buttons = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        vertical_layout.addWidget(buttons)
+
+        horizontal_layout.addLayout(vertical_layout)
+        top_level_layout.addLayout(horizontal_layout)

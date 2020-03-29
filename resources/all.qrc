@@ -4,6 +4,7 @@
         <file alias="klog">klog.png</file>
         <file alias="calendar">schedule.png</file>
         <file alias="discount">discount.png</file>
+        <file alias="user">user.png</file>
         <file alias="fip">fip.png</file>
         <file alias="aliaxis">aliaxis.png</file>
     </qresource>

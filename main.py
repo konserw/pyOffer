@@ -34,7 +34,7 @@ if __name__ == '__main__':
     user_model = database.get_users_table()
     user_dialog = UserSelectionDialog(user_model, default_user)
     if user_dialog.exec_() == QDialog.Accepted:
-        user_row = user_dialog.list.currentIndex().row()
+        user_row = user_dialog.list_view.currentIndex().row()
         settings.setValue("default_user", user_row)
         user = User.from_sql_record(user_model.record(user_row))
         main_window = MainWindow(user)
