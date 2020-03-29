@@ -306,20 +306,21 @@ class TestMerchandiseListModel:
     @pytest.mark.parametrize("ex, which", [
         pytest.param("", "both"),
         pytest.param("O", "both"),
-        pytest.param("R", "none"),
+        pytest.param("R", "second"),
         pytest.param("CODE", "first"),
         pytest.param("DESCR", "none"),
         pytest.param("S", "none"),
-        pytest.param("E", "first"),
+        pytest.param("one", "none"),
+        pytest.param("E", "both"),
         pytest.param("D", "first"),
         pytest.param("Other", "second"),
-        pytest.param("otheR", "none"),
+        pytest.param("otheR", "second"),
         pytest.param("the", "second"),
     ])
     def test_set_discount(self, sample_model, ex, which):
         other = _create_merch(2, discount=0)
         other.code = "Other"
-        other.description = "otheR"
+        other.description = "otheR one"
         sample_model.add_item(other)
         assert_that(sample_model.list[0].discount, is_(0))
         assert_that(sample_model.list[1].discount, is_(0))
@@ -327,11 +328,11 @@ class TestMerchandiseListModel:
         discount = 50
         sample_model.set_discount(ex, discount)
 
-        if which == "both" or which == "first":
+        if which in ("both", "first"):
             assert_that(sample_model.list[0].discount, is_(50))
         else:
             assert_that(sample_model.list[0].discount, is_(0))
-        if which == "both" or which == "second":
+        if which in ("both", "second"):
             assert_that(sample_model.list[1].discount, is_(50))
         else:
             assert_that(sample_model.list[1].discount, is_(0))
