@@ -11,7 +11,6 @@
 from datetime import date
 
 from PySide2 import QtWidgets
-from PySide2.QtCore import QSize
 from PySide2.QtGui import QPixmap, QIcon
 
 # noinspection PyUnresolvedReferences
@@ -69,7 +68,7 @@ class UserSelectionDialog(QtWidgets.QDialog):
 
         self.setWindowTitle(self.tr("pyOffer - Choose user"))
         icon = QIcon()
-        icon.addFile(u":/ico", QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile(u":/ico")
         self.setWindowIcon(icon)
         self.resize(400, 400)
         self.vertical_layout = QtWidgets.QVBoxLayout(self)
@@ -81,7 +80,7 @@ class UserSelectionDialog(QtWidgets.QDialog):
         self.vertical_layout.addWidget(self.label)
 
         self.label2 = QtWidgets.QLabel(self)
-        self.label.setText(self.tr("Please choose user:"))
+        self.label2.setText(self.tr("Please choose user:"))
         self.vertical_layout.addWidget(self.label2)
 
         self.list = QtWidgets.QListView(self)
