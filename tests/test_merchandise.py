@@ -50,12 +50,6 @@ class TestMerchandise:
         assert_that(sample_merch.price, is_(0))
         assert_that(sample_merch.total, is_(0))
 
-    def test_set_discount(self, sample_merch):
-        assert_that(sample_merch.discount, is_(0))
-        discount = 10
-        sample_merch.set_discount(discount)
-        assert_that(sample_merch.discount, is_(discount))
-
     @pytest.mark.parametrize("list_price, count, discount, price, total", [
         pytest.param(100, 1, 0, 100, 100),
         pytest.param(100, 1, 10, 90, 90),

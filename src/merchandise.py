@@ -11,6 +11,7 @@
 import typing
 
 from PySide2 import QtGui, QtCore, QtWidgets
+from PySide2.QtGui import QIcon, QPixmap, QColor
 from PySide2.QtCore import QObject, QAbstractTableModel, QModelIndex, Qt, Slot
 from PySide2.QtWidgets import QWidget, QTableView, QItemDelegate, QDoubleSpinBox, QStyleOptionViewItem
 
@@ -53,9 +54,6 @@ class Merchandise(QObject):
         item.by_meter = record.value("unit") == "m"
         return item
 
-    def set_discount(self, value):
-        self.discount = value
-
     def __eq__(self, other):
         return self.id == other.id
 
@@ -90,6 +88,7 @@ class MerchandiseListModel(QAbstractTableModel):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.list = []
+        self.ex = None
         self.headers = (
             self.tr("Code"),
             self.tr("Description"),
@@ -138,6 +137,10 @@ class MerchandiseListModel(QAbstractTableModel):
             if col > 1:
                 return Qt.AlignRight
             return Qt.AlignLeft
+
+        if role == Qt.BackgroundRole:
+            if self.ex and row < len(self.list) and self.ex.casefold() in self.list[row].code.casefold():
+                return QColor(0xFC, 0xF7, 0xBB)
 
         if role == Qt.EditRole and row < len(self.list) and col in (3, 5):
             return self.list[row][col]
@@ -233,12 +236,69 @@ class MerchandiseListModel(QAbstractTableModel):
         self.endInsertRows()
 
     def set_discount(self, ex, value):
-        for item in filter(lambda item: ex in item.code, self.list):
-            item.set_discount(value)
-        # map(lambda item: item.set_discount(value), filter(lambda item: ex in item.code, self.list))
+        self.beginResetModel()
+        for item in filter(lambda item: ex.casefold() in item.code.casefold(), self.list):
+            item.discount = value
+        self.endResetModel()
+
+    @Slot(str)
+    def highlight_rows(self, ex):
+        self.beginResetModel()
+        self.ex = ex
+        self.endResetModel()
 
     def print(self):
         raise NotImplementedError()
+
+
+class DiscountDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.setWindowTitle(self.tr("Set discounts"))
+        icon = QIcon()
+        icon.addFile(u":/discount")
+        self.setWindowIcon(icon)
+
+        top_level_layout = QtWidgets.QHBoxLayout(self)
+        icon_label = QtWidgets.QLabel(self)
+        pixmap = QPixmap(":/discount").scaled(128, 128, Qt.KeepAspectRatio)
+        icon_label.setPixmap(pixmap)
+        top_level_layout.addWidget(icon_label)
+
+        vertical_layout = QtWidgets.QVBoxLayout(self)
+        self.label = QtWidgets.QLabel(self)
+        self.label.setText(self.tr("Please enter regular expression\nif you want to limit discount to matching items,\nor leave empty to add discount to all items."))
+        vertical_layout.addWidget(self.label)
+
+        self.line_edit_expression = QtWidgets.QLineEdit(self)
+        vertical_layout.addWidget(self.line_edit_expression)
+
+        spin_layout = QtWidgets.QHBoxLayout(self)
+        spin_layout.addStretch()
+        spin_layout.addWidget(QtWidgets.QLabel(self.tr("Discount:"), self))
+        self.spinbox_discount = QtWidgets.QSpinBox(self)
+        self.spinbox_discount.setMinimum(0)
+        self.spinbox_discount.setSingleStep(5)
+        self.spinbox_discount.setMaximum(100)
+        spin_layout.addWidget(self.spinbox_discount)
+        vertical_layout.addLayout(spin_layout)
+
+        self.buttons = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+        self.buttons.accepted.connect(self.accept)
+        self.buttons.rejected.connect(self.reject)
+        vertical_layout.addWidget(self.buttons)
+
+        top_level_layout.addLayout(vertical_layout)
+
+    @property
+    def discount_value(self):
+        self.spinbox_discount.interpretText()
+        return self.spinbox_discount.value()
+
+    @property
+    def filter_expression(self):
+        return self.line_edit_expression.text()
 
 
 class MerchandiseListDelegate(QItemDelegate):

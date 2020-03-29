@@ -13,7 +13,7 @@ from PySide2.QtWidgets import QMainWindow, QDialog
 
 from forms.ui_mainwindow import Ui_MainWindow
 from src.customer import CustomerSelectionDialog
-from src.merchandise import create_merchandise_selection_dialog
+from src.merchandise import create_merchandise_selection_dialog, DiscountDialog
 from src.offer import Offer
 from src.terms import TermsChooserDialog, TermType
 
@@ -32,6 +32,9 @@ class MainWindow(QMainWindow):
         self.ui.action_new_number.triggered.connect(self.new_offer_symbol)
 
         self.ui.push_button_add_merchandise.clicked.connect(self.select_merchandise)
+        self.ui.push_button_remove_row.clicked.connect(self.remove_row)
+        self.ui.push_button_discount.clicked.connect(self.set_discount)
+
         self.ui.command_link_button_cutomer.clicked.connect(self.select_customer)
 
         self.ui.command_link_button_delivery.clicked.connect(self.select_delivery_terms)
@@ -110,3 +113,16 @@ class MainWindow(QMainWindow):
         dialog.exec()
         for item in dialog.selected.values():
             self.offer.merchandise_list.change_item_count(item)
+
+    @Slot()
+    def remove_row(self):
+        index = self.ui.tableView.currentIndex()
+        self.offer.merchandise_list.removeRow(index.row())
+
+    @Slot()
+    def set_discount(self):
+        dialog = DiscountDialog(self)
+        dialog.line_edit_expression.textChanged.connect(self.offer.merchandise_list.highlight_rows)
+        if dialog.exec_() == QDialog.Accepted:
+            self.offer.merchandise_list.set_discount(dialog.filter_expression, dialog.discount_value)
+        self.offer.merchandise_list.highlight_rows("")
