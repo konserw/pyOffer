@@ -12,7 +12,7 @@ import pytest
 from PySide2.QtCore import Qt, QModelIndex
 from hamcrest import assert_that, is_, none
 
-from src.database import get_merchandise_sql_model, get_merchandise_record
+from src.database import get_merchandise_sql_model, get_merchandise_record, get_user_record, get_new_offer_number
 
 
 @pytest.mark.usefixtures("db")
@@ -79,3 +79,37 @@ class TestMerchandiseSqlModel:
         assert_that(merchandise_sql_model.rowCount(), is_(2))
         merchandise_sql_model.update(ex)
         assert_that(merchandise_sql_model.rowCount(), is_(expected))
+
+
+@pytest.mark.usefixtures("db")
+class TestUsers:
+    @pytest.mark.parametrize("user_id, expected_number", [
+        pytest.param(3, 0),  # user 3 does not exist
+        pytest.param(1, 1),
+        pytest.param(1, 2),
+        pytest.param(2, 2323),
+        pytest.param(2, 2324),
+    ])
+    def test_new_offer_number(self, user_id, expected_number):
+        """ This test alters database, so it will work only once on clean db"""
+        assert_that(get_new_offer_number(user_id), is_(expected_number))
+
+    def test_user_record_1(self):
+        rec = get_user_record(1)
+        assert_that(rec.value("user_id"), is_(1))
+        assert_that(rec.value("name"), is_("Mark Salesman"))
+        assert_that(rec.value("mail"), is_("mark@salesman.com"))
+        assert_that(rec.value("male"), is_(True))
+        assert_that(rec.value("phone"), is_("555 55 55"))
+        assert_that(rec.value("char_for_offer_symbol"), is_("M"))
+        assert_that(rec.value("business_symbol"), is_("I"))
+
+    def test_user_record_2(self):
+        rec = get_user_record(2)
+        assert_that(rec.value("user_id"), is_(2))
+        assert_that(rec.value("name"), is_("Agatha Salesman"))
+        assert_that(rec.value("mail"), is_("agatha@salesman.com"))
+        assert_that(rec.value("male"), is_(False))
+        assert_that(rec.value("phone"), is_("555 55 50"))
+        assert_that(rec.value("char_for_offer_symbol"), is_("A"))
+        assert_that(rec.value("business_symbol"), is_("X"))

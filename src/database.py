@@ -46,6 +46,16 @@ def get_user_record(user_id):
     return model.record(0)
 
 
+def get_new_offer_number(user_id):
+    text = f"SELECT public.get_new_offer_number({user_id})"
+    query = QSqlQuery(text)
+    if not query.next():
+        logging.error(f"Query failed: {text}")
+        logging.error(query.lastError().text())
+        return None
+    return query.record().value(0)
+
+
 def get_terms_table(term_type):
     model = QSqlTableModel()
     model.setTable(F"terms_{term_type.name}")

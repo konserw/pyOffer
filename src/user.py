@@ -8,6 +8,9 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 #
+from datetime import date
+
+from src.database import get_new_offer_number
 
 
 class User:
@@ -20,18 +23,34 @@ class User:
         self.char_for_offer_symbol = None
         self.business_symbol = None
 
-    def get_gender_suffix(self):
-        if not self.male:
-            return "a"
-        return ""
+    @property
+    def gender_suffix(self):
+        if self.male:
+            return ""
+        return "a"
+
+    def new_offer_symbol(self):
+        """
+        Example: I1804P01
+            1 char - business symbol,
+        2 - 3 char - year,
+        4 - 5 char - month,
+            6 char - author symbol (M for Mark etc.)
+        7 - 8 char - next number for current month for current author
+        :return: new offer symbol as string
+        """
+        year_and_month = date.today().strftime("%y%m")
+        number = get_new_offer_number(self.id)
+        return f"{self.business_symbol}{year_and_month}{self.char_for_offer_symbol}{number:02}"
 
     @staticmethod
     def from_sql_record(rec):
         user = User()
-        user.name = rec.field("name").value
-        user.phone = rec.field("phone").value
-        user.mail = rec.field("mail").value
-        user.char_for_offer_symbol = rec.field("char_for_offer_symbol").value
-        user.male = rec.field("male").value
-        user.id = rec.field("id").value
-        user.business_symbol = rec.field("business_symbol").value
+        user.id = rec.value("user_id")
+        user.name = rec.value("name")
+        user.phone = rec.value("phone")
+        user.mail = rec.value("mail")
+        user.male = rec.value("male")
+        user.char_for_offer_symbol = rec.value("char_for_offer_symbol")
+        user.business_symbol = rec.value("business_symbol")
+        return user
