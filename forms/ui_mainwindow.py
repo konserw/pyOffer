@@ -11,6 +11,8 @@ from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import *
 
 from src.merchandise import MerchandiseListView
+# noinspection PyUnresolvedReferences
+import resources.mainwindow_rc  # noqa: F401
 
 
 class Ui_MainWindow(object):
