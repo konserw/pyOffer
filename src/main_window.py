@@ -13,7 +13,7 @@ from PySide2.QtWidgets import QMainWindow, QDialog
 from forms.ui_mainwindow import Ui_MainWindow
 from src.customer import CustomerFactory
 from src.merchandise import MerchandiseListModel, create_merchandise_selection_dialog
-from src.terms import TermChooserDialogFactory, TermType
+from src.terms import TermsChooserDialog, TermType
 
 
 class MainWindow(QMainWindow):
@@ -24,7 +24,6 @@ class MainWindow(QMainWindow):
 
         self.merchandise_list_model = MerchandiseListModel(self)
         self.ui.tableView.setModel(self.merchandise_list_model)
-        self.term_chooser_factory = TermChooserDialogFactory(self)
         self.customer_factory = CustomerFactory(self)
 
         self.ui.push_button_add_merchandise.clicked.connect(self.select_merchandise)
@@ -41,22 +40,22 @@ class MainWindow(QMainWindow):
             self.ui.plain_text_edit_customer.setPlainText(dialog.chosen_item.description)
 
     def select_delivery_terms(self):
-        dialog = self.term_chooser_factory.get_terms_chooser_dialog(TermType.delivery)
+        dialog = TermsChooserDialog.make(TermType.delivery, self)
         if dialog.exec() == QDialog.Accepted and dialog.chosen_item:
             self.ui.plain_text_edit_delivery.setPlainText(dialog.chosen_item.long_desc)
 
     def select_offer_terms(self):
-        dialog = self.term_chooser_factory.get_terms_chooser_dialog(TermType.offer)
+        dialog = TermsChooserDialog.make(TermType.offer, self)
         if dialog.exec() == QDialog.Accepted and dialog.chosen_item:
             self.ui.plain_text_edit_offer.setPlainText(dialog.chosen_item.long_desc)
 
     def select_billing_terms(self):
-        dialog = self.term_chooser_factory.get_terms_chooser_dialog(TermType.billing)
+        dialog = TermsChooserDialog.make(TermType.billing, self)
         if dialog.exec() == QDialog.Accepted and dialog.chosen_item:
             self.ui.plain_text_edit_billing.setPlainText(dialog.chosen_item.long_desc)
 
     def select_delivery_date_terms(self):
-        dialog = self.term_chooser_factory.get_terms_chooser_dialog(TermType.delivery_date)
+        dialog = TermsChooserDialog.make(TermType.delivery_date, self)
         if dialog.exec() == QDialog.Accepted and dialog.chosen_item:
             self.ui.plain_text_edit_delivery_date.setPlainText(dialog.chosen_item.long_desc)
 

@@ -12,7 +12,7 @@ import pytest
 from hamcrest import assert_that, is_, none
 from PySide2.QtCore import Qt, QModelIndex
 
-from src.terms import TermItem, TermType, TermModel, TermChooserDialogFactory
+from src.terms import TermItem, TermType, TermModel, TermsChooserDialog
 
 SHORT_DESCRIPTION = "short description"
 LONG_DESCRIPTION = "long description"
@@ -87,8 +87,7 @@ class TestTermsChhoserDialog:
         pytest.param(TermType.offer)
     ])
     def test_initial_state(self, qtbot, type):
-        factory = TermChooserDialogFactory()
-        dialog = factory.get_terms_chooser_dialog(type)
+        dialog = TermsChooserDialog.make(type)
         qtbot.addWidget(dialog)
 
         # todo: other translations

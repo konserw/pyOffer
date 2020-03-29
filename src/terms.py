@@ -91,18 +91,6 @@ class TermModel(QAbstractTableModel):
         return super().index(row, column, parent)
 
 
-class TermChooserDialogFactory:
-    def __init__(self, parent=None):
-        self.parent = parent
-
-    def get_terms_chooser_dialog(self, term_type):
-        table = get_terms_table(term_type)
-        model = TermModel(self.parent)
-        for i in range(table.rowCount()):
-            model.add(TermItem.from_record(term_type, table.record(i)))
-        return TermsChooserDialog(term_type, model, self.parent)
-
-
 class TermsChooserDialog(QDialog):
     def __init__(self, term_type, term_model, parent=None):
         super().__init__(parent)
@@ -128,3 +116,11 @@ class TermsChooserDialog(QDialog):
     def selection_changed(self, index):
         self.chosen_item = index.internalPointer()
         self.ui.plainTextEdit.setPlainText(self.chosen_item.long_desc)
+
+    @classmethod
+    def make(cls, term_type, parent=None):
+        table = get_terms_table(term_type)
+        model = TermModel(parent)
+        for i in range(table.rowCount()):
+            model.add(TermItem.from_record(term_type, table.record(i)))
+        return cls(term_type, model, parent)
