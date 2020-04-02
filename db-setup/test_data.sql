@@ -11,9 +11,7 @@ INSERT INTO public.customers(
         ('Pan', 'Jan', 'Kowalski', 1),
         ('Pani', 'Jane', 'Doe', 1);
 
-
 -- merchandise
-
 
 INSERT INTO public.merchandise(
 	code, description, unit)
@@ -43,5 +41,5 @@ INSERT INTO public.users(
 
 INSERT INTO public.users(
 	name, mail, male, phone, current_offer_number, current_offer_date, char_for_offer_symbol, business_symbol )
-	VALUES ('Agatha Salesman', 'agatha@salesman.com', FALSE, '555 55 50', 2322, '2020-03-28', 'A', 'X');
+	VALUES ('Agatha Salesman', 'agatha@salesman.com', FALSE, '555 55 50', 2322, current_date, 'A', 'X');
 
