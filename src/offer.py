@@ -8,8 +8,9 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 #
-from PySide2.QtCore import QObject
 from datetime import date
+
+from PySide2.QtCore import QObject
 
 from src.customer import Customer
 from src.merchandise import MerchandiseListModel
