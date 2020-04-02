@@ -9,6 +9,7 @@
 # If not, see <http://www.gnu.org/licenses/>.
 #
 import os
+import sys
 import logging
 from datetime import date
 
@@ -16,7 +17,7 @@ from PySide2.QtSql import QSqlDatabase, QSqlTableModel, QSqlQuery, QSqlQueryMode
 
 
 def connect():
-    os.environ["PATH"] += os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, "deps"))
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
     database = QSqlDatabase.addDatabase("QPSQL")
     database.setHostName("127.0.0.1")
     database.setDatabaseName("koferta_test")
