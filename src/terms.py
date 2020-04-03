@@ -83,7 +83,9 @@ class TermModel(QAbstractTableModel):
         return super().headerData(section, orientation, role)
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
-        return Qt.ItemIsSelectable | Qt.ItemIsEnabled
+        if index.isValid():
+            return Qt.ItemIsSelectable | Qt.ItemIsEnabled
+        return Qt.NoItemFlags
 
     def index(self, row: int, column: int, parent: QModelIndex = ...) -> QModelIndex:
         if row < len(self.list):

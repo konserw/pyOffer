@@ -100,10 +100,14 @@ class MerchandiseListModel(QAbstractTableModel):
             self.tr("Total")
         )
 
-    def rowCount(self, parent: QModelIndex = ...) -> int:
+    def rowCount(self, parent: QModelIndex = QModelIndex()) -> int:
+        if parent.isValid():
+            return 0
         return len(self.list) + 1
 
-    def columnCount(self, parent: QModelIndex = ...) -> int:
+    def columnCount(self, parent: QModelIndex = QModelIndex()) -> int:
+        if parent.isValid():
+            return 0
         return len(self.headers)
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int = ...) -> typing.Any:
@@ -165,9 +169,10 @@ class MerchandiseListModel(QAbstractTableModel):
         return Qt.MoveAction
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
+        if not index.isValid():
+            return Qt.NoItemFlags
+
         default = Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled | Qt.ItemIsEnabled | Qt.ItemIsSelectable
-        # if not index.isValid():
-        #    return 0
         row = index.row()
         col = index.column()
         if row == len(self.list):
@@ -380,7 +385,9 @@ class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):
     def lessThan(self, left: QModelIndex, right: QModelIndex) -> bool:
         return self.get_column_value(left, 1) < self.get_column_value(right, 1)
 
-    def columnCount(self, parent: QModelIndex = ...) -> int:
+    def columnCount(self, parent: QModelIndex = QModelIndex()) -> int:
+        if parent.isValid():
+            return 0
         return 5
 
     def data(self, index: QModelIndex, role: int):
@@ -403,9 +410,11 @@ class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):
         self.sourceModel().update(ex)
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
-        if index.isValid() and index.column() == 0:
-            return Qt.ItemIsEditable | Qt.ItemIsSelectable | Qt.ItemIsEnabled
-        return Qt.ItemIsEnabled
+        if index.isValid():
+            if index.column() == 0:
+                return Qt.ItemIsEditable | Qt.ItemIsSelectable | Qt.ItemIsEnabled
+            return Qt.ItemIsEnabled
+        return Qt.NoItemFlags
 
     def setData(self, index: QModelIndex, value: typing.Any, role: int = ...) -> bool:
         if role == Qt.EditRole and index.column() == 0:

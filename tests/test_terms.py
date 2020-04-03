@@ -78,6 +78,10 @@ class TestTermModel:
         assert_that(model.data(model.index(0, 1), Qt.DisplayRole), is_(SHORT_DESCRIPTION))
         assert_that(model.data(model.index(0, 2), Qt.DisplayRole), is_(LONG_DESCRIPTION))
 
+    def test_with_modeltester(self, qtmodeltester):
+        model = TermModel()
+        qtmodeltester.check(model)
+
 
 class TestTermsChhoserDialog:
     @pytest.mark.parametrize("type", [

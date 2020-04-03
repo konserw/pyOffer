@@ -337,6 +337,9 @@ class TestMerchandiseListModel:
         else:
             assert_that(sample_model.list[1].discount, is_(0))
 
+    def test_with_modeltester(self, qtmodeltester, sample_model):
+        qtmodeltester.check(sample_model)
+
 
 class TestMerchandiseListDelegate:
     @pytest.mark.parametrize("col, maximum", [

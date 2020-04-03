@@ -187,6 +187,9 @@ class TestCustomerSearchModel:
         pattern = "Sp. z o.o."
         self._test_search_both(pattern)
 
+    def test_with_modeltester(self, qtmodeltester):
+        qtmodeltester.check(self.model)
+
 
 @pytest.mark.usefixtures("db")
 class TestCustomerSearchWidget:
