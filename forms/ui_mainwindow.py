@@ -102,10 +102,10 @@ class Ui_MainWindow(object):
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setSpacing(6)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.command_link_button_cutomer = QCommandLinkButton(self.tab_2)
-        self.command_link_button_cutomer.setObjectName(u"command_link_button_cutomer")
+        self.command_link_button_customer = QCommandLinkButton(self.tab_2)
+        self.command_link_button_customer.setObjectName(u"command_link_button_cutomer")
 
-        self.horizontalLayout_3.addWidget(self.command_link_button_cutomer)
+        self.horizontalLayout_3.addWidget(self.command_link_button_customer)
 
         self.plain_text_edit_customer = QPlainTextEdit(self.tab_2)
         self.plain_text_edit_customer.setObjectName(u"plain_text_edit_customer")
@@ -425,7 +425,7 @@ class Ui_MainWindow(object):
         self.push_button_discount.setText(QCoreApplication.translate("MainWindow", u"Ustaw rabat", None))
         self.push_button_remove_row.setText(QCoreApplication.translate("MainWindow", u"Usu\u0144 wiersz", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"Tabela zam\u00f3wienia", None))
-        self.command_link_button_cutomer.setText(QCoreApplication.translate("MainWindow", u"Wyb\u00f3r Klienta", None))
+        self.command_link_button_customer.setText(QCoreApplication.translate("MainWindow", u"Wyb\u00f3r Klienta", None))
         self.grup_box_query.setTitle(QCoreApplication.translate("MainWindow", u"Zapytanie", None))
         self.check_box_query_date.setText(QCoreApplication.translate("MainWindow", u"Data zapytania:", None))
         self.push_button_query_date.setText("")

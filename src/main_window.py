@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
         self.ui.push_button_remove_row.clicked.connect(self.remove_row)
         self.ui.push_button_discount.clicked.connect(self.set_discount)
 
-        self.ui.command_link_button_cutomer.clicked.connect(self.select_customer)
+        self.ui.command_link_button_customer.clicked.connect(self.select_customer)
 
         self.ui.command_link_button_delivery.clicked.connect(self.select_delivery_terms)
         self.ui.command_link_button_offer.clicked.connect(self.select_offer_terms)
