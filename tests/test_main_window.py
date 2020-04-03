@@ -27,8 +27,8 @@ def main_window(qtbot):
     user.business_symbol = 'X'
     main_window = MainWindow(user)
     qtbot.addWidget(main_window)
-    main_window.show()
-    qtbot.wait_exposed(main_window)
+#    main_window.show()
+#    qtbot.wait_exposed(main_window)
     return main_window
 
 
@@ -80,9 +80,16 @@ class TestMainWindow:
 
     @pytest.mark.parametrize("menu_name, action_name, slot", [
         pytest.param("menu_offer", "action_new", "new_offer"),
+        pytest.param("menu_offer", "action_open", "load_offer"),
+        pytest.param("menu_offer", "action_save", "save_offer"),
         pytest.param("menu_offer", "action_new_number", "new_offer_symbol"),
+        pytest.param("menu_offer", "action_exit", "exit"),
+        pytest.param("menu_export", "action_print", "print_preview"),
+        pytest.param("menu_export", "action_PDF", "print_pdf"),
+        pytest.param("menu_help", "action_about", "about"),
+        pytest.param("menu_help", "action_about_Qt", "about_qt"),
     ])
-    def test_action_slot_triggered(self, active_window, qtbot, menu_name, action_name, slot):
+    def test_slot_for_triggered(self, active_window, qtbot, menu_name, action_name, slot):
         menu = getattr(active_window.ui, menu_name)
         action = getattr(active_window.ui, action_name)
         with patch(f"src.main_window.MainWindow.{slot}", autospec=True) as slot_mock:
@@ -92,24 +99,46 @@ class TestMainWindow:
                 qtbot.mouseClick(menu, Qt.LeftButton, Qt.NoModifier, rect.center())
             slot_mock.assert_called_once()
 
-    @pytest.mark.parametrize("button_name, slot", [
+    @pytest.mark.parametrize("widget_name, slot", [
         pytest.param("command_link_button_customer", "select_customer"),
         pytest.param("command_link_button_delivery", "select_delivery_terms"),
         pytest.param("command_link_button_offer", "select_offer_terms"),
         pytest.param("command_link_button_billing", "select_billing_terms"),
         pytest.param("command_link_button_delivery_date", "select_delivery_date_terms"),
+        pytest.param("push_button_add_merchandise", "select_merchandise"),
+        pytest.param("push_button_remove_row", "remove_row"),
+        pytest.param("push_button_discount", "set_discount"),
     ])
-    def test_slot_triggered(self, active_window, qtbot, button_name, slot):
-        button = getattr(active_window.ui, button_name)
+    def test_slot_for_clicked(self, active_window, qtbot, widget_name, slot):
+        widget = getattr(active_window.ui, widget_name)
         with patch(f"src.main_window.MainWindow.{slot}", autospec=True) as slot_mock:
-            with qtbot.wait_signal(button.clicked):
-                qtbot.mouseClick(button, Qt.LeftButton)
+            with qtbot.wait_signal(widget.clicked):
+                qtbot.mouseClick(widget, Qt.LeftButton)
             slot_mock.assert_called_once()
 
-    def test_x_slot_triggered(self, active_window, qtbot):
-        with patch("src.main_window.MainWindow.select_delivery_terms", autospec=True) as mock:
-            with qtbot.wait_signal(active_window.ui.command_link_button_delivery.clicked):
-                qtbot.mouseClick(active_window.ui.command_link_button_delivery, Qt.LeftButton)
-            mock.assert_called_once()
+    @pytest.mark.parametrize("widget_name, slot", [
+        pytest.param("check_box_query_date", "inquiry_date_toggled"),
+        pytest.param("check_box_query_number", "inquiry_number_toggled"),
+    ])
+    def test_slot_state_changed(self, active_window, qtbot, widget_name, slot):
+        widget = getattr(active_window.ui, widget_name)
+        with patch(f"src.main_window.MainWindow.{slot}", autospec=True) as mock:
+            with qtbot.wait_signal(widget.stateChanged):
+                qtbot.mouseClick(widget, Qt.LeftButton)
+            mock.assert_called_once_with(active_window, Qt.Checked)
 
-
+    @pytest.mark.parametrize("widget_name, slot", [
+        pytest.param("line_edit_query_number", "inquiry_number_changed"),
+        pytest.param("plain_text_edit_remarks", "update_remarks"),
+    ])
+    def test_slot_text_changed(self, active_window, qtbot, widget_name, slot):
+        text = "lorem ipsum"
+        widget = getattr(active_window.ui, widget_name)
+        widget.setEnabled(True)
+        with patch(f"src.main_window.MainWindow.{slot}", autospec=True) as mock:
+            with qtbot.wait_signal(widget.textChanged):
+                active_window.ui.tabWidget.setCurrentIndex(1)
+                qtbot.keyClicks(widget, text)
+            #    qtbot.stop()
+            mock.assert_called()
+            assert_that(mock.call_count, is_(len(text)))

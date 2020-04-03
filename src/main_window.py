@@ -8,8 +8,8 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 #
-from PySide2.QtCore import Slot
-from PySide2.QtWidgets import QMainWindow, QDialog
+from PySide2.QtCore import Slot, Qt
+from PySide2.QtWidgets import QMainWindow, QDialog, QApplication
 
 from forms.ui_mainwindow import Ui_MainWindow
 from src.customer import CustomerSelectionDialog
@@ -29,13 +29,25 @@ class MainWindow(QMainWindow):
         self.user = user
 
         self.ui.action_new.triggered.connect(self.new_offer)
+        self.ui.action_open.triggered.connect(self.load_offer)
+        self.ui.action_save.triggered.connect(self.save_offer)
         self.ui.action_new_number.triggered.connect(self.new_offer_symbol)
+        self.ui.action_exit.triggered.connect(self.exit)
+
+        self.ui.action_print.triggered.connect(self.print_preview)
+        self.ui.action_PDF.triggered.connect(self.print_pdf)
+
+        self.ui.action_about.triggered.connect(self.about)
+        self.ui.action_about_Qt.triggered.connect(self.about_qt)
 
         self.ui.push_button_add_merchandise.clicked.connect(self.select_merchandise)
         self.ui.push_button_remove_row.clicked.connect(self.remove_row)
         self.ui.push_button_discount.clicked.connect(self.set_discount)
 
         self.ui.command_link_button_customer.clicked.connect(self.select_customer)
+        self.ui.check_box_query_date.stateChanged.connect(self.inquiry_date_toggled)
+        self.ui.check_box_query_number.stateChanged.connect(self.inquiry_number_toggled)
+        self.ui.line_edit_query_number.textChanged.connect(self.inquiry_number_changed)
 
         self.ui.command_link_button_delivery.clicked.connect(self.select_delivery_terms)
         self.ui.command_link_button_offer.clicked.connect(self.select_offer_terms)
@@ -126,3 +138,52 @@ class MainWindow(QMainWindow):
         if dialog.exec_() == QDialog.Accepted:
             self.offer.merchandise_list.set_discount(dialog.filter_expression, dialog.discount_value)
         self.offer.merchandise_list.highlight_rows("")
+
+    @Slot(int)
+    def inquiry_date_toggled(self, state: int) -> None:
+        enabled = state == Qt.Checked
+        self.ui.push_button_query_date.setEnabled(enabled)
+#        self.ui.line_edit_query_date
+        if not enabled:
+            self.offer.inquiry_date = None
+
+    @Slot(int)
+    def inquiry_number_toggled(self, state: int) -> None:
+        enabled = state == Qt.Checked
+        self.ui.line_edit_query_number.setEnabled(enabled)
+        if not enabled:
+            self.offer.inquiry_number = None
+
+    @Slot(str)
+    def inquiry_number_changed(self, text: str) -> None:
+        self.offer.inquiry_number = text
+
+    @Slot()
+    def load_offer(self) -> None:
+        pass
+
+    @Slot()
+    def save_offer(self) -> None:
+        pass
+
+    @Slot()
+    def exit(self) -> None:
+        """Forward to QMainWindow.close, but keep here for sake of tests"""
+        super().close()
+
+    @Slot()
+    def print_preview(self) -> None:
+        pass
+
+    @Slot()
+    def print_pdf(self) -> None:
+        pass
+
+    @Slot()
+    def about(self) -> None:
+        pass
+
+    @Slot()
+    def about_qt(self) -> None:
+        """Forward to QApplication.aboutQt, but keep here for sake of tests"""
+        QApplication.aboutQt()

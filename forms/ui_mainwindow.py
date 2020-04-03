@@ -302,7 +302,6 @@ class Ui_MainWindow(object):
 
         self.formLayout.setItem(11, QFormLayout.FieldRole, self.verticalSpacer_6)
 
-
         self.gridLayout.addWidget(self.groupBox, 2, 0, 2, 2)
 
 #        self.kolumny = QGroupBox(self.tab_2)
@@ -398,6 +397,7 @@ class Ui_MainWindow(object):
         self.menu_offer.addAction(self.action_open)
         self.menu_offer.addAction(self.action_save)
         self.menu_offer.addAction(self.action_new_number)
+        self.menu_offer.addAction(self.action_exit)
         self.menu_export.addAction(self.action_PDF)
         self.menu_export.addAction(self.action_print)
         self.menu_help.addAction(self.action_about)
@@ -406,7 +406,6 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
 
         self.tabWidget.setCurrentIndex(0)
-
 
         QMetaObject.connectSlotsByName(MainWindow)
     # setupUi
