@@ -12,7 +12,7 @@ import typing
 
 from PySide2 import QtGui, QtCore, QtWidgets
 from PySide2.QtGui import QIcon, QPixmap, QColor
-from PySide2.QtCore import QObject, QAbstractTableModel, QModelIndex, Qt, Slot
+from PySide2.QtCore import QObject, QAbstractTableModel, QModelIndex, Qt, Slot, Signal
 from PySide2.QtWidgets import QWidget, QTableView, QItemDelegate, QDoubleSpinBox, QStyleOptionViewItem
 
 from src.database import get_merchandise_sql_model
@@ -28,6 +28,7 @@ class Merchandise(QObject):
         self.discount = 0
         self.count = 0
         self.by_meter = False  # by default by piece
+        self.position = None
 
     @property
     def unit(self):
@@ -113,7 +114,7 @@ class MerchandiseListModel(QAbstractTableModel):
     def headerData(self, section: int, orientation: Qt.Orientation, role: int = ...) -> typing.Any:
         if orientation == Qt.Vertical and role == Qt.DisplayRole:
             if section < len(self.list):
-                return str(section + 1)
+                return str(self.list[section].position)
             return ""
         elif orientation == Qt.Horizontal and role == Qt.DisplayRole and section < len(self.headers):
             return self.headers[section]
@@ -213,29 +214,32 @@ class MerchandiseListModel(QAbstractTableModel):
         self.endRemoveRows()
         return True
 
-    def moveRows(self, sourceParent: QModelIndex, sourceRow: int, count: int, destinationParent: QModelIndex, destinationChild: int) -> bool:
-        last_row = sourceRow + count - 1
-        offset = destinationChild - sourceRow
-        if destinationChild == len(self.list):
-            offset -= 1
+    def move_item(self, item_index, position):
+        self.list[item_index].position = position
+#    def moveRows(self, sourceParent: QModelIndex, sourceRow: int, count: int, destinationParent: QModelIndex, destinationChild: int) -> bool:
+#        last_row = sourceRow + count - 1
+#        offset = destinationChild - sourceRow
+#        if destinationChild == len(self.list):
+#            offset -= 1
+#
+#        if destinationChild in range(sourceRow, sourceRow + count + 1):
+#            return False
+#
+#        self.beginMoveRows(sourceParent, sourceRow, last_row, destinationParent, destinationChild)
+#        for i in range(count):
+#            self.list.insert(sourceRow + offset + i, self.list.pop(sourceRow + i))
+#        self.endMoveRows()
+#        return True
 
-        if destinationChild in range(sourceRow, sourceRow + count + 1):
-            return False
-
-        self.beginMoveRows(sourceParent, sourceRow, last_row, destinationParent, destinationChild)
-        for i in range(count):
-            self.list.insert(sourceRow + offset + i, self.list.pop(sourceRow + i))
-        self.endMoveRows()
-        return True
-
-    def sort(self, column, order):
-        reverse = (order == Qt.DescendingOrder)
-        self.beginResetModel()
-        self.list.sort(key=(lambda item: item[column]), reverse=reverse)
-        self.endResetModel()
+#    def sort(self, column, order):
+#        reverse = (order == Qt.DescendingOrder)
+#        self.beginResetModel()
+#        self.list.sort(key=(lambda item: item[column]), reverse=reverse)
+#        self.endResetModel()
 
     def add_item(self, item):
         where = len(self.list)
+        item.position = where + 1
         self.beginInsertRows(QModelIndex(), where, where)
         self.list.append(item)
         self.endInsertRows()
@@ -335,33 +339,59 @@ class MerchandiseListDelegate(QItemDelegate):
 
 
 class MerchandiseListView(QTableView):
+    row_moved = Signal()
+
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.drag_start_index = None
+#        self.drag_start_index = None
         self.setItemDelegate(MerchandiseListDelegate(self))
-        self.setSortingEnabled(True)
-        self.setAcceptDrops(True)
+#        self.setSortingEnabled(True)
+#        self.setAcceptDrops(True)
         self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self.setDropIndicatorShown(True)
-        self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+#        self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
 
-        self.header = super().horizontalHeader()
-        self.header.setSortIndicatorShown(False)
-        self.header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        self.horizontal_header.setSortIndicatorShown(False)
+        self.horizontal_header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+
+        self.vertical_header.setSectionsMovable(True)
+        self.vertical_header.setFirstSectionMovable(True)
+        self.vertical_header.sectionMoved.connect(self.move_row)
+
+    @property
+    def horizontal_header(self):
+        return self.horizontalHeader()
+
+    @property
+    def vertical_header(self):
+        return self.verticalHeader()
 
     def setModel(self, model: QtCore.QAbstractItemModel) -> None:
         super().setModel(model)
-        self.header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        self.horizontal_header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
 
-    def dragEnterEvent(self, a0: QtGui.QDragEnterEvent) -> None:
-        if a0.source() is self:
-            self.drag_start_index = self.indexAt(a0.pos())
-            a0.acceptProposedAction()
+    @Slot()
+    def move_row(self, logical_index: int, old_visual_index: int, new_visual_index: int) -> None:
+        last_row = self.vertical_header.count()
+        if old_visual_index < last_row and new_visual_index < last_row:
+            self.model().move_item(logical_index, new_visual_index)
 
-    def dropEvent(self, a0: QtGui.QDropEvent) -> None:
-        drag_end_index = self.indexAt(a0.pos())
-        self.model().moveRow(QModelIndex(), self.drag_start_index.row(), QModelIndex, drag_end_index.row())
-        a0.acceptProposedAction()
+            self.row_moved.emit()
+        #    def dragEnterEvent(self, a0: QtGui.QDragEnterEvent) -> None:
+#        mime = a0.mimeData()
+#        x = mime.text()
+#        pos = a0.pos()
+#        if a0.source() is self:
+#            pos = a0.pos()
+#            self.drag_start_index = self.indexAt(pos)
+#            a0.acceptProposedAction()
+#
+#    def dropEvent(self, a0: QtGui.QDropEvent) -> None:
+#        pos = a0.pos()
+#        drag_end_index = self.indexAt(pos)
+#        self.model().moveRow(QModelIndex(), self.drag_start_index.row(), QModelIndex(), drag_end_index.row())
+#        a0.acceptProposedAction()
+#        self.row_moved.emit()
 
 
 class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):

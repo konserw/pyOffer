@@ -9,8 +9,8 @@
 # If not, see <http://www.gnu.org/licenses/>.
 #
 import pytest
-from PySide2 import QtWidgets
-from PySide2.QtCore import Qt, QModelIndex, QAbstractItemModel, QPoint, QSize
+from PySide2 import QtWidgets, QtGui
+from PySide2.QtCore import Qt, QModelIndex, QAbstractItemModel, QPoint, QSize, QVariantAnimation, QEvent, QMimeData
 from PySide2.QtSql import QSqlField, QSqlRecord
 from hamcrest import assert_that, is_, greater_than, instance_of
 from qtmatchers import has_item_flags
@@ -378,23 +378,65 @@ class TestMerchandiseListDelegate:
         assert_that(sample_model.data(index, Qt.DisplayRole), is_(target))
 
 
-@pytest.mark.xfail  # Events are not processed correctly in QTest
+# @pytest.mark.xfail  # Events are not processed correctly in QTest
 class TestMerchandiseListView:
     def test_drag_and_drop(self, qtbot, sample_model):
-        sample_model.add_item(_create_merch(2))
+        merch = _create_merch(2)
+        merch.code = "SECOND"
+        sample_model.add_item(merch)
         view = MerchandiseListView()
         qtbot.addWidget(view)
-        #view.show()
         view.setModel(sample_model)
+
+        view.show()
+        view.resize(800, 600)
+        qtbot.wait_exposed(view)
+      #  qtbot.stop()
+
         pos0 = QPoint(view.columnViewportPosition(1), view.rowViewportPosition(0))
         assert_that(view.indexAt(pos0).data(Qt.UserRole), is_(1))
         pos1 = QPoint(view.columnViewportPosition(1), view.rowViewportPosition(1))
         assert_that(view.indexAt(pos1).data(Qt.UserRole), is_(2))
         pos2 = QPoint(view.columnViewportPosition(1), view.rowViewportPosition(2))
 
-        qtbot.mousePress(view, Qt.LeftButton, pos=pos0)
-        qtbot.mouseMove(view, pos2)
-        qtbot.mouseRelease(view, Qt.LeftButton, delay=15)
+        drag_event = QtGui.QDragEnterEvent(view.mapToGlobal(pos0), Qt.MoveAction, QMimeData(), Qt.LeftButton, Qt.NoModifier)
+        drop_event = QtGui.QDragEnterEvent(view.mapToGlobal(pos2), Qt.MoveAction, QMimeData(), Qt.LeftButton, Qt.NoModifier)
+#        def on_value_changed(value):
+#            event = QtGui.QMouseEvent(
+#                QEvent.MouseMove,
+#                value,
+#                Qt.NoButton,
+#                Qt.LeftButton,
+#                Qt.NoModifier,
+#            )
+#            QtWidgets.QApplication.sendEvent(view, event)
+#            qtbot.wait(10)
+#
+#        animation = QVariantAnimation(
+#            startValue=pos0, endValue=pos2, duration=5000
+#        )
+#        qtbot.mousePress(view, Qt.LeftButton, pos=pos0)
+#        animation.valueChanged.connect(on_value_changed)
+#        with qtbot.waitSignal(animation.finished, timeout=10000):
+#            animation.start()
+#        qtbot.mouseRelease(view, Qt.LeftButton)
+        with qtbot.wait_signal(view.row_moved):
+         #   qtbot.stop()
+            view.vertical_header.moveSection(0, 1)
+            qtbot.stop()
+        #    view.dragEnterEvent(drag_event)
+         #   view.dropEvent(drop_event)
+     #       qtbot.mouseMove(view, pos0)
+     #  #     qtbot.wait(1000)
+     #       qtbot.stop()
+#    #        qtbot.mouseMove(view, pos1)
+#    #        qtbot.wait(1000)
+     #       qtbot.mousePress(view, Qt.LeftButton, pos=pos0)
+     #       qtbot.wait(1000)
+     #       qtbot.mouseMove(view, pos2)
+     #       qtbot.wait(1000)
+     #       qtbot.mouseRelease(view, Qt.LeftButton, delay=15)
+            #qtbot.stop()
 
         assert_that(view.indexAt(pos0).data(Qt.UserRole), is_(2))
         assert_that(view.indexAt(pos1).data(Qt.UserRole), is_(1))
