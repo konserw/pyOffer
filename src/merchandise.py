@@ -497,7 +497,7 @@ class MerchandiseSelectionDialog(QtWidgets.QDialog):
         return self.model.selected
 
 
-def create_merchandise_selection_dialog(parent):
+def create_merchandise_selection_dialog(parent=None):
     sql_model = get_merchandise_sql_model()
     selection_model = MerchandiseSelectionModel(parent)
     selection_model.setSourceModel(sql_model)

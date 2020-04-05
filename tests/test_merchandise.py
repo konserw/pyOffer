@@ -18,7 +18,7 @@ from qtmatchers import has_item_flags
 
 from src.database import get_merchandise_sql_model
 from src.merchandise import Merchandise, MerchandiseListModel, MerchandiseSelectionModel, MerchandiseListDelegate, \
-    MerchandiseListView, MerchandiseSelectionDelegate, MerchandiseSelectionDialog
+    MerchandiseListView, MerchandiseSelectionDelegate, MerchandiseSelectionDialog, create_merchandise_selection_dialog
 
 
 def _create_merch(id=1, list_price=9.99, count=1, discount=10):
@@ -584,6 +584,33 @@ class TestMerchandiseSelectionDialog:
         assert_that(dialog.selected, is_({}))
         for i in range(1, loops + 1):
             selection_model.setData(selection_model.index(0, 0), i, Qt.EditRole)
+            assert_that(dialog.selected, is_({1: _create_merch(1, count=i)}))
+
+
+@pytest.mark.usefixtures("db")
+class TestMerchandiseSelectionDialogWithDB:
+    def test_initial_state(self, qtbot):
+        dialog = create_merchandise_selection_dialog()
+        qtbot.addWidget(dialog)
+
+        # todo: other translations
+        assert_that(dialog.windowTitle(), is_("Choose merchandise"))
+        assert_that(dialog.size(), is_(QSize(800, 500)))
+        assert_that(dialog.label.text(), is_("Filter"))
+        assert_that(dialog.push_button_close.text(), is_("Add"))
+        assert_that(dialog.line_edit.text(), is_(""))
+
+    @pytest.mark.parametrize("loops", [
+        pytest.param(1),
+        pytest.param(3),
+        pytest.param(5),
+    ])
+    def test_selected(self, qtbot, loops):
+        dialog = create_merchandise_selection_dialog()
+        qtbot.addWidget(dialog)
+        assert_that(dialog.selected, is_({}))
+        for i in range(1, loops + 1):
+            dialog.model.setData(dialog.model.index(0, 0), i, Qt.EditRole)
             assert_that(dialog.selected, is_({1: _create_merch(1, count=i)}))
 
 
