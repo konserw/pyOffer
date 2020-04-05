@@ -135,9 +135,10 @@ class MainWindow(QMainWindow):
     def set_discount(self):
         dialog = DiscountDialog(self)
         dialog.line_edit_expression.textChanged.connect(self.offer.merchandise_list.highlight_rows)
+        self.offer.merchandise_list.highlight_rows("")
         if dialog.exec_() == QDialog.Accepted:
             self.offer.merchandise_list.set_discount(dialog.filter_expression, dialog.discount_value)
-        self.offer.merchandise_list.highlight_rows("")
+        self.offer.merchandise_list.highlight_rows(None)
 
     @Slot(int)
     def inquiry_date_toggled(self, state: int) -> None:

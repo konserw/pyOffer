@@ -143,7 +143,7 @@ class MerchandiseListModel(QAbstractTableModel):
             return Qt.AlignLeft
 
         if role == Qt.BackgroundRole:
-            if self.ex and row < len(self.list) and self.ex.casefold() in self.list[row].code.casefold():
+            if self.ex is not None and row < len(self.list) and self.ex.casefold() in self.list[row].code.casefold():
                 return QColor(0xFC, 0xF7, 0xBB)
 
         if role == Qt.EditRole and row < len(self.list) and col in (3, 5):

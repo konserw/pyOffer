@@ -11,8 +11,9 @@
 import pytest
 from PySide2 import QtWidgets
 from PySide2.QtCore import Qt, QModelIndex, QAbstractItemModel, QPoint, QSize
+from PySide2.QtGui import QColor
 from PySide2.QtSql import QSqlField, QSqlRecord
-from hamcrest import assert_that, is_, greater_than, instance_of
+from hamcrest import assert_that, is_, greater_than, instance_of, none
 from qtmatchers import has_item_flags
 
 from src.database import get_merchandise_sql_model
@@ -336,6 +337,43 @@ class TestMerchandiseListModel:
             assert_that(sample_model.list[1].discount, is_(50))
         else:
             assert_that(sample_model.list[1].discount, is_(0))
+
+    @pytest.mark.parametrize("ex, which", [
+        pytest.param("", "both"),
+        pytest.param("O", "both"),
+        pytest.param("R", "second"),
+        pytest.param("CODE", "first"),
+        pytest.param("DESCR", "none"),
+        pytest.param("S", "none"),
+        pytest.param("one", "none"),
+        pytest.param("E", "both"),
+        pytest.param("D", "first"),
+        pytest.param("Other", "second"),
+        pytest.param("otheR", "second"),
+        pytest.param("the", "second"),
+    ])
+    def test_highlight_rows(self, sample_model, ex, which):
+        other = _create_merch(2, discount=0)
+        other.code = "Other"
+        other.description = "otheR one"
+        sample_model.add_item(other)
+        indexes = [
+            sample_model.index(0, 0),
+            sample_model.index(1, 0),
+        ]
+        assert_that(sample_model.data(indexes[0], Qt.BackgroundRole), is_(none()))
+        assert_that(sample_model.data(indexes[1], Qt.BackgroundRole), is_(none()))
+
+        sample_model.highlight_rows(ex)
+
+        if which in ("both", "first"):
+            assert_that(sample_model.data(indexes[0], Qt.BackgroundRole), is_(QColor(0xFC, 0xF7, 0xBB)))
+        else:
+            assert_that(sample_model.data(indexes[0], Qt.BackgroundRole), is_(none()))
+        if which in ("both", "second"):
+            assert_that(sample_model.data(indexes[1], Qt.BackgroundRole), is_(QColor(0xFC, 0xF7, 0xBB)))
+        else:
+            assert_that(sample_model.data(indexes[1], Qt.BackgroundRole), is_(none()))
 
     def test_with_modeltester(self, qtmodeltester, sample_model):
         qtmodeltester.check(sample_model)
