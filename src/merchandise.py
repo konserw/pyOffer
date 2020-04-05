@@ -90,6 +90,7 @@ class MerchandiseListModel(QAbstractTableModel):
         super().__init__(parent)
         self.list = []
         self.ex = None
+        self.drag_icon = QPixmap(":/user").scaled(28, 28, Qt.KeepAspectRatio)
         self.headers = (
             self.tr("Code"),
             self.tr("Description"),
@@ -112,9 +113,10 @@ class MerchandiseListModel(QAbstractTableModel):
         return len(self.headers)
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int = ...) -> typing.Any:
-        if orientation == Qt.Vertical and role == Qt.DisplayRole:
+        if orientation == Qt.Vertical and role == Qt.DecorationRole:
             if section < len(self.list):
-                return str(self.list[section].position)
+                return self.drag_icon
+        if orientation == Qt.Vertical and role == Qt.DisplayRole:
             return ""
         elif orientation == Qt.Horizontal and role == Qt.DisplayRole and section < len(self.headers):
             return self.headers[section]

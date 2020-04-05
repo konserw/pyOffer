@@ -423,6 +423,7 @@ class TestMerchandiseListView:
         with qtbot.wait_signal(view.row_moved):
          #   qtbot.stop()
             view.vertical_header.moveSection(0, 1)
+            x = view.vertical_header.saveState()
             qtbot.stop()
         #    view.dragEnterEvent(drag_event)
          #   view.dropEvent(drop_event)
