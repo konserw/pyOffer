@@ -16,7 +16,7 @@ from PySide2.QtGui import QPixmap, QIcon
 
 # noinspection PyUnresolvedReferences
 import resources.all  # noqa: F401
-from src.database import get_new_offer_number
+from src.database import get_new_offer_number, get_users_table
 
 
 class User:
@@ -83,14 +83,14 @@ class UserSelectionDialog(QtWidgets.QDialog):
         logo_label.setAlignment(Qt.AlignCenter)
         top_level_layout.addWidget(logo_label)
 
-        horizontal_layout = QtWidgets.QHBoxLayout(self)
+        horizontal_layout = QtWidgets.QHBoxLayout()
         icon_label = QtWidgets.QLabel(self)
         pixmap = QPixmap(":/user").scaled(128, 128, Qt.KeepAspectRatio)
         icon_label.setPixmap(pixmap)
         icon_label.setAlignment(Qt.AlignCenter)
         horizontal_layout.addWidget(icon_label)
 
-        vertical_layout = QtWidgets.QVBoxLayout(self)
+        vertical_layout = QtWidgets.QVBoxLayout()
         label_description = QtWidgets.QLabel(self)
         label_description.setText(self.tr("Please choose user:"))
         vertical_layout.addWidget(label_description)
@@ -102,17 +102,22 @@ class UserSelectionDialog(QtWidgets.QDialog):
         self.list_view.setCurrentIndex(self.model.index(default_user, 1))
         vertical_layout.addWidget(self.list_view)
 
-        buttons = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
-        buttons.accepted.connect(self.ok)
-        buttons.rejected.connect(self.reject)
-        vertical_layout.addWidget(buttons)
+        self.buttons = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+        self.buttons.accepted.connect(self.ok)
+        self.buttons.rejected.connect(self.reject)
+        vertical_layout.addWidget(self.buttons)
 
         horizontal_layout.addLayout(vertical_layout)
         top_level_layout.addLayout(horizontal_layout)
 
     @Slot()
-    def ok(self):
+    def ok(self) -> None:
         row = self.list_view.currentIndex().row()
         self.chosen_user_record = self.model.record(row)
         self.settings.setValue("default_user", row)
         self.accept()
+
+    @staticmethod
+    def make():
+        user_model = get_users_table()
+        return UserSelectionDialog(user_model)

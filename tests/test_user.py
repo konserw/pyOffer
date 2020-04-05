@@ -11,10 +11,12 @@
 from datetime import date
 
 import pytest
-from hamcrest import assert_that, is_
+from PySide2.QtCore import Qt
+from PySide2.QtWidgets import QDialogButtonBox
+from hamcrest import assert_that, is_, none, not_none
 from mock import patch
 
-from src.user import User
+from src.user import User, UserSelectionDialog
 
 USER_ID = 1
 NAME = "name"
@@ -82,3 +84,70 @@ class TestUser:
             monkeypatch.setattr("src.user.get_new_offer_number", lambda _: 8)
 
             assert_that(user.new_offer_symbol(), is_("X2012N08"))
+
+
+@pytest.fixture
+def user_dialog():
+    model = ...
+    dialog = UserSelectionDialog(model)
+    return dialog
+
+
+class MockSettings:
+    VALUE = None
+    KEY = "default_user"
+    set_value = None
+
+    @classmethod
+    def value(cls, key, default):
+        assert_that(key, is_(cls.KEY))
+        if cls.VALUE:
+            return cls.VALUE
+        return default
+
+    @classmethod
+    def setValue(cls, key, value):
+        assert_that(key, is_(cls.KEY))
+        cls.set_value = value
+
+
+@pytest.fixture
+def mock_settings(monkeypatch):
+    monkeypatch.setattr("src.user.QSettings", MockSettings)
+
+
+@pytest.mark.usefixtures("db", "mock_settings")
+class TestUserDialogWithDb:
+    @pytest.mark.parametrize("row", [
+        pytest.param(None),  # check the default
+        pytest.param(0),
+        pytest.param(1),
+    ])
+    def test_initial_state(self, qtbot, row):
+        MockSettings.VALUE = row
+        user_dialog = UserSelectionDialog.make()
+        assert_that(user_dialog.chosen_user_record, is_(none()))
+        # todo: translations
+        assert_that(user_dialog.windowTitle(), is_("pyOffer - Choose user"))
+        assert_that(user_dialog.list_view.currentIndex().row(), is_(row if row else 0))
+
+    def test_ok_slot_triggered(self, qtbot):
+        user_dialog = UserSelectionDialog.make()
+        button = user_dialog.buttons.button(QDialogButtonBox.Ok)
+        with patch(f"src.user.UserSelectionDialog.ok", autospec=True) as slot_mock:
+            with qtbot.wait_signal(button.clicked):
+                qtbot.mouseClick(button, Qt.LeftButton)
+            slot_mock.assert_called_once()
+
+    @pytest.mark.parametrize("row", [
+        pytest.param(0),
+        pytest.param(1),
+    ])
+    def test_ok_slot(self, qtbot, row):
+        user_dialog = UserSelectionDialog.make()
+        user_dialog.list_view.setCurrentIndex(user_dialog.model.index(row, 1))
+        user_dialog.ok()
+        record = user_dialog.chosen_user_record
+        assert_that(record, is_(not_none()))
+        assert_that(record.value("user_id"), is_(row + 1))
+        assert_that(MockSettings.set_value, is_(row))

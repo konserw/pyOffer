@@ -28,8 +28,7 @@ if __name__ == '__main__':
     app.setApplicationName("pyOffer")
 
     database.connect()
-    user_model = database.get_users_table()
-    user_dialog = UserSelectionDialog(user_model)
+    user_dialog = UserSelectionDialog.make()
     if user_dialog.exec_() == QDialog.Accepted:
         user = User.from_sql_record(user_dialog.chosen_user_record)
         main_window = MainWindow(user)
