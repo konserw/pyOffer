@@ -104,4 +104,3 @@ class TestTermsChhoserDialog:
         assert_that(dialog.windowTitle(), is_(expected_titles[type]))
         assert_that(dialog.chosen_item, is_(none()))
         assert_that(dialog.ui.plainTextEdit.toPlainText(), is_(""))
-

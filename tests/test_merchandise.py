@@ -422,7 +422,6 @@ class TestMerchandiseListView:
         sample_model.add_item(_create_merch(2))
         view = MerchandiseListView()
         qtbot.addWidget(view)
-        #view.show()
         view.setModel(sample_model)
         pos0 = QPoint(view.columnViewportPosition(1), view.rowViewportPosition(0))
         assert_that(view.indexAt(pos0).data(Qt.UserRole), is_(1))
