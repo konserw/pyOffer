@@ -8,11 +8,14 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 #
+from __future__ import annotations
+
 import typing
 
 from PySide2 import QtGui, QtCore, QtWidgets
 from PySide2.QtCore import QObject, QAbstractTableModel, QModelIndex, Qt, Slot
 from PySide2.QtGui import QIcon, QPixmap, QColor
+from PySide2.QtSql import QSqlRecord
 from PySide2.QtWidgets import QWidget, QTableView, QItemDelegate, QDoubleSpinBox, QStyleOptionViewItem
 
 # noinspection PyUnresolvedReferences
@@ -21,7 +24,7 @@ from src.database import get_merchandise_sql_model
 
 
 class Merchandise(QObject):
-    def __init__(self, merchandise_id=None):
+    def __init__(self, merchandise_id: int = None):
         super().__init__()
         self.id = merchandise_id
         self.code = None
@@ -32,22 +35,22 @@ class Merchandise(QObject):
         self.by_meter = False  # by default by piece
 
     @property
-    def unit(self):
+    def unit(self) -> str:
         if self.by_meter:
             return self.tr("m")
         else:
             return self.tr("pc.")
 
     @property
-    def price(self):
+    def price(self) -> float:
         return round(self.list_price * (100 - self.discount) / 100, 2)
 
     @property
-    def total(self):
+    def total(self) -> float:
         return round(self.price * self.count, 2)
 
     @staticmethod
-    def from_sql_record(record):
+    def from_sql_record(record: QSqlRecord) -> Merchandise:
         item = Merchandise()
         item.id = record.value("merchandise_id")
         item.code = record.value("code")
@@ -56,10 +59,10 @@ class Merchandise(QObject):
         item.by_meter = record.value("unit") == "m"
         return item
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return self.id == other.id
 
-    def __getitem__(self, col):
+    def __getitem__(self, col: int):
         if col == 0:
             return self.code
         elif col == 1:
@@ -77,7 +80,7 @@ class Merchandise(QObject):
         elif col == 7:
             return self.total
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: int, value: float) -> None:
         if key == 3:
             self.discount = value
         elif key == 5:
@@ -87,7 +90,7 @@ class Merchandise(QObject):
 
 
 class MerchandiseListModel(QAbstractTableModel):
-    def __init__(self, parent=None):
+    def __init__(self, parent: QObject = None):
         super().__init__(parent)
         self.list = []
         self.ex = None
@@ -161,7 +164,7 @@ class MerchandiseListModel(QAbstractTableModel):
                 return self.list[row][col]
 
     @property
-    def grand_total(self):
+    def grand_total(self) -> float:
         sum = 0
         for item in self.list:
             sum += item.total
@@ -184,14 +187,14 @@ class MerchandiseListModel(QAbstractTableModel):
             return Qt.ItemIsEditable | default
         return default
 
-    def index(self, row: int, column: int, parent: QModelIndex = ...) -> QModelIndex:
+    def index(self, row: int, column: int, parent: QModelIndex = QModelIndex()) -> QModelIndex:
         if row > len(self.list):
             return QModelIndex()
         elif row == len(self.list):
             return self.createIndex(row, column, None)
         return self.createIndex(row, column, self.list[row])
 
-    def clear(self):
+    def clear(self) -> None:
         if not self.list:
             return
 
@@ -199,7 +202,7 @@ class MerchandiseListModel(QAbstractTableModel):
         self.list.clear()
         self.endRemoveRows()
 
-    def change_item_count(self, item):
+    def change_item_count(self, item: Merchandise) -> None:
         try:
             idx = self.list.index(item)
         except ValueError:  # item not on the list
@@ -207,7 +210,7 @@ class MerchandiseListModel(QAbstractTableModel):
         else:
             self.list[idx].count += item.count
 
-    def removeRows(self, row: int, count: int, parent: QModelIndex = ...) -> bool:
+    def removeRows(self, row: int, count: int, parent: QModelIndex = QModelIndex()) -> bool:
         end = row + count - 1
         self.beginRemoveRows(QModelIndex(), row, end)
         for i in range(row, end + 1):
@@ -230,36 +233,36 @@ class MerchandiseListModel(QAbstractTableModel):
         self.endMoveRows()
         return True
 
-    def sort(self, column, order):
+    def sort(self, column: int, order) -> None:
         reverse = (order == Qt.DescendingOrder)
         self.beginResetModel()
         self.list.sort(key=(lambda item: item[column]), reverse=reverse)
         self.endResetModel()
 
-    def add_item(self, item):
+    def add_item(self, item: Merchandise) -> None:
         where = len(self.list)
         self.beginInsertRows(QModelIndex(), where, where)
         self.list.append(item)
         self.endInsertRows()
 
-    def set_discount(self, ex, value):
+    def set_discount(self, ex: str, value: float) -> None:
         self.beginResetModel()
         for item in filter(lambda item: ex.casefold() in item.code.casefold(), self.list):
             item.discount = value
         self.endResetModel()
 
     @Slot(str)
-    def highlight_rows(self, ex):
+    def highlight_rows(self, ex: str) -> None:
         self.beginResetModel()
         self.ex = ex
         self.endResetModel()
 
-    def print(self):
+    def print(self) -> str:
         raise NotImplementedError()
 
 
 class DiscountDialog(QtWidgets.QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent: QObject = None):
         super().__init__(parent)
 
         self.setWindowTitle(self.tr("Set discounts"))
@@ -309,7 +312,7 @@ class DiscountDialog(QtWidgets.QDialog):
 
 
 class MerchandiseListDelegate(QItemDelegate):
-    def __init__(self, parent=None):
+    def __init__(self, parent: QObject = None):
         super().__init__(parent)
 
     def createEditor(self, parent: QWidget, _, index: QModelIndex) -> QWidget:
@@ -337,7 +340,7 @@ class MerchandiseListDelegate(QItemDelegate):
 
 
 class MerchandiseListView(QTableView):
-    def __init__(self, parent=None):
+    def __init__(self, parent: QObject = None):
         super().__init__(parent)
         self.drag_start_index = None
         self.setItemDelegate(MerchandiseListDelegate(self))
@@ -367,7 +370,7 @@ class MerchandiseListView(QTableView):
 
 
 class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):
-    def __init__(self, parent=None):
+    def __init__(self, parent: QObject = None):
         super().__init__(parent)
         self.selected = {}
         self.headers = (
@@ -378,7 +381,7 @@ class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):
             self.tr("List price"),
         )
 
-    def get_item_id(self, row):
+    def get_item_id(self, row: int) -> int:
         return self.sourceModel().data(self.createIndex(row, 0), Qt.DisplayRole)
 
     def get_column_value(self, index: QModelIndex, col: int):
@@ -408,7 +411,7 @@ class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):
             return self.headers[section]
 
     @Slot(str)
-    def search(self, ex):
+    def search(self, ex: str) -> None:
         self.sourceModel().update(ex)
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
@@ -432,7 +435,7 @@ class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):
 
 
 class MerchandiseSelectionDelegate(QtWidgets.QItemDelegate):
-    def __init__(self, parent=None):
+    def __init__(self, parent: QObject = None):
         super().__init__(parent)
 
     def createEditor(self, parent: QWidget, option: QStyleOptionViewItem, index: QtCore.QModelIndex) -> QWidget:
@@ -458,7 +461,7 @@ class MerchandiseSelectionDelegate(QtWidgets.QItemDelegate):
 
 
 class MerchandiseSelectionDialog(QtWidgets.QDialog):
-    def __init__(self, model, parent=None):
+    def __init__(self, model, parent: QObject = None):
         super().__init__(parent)
         self.model = model
 
@@ -495,11 +498,11 @@ class MerchandiseSelectionDialog(QtWidgets.QDialog):
         self.vertical_layout.addWidget(self.table_view)
 
     @property
-    def selected(self):
+    def selected(self) -> Merchandise:
         return self.model.selected
 
 
-def create_merchandise_selection_dialog(parent=None):
+def create_merchandise_selection_dialog(parent: QObject = None):
     sql_model = get_merchandise_sql_model()
     selection_model = MerchandiseSelectionModel(parent)
     selection_model.setSourceModel(sql_model)

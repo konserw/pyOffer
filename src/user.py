@@ -8,11 +8,14 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 #
+from __future__ import annotations
+
 from datetime import date
 
 from PySide2 import QtWidgets
 from PySide2.QtCore import Qt, Slot, QSettings
 from PySide2.QtGui import QPixmap, QIcon
+from PySide2.QtSql import QSqlRecord
 
 # noinspection PyUnresolvedReferences
 import resources.all  # noqa: F401
@@ -30,12 +33,12 @@ class User:
         self.business_symbol = None
 
     @property
-    def gender_suffix(self):
+    def gender_suffix(self) -> str:
         if self.male:
             return ""
         return "a"
 
-    def new_offer_symbol(self):
+    def new_offer_symbol(self) -> str:
         """
         Example: I1804P01
             1 char - business symbol,
@@ -50,7 +53,7 @@ class User:
         return f"{self.business_symbol}{year_and_month}{self.char_for_offer_symbol}{number:02}"
 
     @classmethod
-    def from_sql_record(cls, rec):
+    def from_sql_record(cls, rec: QSqlRecord) -> User:
         user = cls()
         user.id = rec.value("user_id")
         user.name = rec.value("name")
@@ -118,6 +121,6 @@ class UserSelectionDialog(QtWidgets.QDialog):
         self.accept()
 
     @staticmethod
-    def make():
+    def make() -> UserSelectionDialog:
         user_model = get_users_table()
         return UserSelectionDialog(user_model)

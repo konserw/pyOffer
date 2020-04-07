@@ -10,7 +10,7 @@
 #
 import pytest
 from PySide2.QtCore import Qt, QModelIndex
-from hamcrest import assert_that, is_, none
+from hamcrest import assert_that, is_, none, calling, raises
 
 from src.database import get_merchandise_sql_model, get_merchandise_record, get_user_record, get_new_offer_number
 
@@ -34,8 +34,7 @@ class TestMerchandiseRecord:
         assert_that(rec.field(4).value(), is_(5.49))
 
     def test_not_found(self):
-        rec = get_merchandise_record(3)
-        assert_that(rec, is_(none()))
+        assert_that(calling(get_merchandise_record).with_args(3), raises(RuntimeError))
 
 
 @pytest.fixture

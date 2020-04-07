@@ -8,10 +8,12 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 #
+from __future__ import annotations
+
 from PySide2 import QtWidgets
+from PySide2.QtCore import QModelIndex, Qt, Slot, QObject
+from PySide2.QtSql import QSqlTableModel, QSqlRecord
 from PySide2.QtWidgets import QWidget, QDialog, QHeaderView
-from PySide2.QtSql import QSqlTableModel
-from PySide2.QtCore import QModelIndex, Qt, Slot
 
 
 class Customer:
@@ -25,30 +27,30 @@ class Customer:
         self.address = ""
 
     @property
-    def concated_name(self):
+    def concated_name(self) -> str:
         return "{} {} {}".format(self.title, self.first_name, self.last_name)
 
     @property
-    def is_valid(self):
+    def is_valid(self) -> bool:
         return self.id is not None
 
     @property
-    def html_address(self):
+    def html_address(self) -> str:
         return self.address.replace("\n", "<br />\n")
 
     @property
-    def db_id(self):
+    def db_id(self) -> str:
         return "NULL" if self.id is None else str(self.id)
 
     @property
-    def description(self):
+    def description(self) -> str:
         return "{}\n{}\n{}".format(self.concated_name, self.full_name, self.address)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "Customer {}: {}; {}".format(self.id, self.concated_name, self.short_name)
 
     @staticmethod
-    def from_record(record):
+    def from_record(record: QSqlRecord) -> Customer:
         c = Customer()
         c.id = record.value("customer_id")
         c.short_name = record.value("short_name")
@@ -61,7 +63,7 @@ class Customer:
 
 
 class CustomerSearchModel(QSqlTableModel):
-    def __init__(self, parent=None):
+    def __init__(self, parent: QObject = None):
         super().__init__(parent)
         self.setTable("customers_view")
         self.select()
@@ -87,12 +89,12 @@ class CustomerSearchModel(QSqlTableModel):
         return super().headerData(section, orientation, role)
 
     @Slot(str)
-    def search(self, pattern):
+    def search(self, pattern: str) -> None:
         super().setFilter("first_name ilike '%{0}%' or full_name ilike '%{0}%' or last_name ilike '%{0}%'".format(pattern))
 
 
 class CustomerSearchWidget(QWidget):
-    def __init__(self, model, parent=None):
+    def __init__(self, model, parent: QObject = None):
         super().__init__(parent)
         self.model = model
         self.chosen_customer = None
@@ -109,12 +111,12 @@ class CustomerSearchWidget(QWidget):
         self.verticalLayout.addWidget(self.table_widget)
 
     @Slot(QModelIndex)
-    def selection_changed(self, index):
+    def selection_changed(self, index: QModelIndex) -> None:
         self.chosen_customer = Customer.from_record(self.model.record(index.row())) if index.isValid() else None
 
 
 class CustomerSelectionDialog(QDialog):
-    def __init__(self, model, parent=None):
+    def __init__(self, model, parent: QObject = None):
         super().__init__(parent)
         self.customer_search = CustomerSearchWidget(model)
 
@@ -133,10 +135,10 @@ class CustomerSelectionDialog(QDialog):
         self.verticalLayout.addLayout(self.horizontalLayout)
 
     @property
-    def chosen_customer(self):
+    def chosen_customer(self) -> Customer:
         return self.customer_search.chosen_customer
 
     @classmethod
-    def make(cls, parent=None):
+    def make(cls, parent: QObject = None) -> CustomerSelectionDialog:
         model = CustomerSearchModel(parent)
         return cls(model, parent)

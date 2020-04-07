@@ -8,15 +8,17 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 #
+from __future__ import annotations
+
+import logging
 import os
 import sys
-import logging
 from datetime import date
 
-from PySide2.QtSql import QSqlDatabase, QSqlTableModel, QSqlQuery, QSqlQueryModel
+from PySide2.QtSql import QSqlDatabase, QSqlTableModel, QSqlQuery, QSqlQueryModel, QSqlRecord
 
 
-def connect():
+def connect() -> None:
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
     database = QSqlDatabase.addDatabase("QPSQL")
     database.setHostName("127.0.0.1")
@@ -31,7 +33,7 @@ def connect():
         raise RuntimeError(f"Failed to connect to db: {error}")
 
 
-def get_customer_record(customer_id):
+def get_customer_record(customer_id: int) -> QSqlRecord:
     model = QSqlTableModel()
     model.setTable("customers_view")
     model.setFilter(F"customer_id = '{customer_id}'")
@@ -39,30 +41,30 @@ def get_customer_record(customer_id):
     return model.record(0)
 
 
-def get_users_table():
+def get_users_table() -> QSqlTableModel:
     model = QSqlTableModel()
     model.setTable("users")
     model.select()
     return model
 
 
-def get_user_record(user_id):
+def get_user_record(user_id: int) -> QSqlRecord:
     model = get_users_table()
     model.setFilter(F"user_id = '{user_id}'")
     return model.record(0)
 
 
-def get_new_offer_number(user_id):
+def get_new_offer_number(user_id: int) -> int:
     text = f"SELECT public.get_new_offer_number({user_id})"
     query = QSqlQuery(text)
     if not query.next():
         logging.error(f"Query failed: {text}")
         logging.error(query.lastError().text())
-        return None
+        raise RuntimeError("Error accessing database")
     return query.record().value(0)
 
 
-def get_terms_table(term_type):
+def get_terms_table(term_type: 'TermType') -> QSqlTableModel:
     model = QSqlTableModel()
     model.setTable(F"terms_{term_type.name}")
     model.select()
@@ -71,29 +73,30 @@ def get_terms_table(term_type):
     return model
 
 
-def get_merchandise_record(merchandise_id):
+def get_merchandise_record(merchandise_id: int) -> QSqlRecord:
     text = f"select * from merchandise_view('{date.today()}') where merchandise_id = '{merchandise_id}'"
     query = QSqlQuery(text)
     if not query.next():
         logging.error(f"Query failed: {text}")
         logging.error(query.lastError().text())
-        return None
+        raise RuntimeError("Error accessing database")
     return query.record()
 
 
-def get_merchandise_sql_model(for_date=date.today()):
-    class MerchandiseSqlModel(QSqlQueryModel):
-        def __init__(self, for_date, parent=None):
-            super().__init__(parent)
-            self.for_date = for_date
-            self.update()
+class MerchandiseSqlModel(QSqlQueryModel):
+    def __init__(self, for_date, parent=None):
+        super().__init__(parent)
+        self.for_date = for_date
+        self.update()
 
-        def update(self, ex=""):
-            self.beginResetModel()
-            self.setQuery(f"select * from merchandise_view('{self.for_date}')"
-                          f"where code ilike '%{ex}%' or description ilike '%{ex}%'")
-            if self.lastError().isValid():
-                raise RuntimeError(self.lastError().text())
-            self.endResetModel()
+    def update(self, ex=""):
+        self.beginResetModel()
+        self.setQuery(f"select * from merchandise_view('{self.for_date}')"
+                      f"where code ilike '%{ex}%' or description ilike '%{ex}%'")
+        if self.lastError().isValid():
+            raise RuntimeError(self.lastError().text())
+        self.endResetModel()
 
+
+def get_merchandise_sql_model(for_date: date = date.today()) -> MerchandiseSqlModel:
     return MerchandiseSqlModel(for_date)

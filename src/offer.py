@@ -8,12 +8,15 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 #
+from __future__ import annotations
+
 from datetime import date
 
 from PySide2.QtCore import QObject
 
 from src.customer import Customer
 from src.merchandise import MerchandiseListModel
+from src.user import User
 
 
 class Offer(QObject):
@@ -30,11 +33,11 @@ class Offer(QObject):
         self.author = None
         self.remarks = ""
 
-    def new_symbol(self):
+    def new_symbol(self) -> None:
         self.symbol = self.author.new_offer_symbol()
 
     @classmethod
-    def create_empty(cls, author, parent=None):
+    def create_empty(cls, author: User, parent: QObject = None) -> Offer:
         offer = cls(parent)
         offer.merchandise_list = MerchandiseListModel(offer)
         offer.customer = Customer()

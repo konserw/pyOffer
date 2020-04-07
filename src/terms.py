@@ -8,11 +8,14 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 #
+from __future__ import annotations
+
 import typing
 from enum import Enum, unique
 
-from PySide2.QtCore import QAbstractTableModel, QModelIndex, Qt, Slot
+from PySide2.QtCore import QAbstractTableModel, QModelIndex, Qt, Slot, QObject
 from PySide2.QtWidgets import QDialog
+from PySide2.QtSql import QSqlRecord
 
 from forms.ui_terms_chooser_dialog import Ui_TermsChooserDialog
 from src.database import get_terms_table
@@ -35,7 +38,7 @@ class TermItem:
         self.long_desc = None
 
     @staticmethod
-    def from_record(term_type, record):
+    def from_record(term_type: TermType, record: QSqlRecord) -> TermItem:
         t = TermItem()
         t.type = term_type
         t.id = record.value("id")
@@ -54,13 +57,17 @@ class TermModel(QAbstractTableModel):
             self.tr("Option text"),
         )
 
-    def add(self, item):
+    def add(self, item: TermItem) -> None:
         self.list.append(item)
 
-    def rowCount(self, parent: QModelIndex = ...) -> int:
+    def rowCount(self, parent: QModelIndex = QModelIndex()) -> int:
+        if parent.isValid():
+            return 0
         return len(self.list)
 
-    def columnCount(self, parent: QModelIndex = ...) -> int:
+    def columnCount(self, parent: QModelIndex = QModelIndex()) -> int:
+        if parent.isValid():
+            return 0
         return 3
 
     def data(self, index: QModelIndex, role: int = ...) -> typing.Any:
@@ -115,12 +122,12 @@ class TermsChooserDialog(QDialog):
         self.ui.listView.clicked.connect(self.selection_changed)
 
     @Slot(QModelIndex)
-    def selection_changed(self, index):
+    def selection_changed(self, index: QModelIndex) -> None:
         self.chosen_item = index.internalPointer()
         self.ui.plainTextEdit.setPlainText(self.chosen_item.long_desc)
 
     @classmethod
-    def make(cls, term_type, parent=None):
+    def make(cls, term_type: TermType, parent: QObject = None) -> TermsChooserDialog:
         table = get_terms_table(term_type)
         model = TermModel(parent)
         for i in range(table.rowCount()):

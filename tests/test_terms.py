@@ -66,20 +66,25 @@ class TestTermModel:
         assert_that(model.rowCount(QModelIndex()), is_(0))
 
     def test_one_item(self):
-        item = TermItem()
-        item.id = 0
-        item.short_desc = SHORT_DESCRIPTION
-        item.long_desc = LONG_DESCRIPTION
         model = TermModel()
-        model.add(item)
+        model.add(self._create_term_item())
 
         assert_that(model.rowCount(QModelIndex()), is_(1))
         assert_that(model.data(model.index(0, 0), Qt.DisplayRole), is_("0"))
         assert_that(model.data(model.index(0, 1), Qt.DisplayRole), is_(SHORT_DESCRIPTION))
         assert_that(model.data(model.index(0, 2), Qt.DisplayRole), is_(LONG_DESCRIPTION))
 
+    def _create_term_item(self, item_id=0):
+        item = TermItem()
+        item.id = item_id
+        item.short_desc = SHORT_DESCRIPTION
+        item.long_desc = LONG_DESCRIPTION
+        return item
+
     def test_with_modeltester(self, qtmodeltester):
         model = TermModel()
+        model.add(self._create_term_item(0))
+        model.add(self._create_term_item(1))
         qtmodeltester.check(model)
 
 
