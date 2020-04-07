@@ -11,10 +11,12 @@
 import typing
 
 from PySide2 import QtGui, QtCore, QtWidgets
-from PySide2.QtGui import QIcon, QPixmap, QColor
 from PySide2.QtCore import QObject, QAbstractTableModel, QModelIndex, Qt, Slot
+from PySide2.QtGui import QIcon, QPixmap, QColor
 from PySide2.QtWidgets import QWidget, QTableView, QItemDelegate, QDoubleSpinBox, QStyleOptionViewItem
 
+# noinspection PyUnresolvedReferences
+import resources.all  # noqa: F401
 from src.database import get_merchandise_sql_model
 
 
@@ -297,12 +299,12 @@ class DiscountDialog(QtWidgets.QDialog):
         top_level_layout.addLayout(vertical_layout)
 
     @property
-    def discount_value(self):
+    def discount_value(self) -> int:
         self.spinbox_discount.interpretText()
         return self.spinbox_discount.value()
 
     @property
-    def filter_expression(self):
+    def filter_expression(self) -> str:
         return self.line_edit_expression.text()
 
 

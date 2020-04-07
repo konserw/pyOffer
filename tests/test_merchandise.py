@@ -13,12 +13,12 @@ from PySide2 import QtWidgets
 from PySide2.QtCore import Qt, QModelIndex, QAbstractItemModel, QPoint, QSize
 from PySide2.QtGui import QColor
 from PySide2.QtSql import QSqlField, QSqlRecord
-from hamcrest import assert_that, is_, greater_than, instance_of, none
+from hamcrest import assert_that, is_, greater_than, instance_of, none, empty
 from qtmatchers import has_item_flags
 
 from src.database import get_merchandise_sql_model
 from src.merchandise import Merchandise, MerchandiseListModel, MerchandiseSelectionModel, MerchandiseListDelegate, \
-    MerchandiseListView, MerchandiseSelectionDelegate, MerchandiseSelectionDialog, create_merchandise_selection_dialog
+    MerchandiseListView, MerchandiseSelectionDelegate, MerchandiseSelectionDialog, create_merchandise_selection_dialog, DiscountDialog
 
 
 def _create_merch(id=1, list_price=9.99, count=1, discount=10):
@@ -667,3 +667,41 @@ class TestMerchandiseSelectionModelWithDB:
         assert_that(selection_model_with_db.rowCount(), is_(2))
         selection_model_with_db.search(ex)
         assert_that(selection_model_with_db.rowCount(), is_(expected))
+
+
+@pytest.fixture
+def discount_dialog(qtbot):
+    dialog = DiscountDialog()
+    qtbot.addWidget(dialog)
+    return dialog
+
+
+class TestDiscountDialog:
+    def test_initial_state(self, discount_dialog):
+        # todo: other translations
+        assert_that(discount_dialog.windowTitle(), is_("Set discounts"))
+        assert_that(discount_dialog.line_edit_expression.text(), is_(""))
+        assert_that(discount_dialog.label.text(), is_("Please enter regular expression\nif you want to limit discount to matching items,\nor leave empty to add discount to all items."))
+        assert_that(discount_dialog.spinbox_discount.minimum(), is_(0))
+        assert_that(discount_dialog.spinbox_discount.singleStep(), is_(5))
+        assert_that(discount_dialog.spinbox_discount.maximum(), is_(100))
+
+    @pytest.mark.parametrize("value", [
+        pytest.param(0),
+        pytest.param(11),
+        pytest.param(50),
+        pytest.param(100),
+    ])
+    def test_discount_value(self, discount_dialog, value):
+        discount_dialog.spinbox_discount.setValue(value)
+        assert_that(discount_dialog.discount_value, is_(value))
+
+    @pytest.mark.parametrize("ex", [
+        pytest.param(""),
+        pytest.param("Something"),
+    ])
+    def test_filter_expression(self, discount_dialog, ex, qtbot):
+        assert_that(discount_dialog.filter_expression, is_(empty()))
+        if ex:
+            qtbot.keyClicks(discount_dialog.line_edit_expression, ex)
+        assert_that(discount_dialog.filter_expression, is_(ex))
