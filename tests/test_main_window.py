@@ -8,7 +8,6 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 #
-from datetime import date
 
 import pytest
 from PySide2.QtCore import Qt
@@ -17,6 +16,7 @@ from mock import patch
 from qtmatchers import disabled, enabled
 
 from src.main_window import MainWindow
+from src.merchandise import MerchandiseListModel
 from src.user import User
 
 
@@ -27,18 +27,29 @@ def main_window(qtbot):
     user.business_symbol = 'X'
     main_window = MainWindow(user)
     qtbot.addWidget(main_window)
-#    main_window.show()
-#    qtbot.wait_exposed(main_window)
     return main_window
 
 
 @pytest.fixture
-def active_window(main_window, monkeypatch):
-    with patch("src.user.date", autospec=True) as mock_date:
-        mock_date.today.return_value = date(2020, 12, 15)
-        mock_date.side_effect = lambda *args, **kw: date(*args, **kw)
-        monkeypatch.setattr("src.user.get_new_offer_number", lambda _: 8)
-        main_window.new_offer()
+def expected_symbol():
+    return "X2012N08"
+
+
+@pytest.fixture
+def mock_new_offer(monkeypatch, expected_symbol):
+    class MockOffer:
+        def __init__(self, author, parent=None):
+            self.parent = parent
+            self.author = author
+            self.symbol = expected_symbol
+            self.merchandise_list = MerchandiseListModel()
+
+    monkeypatch.setattr("src.offer.Offer.create_empty", lambda author, parent: MockOffer(author, parent))
+
+
+@pytest.fixture
+def active_window(monkeypatch, main_window, mock_new_offer):
+    main_window.new_offer()
     return main_window
 
 
@@ -62,17 +73,13 @@ class TestMainWindow:
 
         self._check_offer_ui(main_window, disabled())
 
-    def test_new_offer(self, main_window, monkeypatch):
+    def test_new_offer(self, main_window, expected_symbol, mock_new_offer):
         assert_that(main_window.offer, is_(none()))
         self._check_offer_ui(main_window, disabled())
 
-        with patch("src.user.date", autospec=True) as mock_date:
-            mock_date.today.return_value = date(2020, 12, 15)
-            mock_date.side_effect = lambda *args, **kw: date(*args, **kw)
-            monkeypatch.setattr("src.user.get_new_offer_number", lambda _: 8)
-            main_window.new_offer()
+        main_window.new_offer()
 
-        assert_that(main_window.windowTitle(), is_("pyOffer - X2012N08"))
+        assert_that(main_window.windowTitle(), is_(f"pyOffer - {expected_symbol}"))
         assert_that(main_window.offer, is_(not_none()))
         assert_that(main_window.offer.author, is_(main_window.user))
         self._check_offer_ui(main_window, enabled())

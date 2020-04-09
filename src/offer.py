@@ -20,7 +20,7 @@ from src.user import User
 
 
 class Offer(QObject):
-    def __init__(self, parent=None):
+    def __init__(self, author, parent=None):
         super().__init__(parent)
         self.merchandise_list = None
         self.customer = None
@@ -30,7 +30,7 @@ class Offer(QObject):
         self.inquiry_number = None
         self.id = None
         self.symbol = None
-        self.author = None
+        self.author = author
         self.remarks = ""
 
     def new_symbol(self) -> None:
@@ -38,10 +38,9 @@ class Offer(QObject):
 
     @classmethod
     def create_empty(cls, author: User, parent: QObject = None) -> Offer:
-        offer = cls(parent)
+        offer = cls(author, parent)
         offer.merchandise_list = MerchandiseListModel(offer)
         offer.customer = Customer()
         offer.date = date.today()
-        offer.author = author
         offer.new_symbol()
         return offer

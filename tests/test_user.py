@@ -44,7 +44,7 @@ class FakeRecord:
 
 
 @pytest.fixture
-def user():
+def sample_user():
     u = User()
     u.id = USER_ID
     u.name = NAME
@@ -72,18 +72,18 @@ class TestUser:
         pytest.param(True, ""),
         pytest.param(False, "a"),
     ])
-    def test_gender_suffix(self, user, male, suffix):
-        user.male = male
-        assert_that(user.gender_suffix, is_(suffix))
+    def test_gender_suffix(self, sample_user, male, suffix):
+        sample_user.male = male
+        assert_that(sample_user.gender_suffix, is_(suffix))
 
-    def test_new_offer_symbol(self, monkeypatch, user):
+    def test_new_offer_symbol(self, monkeypatch, sample_user):
         with patch("src.user.date") as mock_date:
             mock_date.today.return_value = date(2020, 12, 15)
             mock_date.side_effect = lambda *args, **kw: date(*args, **kw)
 
             monkeypatch.setattr("src.user.get_new_offer_number", lambda _: 8)
 
-            assert_that(user.new_offer_symbol(), is_("X2012N08"))
+            assert_that(sample_user.new_offer_symbol(), is_("X2012N08"))
 
 
 @pytest.fixture

@@ -8,11 +8,43 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 #
-import pytest
-from hamcrest import assert_that, is_
+from datetime import date
+
+from hamcrest import assert_that, is_, instance_of, none
+from mock import patch
+
+from src.customer import Customer
+from src.merchandise import MerchandiseListModel
+from src.offer import Offer
+# noinspection PyUnresolvedReferences
+from tests.test_user import sample_user  # noqa: F401
 
 
-@pytest.mark.xfail
 class TestOffer:
-    def test_something(self):
-        assert_that(True, is_(False))
+    def test_new_symbol(self, monkeypatch, sample_user):
+        expected_symbol = "X2012N08"
+        offer = Offer(sample_user)
+        assert_that(offer.symbol, is_(none()))
+
+        monkeypatch.setattr("src.user.User.new_offer_symbol", lambda _: expected_symbol)
+        offer.new_symbol()
+
+        assert_that(offer.symbol, is_(expected_symbol))
+
+    def test_create_empty(self, monkeypatch, sample_user):
+        expected_date = date(2020, 12, 15)
+        expected_symbol = "X2012N08"
+
+        with patch("src.offer.date", autospec=True) as mock_date:
+            mock_date.today.return_value = expected_date
+            mock_date.side_effect = lambda *args, **kw: date(*args, **kw)
+            monkeypatch.setattr("src.user.User.new_offer_symbol", lambda _: expected_symbol)
+            offer = Offer.create_empty(sample_user)
+
+        assert_that(offer.merchandise_list, is_(instance_of(MerchandiseListModel)))
+        assert_that(offer.customer, is_(instance_of(Customer)))
+        assert_that(offer.date, is_(expected_date))
+        assert_that(offer.author, is_(sample_user))
+        assert_that(offer.symbol, is_(expected_symbol))
+
+
