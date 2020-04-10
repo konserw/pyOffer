@@ -14,8 +14,12 @@ import logging
 import os
 import sys
 from datetime import date
+from typing import TYPE_CHECKING
 
 from PySide2.QtSql import QSqlDatabase, QSqlTableModel, QSqlQuery, QSqlQueryModel, QSqlRecord
+
+if TYPE_CHECKING:
+    from src.terms import TermType
 
 
 def connect() -> None:
@@ -64,7 +68,7 @@ def get_new_offer_number(user_id: int) -> int:
     return query.record().value(0)
 
 
-def get_terms_table(term_type: 'TermType') -> QSqlTableModel:
+def get_terms_table(term_type: TermType) -> QSqlTableModel:
     model = QSqlTableModel()
     model.setTable(F"terms_{term_type.name}")
     model.select()
