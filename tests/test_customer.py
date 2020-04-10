@@ -41,7 +41,7 @@ class FakeRecord:
 
 
 @pytest.fixture
-def customer():
+def sample_customer():
     c = Customer()
     c.id = CUSTOMER_ID
     c.short_name = SHORT_NAME
@@ -64,28 +64,28 @@ class TestCustomer:
         assert_that(customer.last_name, is_(LAST_NAME))
         assert_that(customer.address, is_(ADDRESS))
 
-    def test_concated_name(self, customer):
-        assert_that(customer.concated_name, is_("Mr. John Doe"))
+    def test_concated_name(self, sample_customer):
+        assert_that(sample_customer.concated_name, is_("Mr. John Doe"))
 
     def test_is_not_valid(self):
         customer = Customer()
         assert_that(customer.is_valid, is_(False))
 
-    def test_html_address(self, customer):
-        assert_that(customer.html_address, is_("255 Some street<br />\nIn some town"))
+    def test_html_address(self, sample_customer):
+        assert_that(sample_customer.html_address, is_("255 Some street<br />\nIn some town"))
 
-    def test_db_id(self, customer):
-        assert_that(customer.db_id, is_("1"))
+    def test_db_id(self, sample_customer):
+        assert_that(sample_customer.db_id, is_("1"))
 
     def test_null_id(self):
         customer = Customer()
         assert_that(customer.db_id, is_("NULL"))
 
-    def test_description(self, customer):
-        assert_that(customer.description, is_("Mr. John Doe\nFull business name that is quite long\n255 Some street\nIn some town"))
+    def test_description(self, sample_customer):
+        assert_that(sample_customer.description, is_("Mr. John Doe\nFull business name that is quite long\n255 Some street\nIn some town"))
 
-    def test_str(self, customer):
-        assert_that(str(customer), is_("Customer 1: Mr. John Doe; short name"))
+    def test_str(self, sample_customer):
+        assert_that(str(sample_customer), is_("Customer 1: Mr. John Doe; short name"))
 
     def test_customer_from_db_1(self, db):
         customer_id = 1

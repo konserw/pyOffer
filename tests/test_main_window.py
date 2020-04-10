@@ -11,13 +11,18 @@
 
 import pytest
 from PySide2.QtCore import Qt
+from PySide2.QtWidgets import QDialog
 from hamcrest import assert_that, is_, none, not_none
 from mock import patch
 from qtmatchers import disabled, enabled
 
 from src.main_window import MainWindow
 from src.merchandise import MerchandiseListModel
+from src.terms import TermType
 from src.user import User
+# noinspection PyUnresolvedReferences
+from tests.test_customer import sample_customer  # noqa: F401
+from tests.test_terms import create_term_item
 
 
 @pytest.fixture
@@ -36,13 +41,24 @@ def expected_symbol():
 
 
 @pytest.fixture
-def mock_new_offer(monkeypatch, expected_symbol):
+def expected_next_symbol():
+    return "X2012N08"
+
+
+@pytest.fixture
+def mock_new_offer(monkeypatch, expected_symbol, expected_next_symbol):
     class MockOffer:
         def __init__(self, author, parent=None):
             self.parent = parent
             self.author = author
             self.symbol = expected_symbol
             self.merchandise_list = MerchandiseListModel()
+            self.remarks = ""
+            self.customer = None
+            self.terms = {}
+
+        def new_symbol(self):
+            self.symbol = expected_next_symbol
 
     monkeypatch.setattr("src.offer.Offer.create_empty", lambda author, parent: MockOffer(author, parent))
 
@@ -72,18 +88,6 @@ class TestMainWindow:
         assert_that(main_window.ui.menu_help, is_(enabled()))
 
         self._check_offer_ui(main_window, disabled())
-
-    def test_new_offer(self, main_window, expected_symbol, mock_new_offer):
-        assert_that(main_window.offer, is_(none()))
-        self._check_offer_ui(main_window, disabled())
-
-        main_window.new_offer()
-
-        assert_that(main_window.windowTitle(), is_(f"pyOffer - {expected_symbol}"))
-        assert_that(main_window.offer, is_(not_none()))
-        assert_that(main_window.offer.author, is_(main_window.user))
-        self._check_offer_ui(main_window, enabled())
-        assert_that(main_window.ui.tableView.model(), is_(main_window.offer.merchandise_list))
 
     @pytest.mark.parametrize("menu_name, action_name, slot", [
         pytest.param("menu_offer", "action_new", "new_offer"),
@@ -146,6 +150,69 @@ class TestMainWindow:
             with qtbot.wait_signal(widget.textChanged):
                 active_window.ui.tabWidget.setCurrentIndex(1)
                 qtbot.keyClicks(widget, text)
-            #    qtbot.stop()
             mock.assert_called()
             assert_that(mock.call_count, is_(len(text)))
+
+    def test_new_offer(self, main_window, expected_symbol, mock_new_offer):
+        assert_that(main_window.offer, is_(none()))
+        self._check_offer_ui(main_window, disabled())
+
+        main_window.new_offer()
+
+        assert_that(main_window.windowTitle(), is_(f"pyOffer - {expected_symbol}"))
+        assert_that(main_window.offer, is_(not_none()))
+        assert_that(main_window.offer.author, is_(main_window.user))
+        self._check_offer_ui(main_window, enabled())
+        assert_that(main_window.ui.tableView.model(), is_(main_window.offer.merchandise_list))
+
+    def test_new_offer_symbol(self, monkeypatch, active_window, expected_symbol, expected_next_symbol):
+        assert_that(active_window.windowTitle(), is_(f"pyOffer - {expected_symbol}"))
+
+        active_window.new_offer_symbol()
+        assert_that(active_window.windowTitle(), is_(f"pyOffer - {expected_next_symbol}"))
+
+    @patch("src.main_window.CustomerSelectionDialog")
+    def test_select_customer(self, dialog, active_window, sample_customer):
+        dialog.make.return_value = dialog
+        dialog.exec.return_value = QDialog.Accepted
+        dialog.chosen_customer = sample_customer
+
+        assert_that(active_window.offer.customer, is_(none()))
+
+        active_window.select_customer()
+
+        dialog.make.assert_called_once_with(active_window)
+        dialog.exec.assert_called_once()
+        assert_that(active_window.offer.customer, is_(sample_customer))
+        assert_that(active_window.ui.plain_text_edit_customer.toPlainText(), is_(sample_customer.description))
+
+    def test_update_remarks(self, active_window):
+        expected_remarks = "Lorem ipsum"
+        assert_that(active_window.offer.remarks, is_(""))
+        active_window.ui.plain_text_edit_remarks.setPlainText(expected_remarks)
+        active_window.update_remarks()
+        assert_that(active_window.offer.remarks, is_(expected_remarks))
+
+    @pytest.mark.parametrize("term_type", [
+        pytest.param(TermType.delivery_date),
+        pytest.param(TermType.delivery),
+        pytest.param(TermType.billing),
+        pytest.param(TermType.offer),
+    ])
+    @patch("src.main_window.TermsChooserDialog")
+    def test_select_terms(self, dialog, active_window, term_type):
+        assert_that(active_window.offer.terms, is_({}))
+        expected_item = create_term_item(term_type=term_type)
+        method_under_test = getattr(active_window, f"select_{term_type.name}_terms")
+        ui_under_test = getattr(active_window.ui, f"plain_text_edit_{term_type.name}")
+
+        dialog.make.return_value = dialog
+        dialog.exec.return_value = QDialog.Accepted
+        dialog.chosen_item = expected_item
+
+        method_under_test()
+
+        dialog.make.assert_called_once_with(term_type, active_window)
+        dialog.exec.assert_called_once()
+        assert_that(active_window.offer.terms, is_({term_type: expected_item}))
+        assert_that(ui_under_test.toPlainText(), is_(expected_item.long_desc))

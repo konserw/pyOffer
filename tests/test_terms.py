@@ -18,6 +18,15 @@ SHORT_DESCRIPTION = "short description"
 LONG_DESCRIPTION = "long description"
 
 
+def create_term_item(item_id=0, term_type=None):
+    item = TermItem()
+    item.type = term_type
+    item.id = item_id
+    item.short_desc = SHORT_DESCRIPTION
+    item.long_desc = LONG_DESCRIPTION
+    return item
+
+
 class MockSqlRecord:
     values = {
         "id": 0,
@@ -67,24 +76,17 @@ class TestTermModel:
 
     def test_one_item(self):
         model = TermModel()
-        model.add(self._create_term_item())
+        model.add(create_term_item())
 
         assert_that(model.rowCount(QModelIndex()), is_(1))
         assert_that(model.data(model.index(0, 0), Qt.DisplayRole), is_("0"))
         assert_that(model.data(model.index(0, 1), Qt.DisplayRole), is_(SHORT_DESCRIPTION))
         assert_that(model.data(model.index(0, 2), Qt.DisplayRole), is_(LONG_DESCRIPTION))
 
-    def _create_term_item(self, item_id=0):
-        item = TermItem()
-        item.id = item_id
-        item.short_desc = SHORT_DESCRIPTION
-        item.long_desc = LONG_DESCRIPTION
-        return item
-
     def test_with_modeltester(self, qtmodeltester):
         model = TermModel()
-        model.add(self._create_term_item(0))
-        model.add(self._create_term_item(1))
+        model.add(create_term_item(0))
+        model.add(create_term_item(1))
         qtmodeltester.check(model)
 
 
