@@ -501,9 +501,9 @@ class MerchandiseSelectionDialog(QtWidgets.QDialog):
     def selected(self) -> Merchandise:
         return self.model.selected
 
-
-def create_merchandise_selection_dialog(parent: QObject = None):
-    sql_model = get_merchandise_sql_model()
-    selection_model = MerchandiseSelectionModel(parent)
-    selection_model.setSourceModel(sql_model)
-    return MerchandiseSelectionDialog(selection_model, parent)
+    @classmethod
+    def make(cls, parent: QObject = None) -> MerchandiseSelectionDialog:
+        sql_model = get_merchandise_sql_model()
+        selection_model = MerchandiseSelectionModel(parent)
+        selection_model.setSourceModel(sql_model)
+        return cls(selection_model, parent)

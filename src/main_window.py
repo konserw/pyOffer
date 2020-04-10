@@ -15,7 +15,7 @@ from PySide2.QtWidgets import QMainWindow, QDialog, QApplication
 
 from forms.ui_mainwindow import Ui_MainWindow
 from src.customer import CustomerSelectionDialog
-from src.merchandise import create_merchandise_selection_dialog, DiscountDialog
+from src.merchandise import MerchandiseSelectionDialog, DiscountDialog
 from src.offer import Offer
 from src.terms import TermsChooserDialog, TermType
 from src.user import User
@@ -124,7 +124,7 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def select_merchandise(self) -> None:
-        dialog = create_merchandise_selection_dialog(self)
+        dialog = MerchandiseSelectionDialog.make(self)
         dialog.exec()
         for item in dialog.selected.values():
             self.offer.merchandise_list.change_item_count(item)

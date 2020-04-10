@@ -12,8 +12,8 @@
 import pytest
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QDialog
-from hamcrest import assert_that, is_, none, not_none
-from mock import patch
+from hamcrest import assert_that, is_, none, not_none, contains_inanyorder
+from mock import patch, MagicMock
 from qtmatchers import disabled, enabled
 
 from src.main_window import MainWindow
@@ -23,6 +23,7 @@ from src.user import User
 # noinspection PyUnresolvedReferences
 from tests.test_customer import sample_customer  # noqa: F401
 from tests.test_terms import create_term_item
+from tests.test_merchandise import create_merch
 
 
 @pytest.fixture
@@ -52,7 +53,7 @@ def mock_new_offer(monkeypatch, expected_symbol, expected_next_symbol):
             self.parent = parent
             self.author = author
             self.symbol = expected_symbol
-            self.merchandise_list = MerchandiseListModel()
+            self.merchandise_list = MerchandiseListModel()  # MagicMock(spec_set=MerchandiseListModel)
             self.remarks = ""
             self.customer = None
             self.terms = {}
@@ -216,3 +217,21 @@ class TestMainWindow:
         dialog.exec.assert_called_once()
         assert_that(active_window.offer.terms, is_({term_type: expected_item}))
         assert_that(ui_under_test.toPlainText(), is_(expected_item.long_desc))
+
+    @patch("src.main_window.MerchandiseSelectionDialog")
+    def test_select_merchandise(self, dialog, active_window, sample_customer):
+        m1 = create_merch(1)
+        m2 = create_merch(2)
+
+        dialog.make.return_value = dialog
+        dialog.exec.return_value = QDialog.Accepted
+        dialog.selected = {m1.id: m1, m2.id: m2}
+
+        assert_that(active_window.offer.customer, is_(none()))
+
+        active_window.select_merchandise()
+
+        dialog.make.assert_called_once_with(active_window)
+        dialog.exec.assert_called_once()
+        assert_that(active_window.offer.merchandise_list.list,  contains_inanyorder(m1, m2))
+        # todo: dont rely on real MerchandiseListModel, mock it instead and check that change_item_count has been called

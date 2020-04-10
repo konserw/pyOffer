@@ -18,11 +18,11 @@ from qtmatchers import has_item_flags
 
 from src.database import get_merchandise_sql_model
 from src.merchandise import Merchandise, MerchandiseListModel, MerchandiseSelectionModel, MerchandiseListDelegate, \
-    MerchandiseListView, MerchandiseSelectionDelegate, MerchandiseSelectionDialog, create_merchandise_selection_dialog, DiscountDialog
+    MerchandiseListView, MerchandiseSelectionDelegate, MerchandiseSelectionDialog, DiscountDialog
 
 
-def _create_merch(id=1, list_price=9.99, count=1, discount=10):
-    m = Merchandise(id)
+def create_merch(merchandise_id=1, list_price=9.99, count=1, discount=10):
+    m = Merchandise(merchandise_id)
     m.code = "CODE"
     m.description = "DESCR"
     m.list_price = list_price
@@ -64,7 +64,7 @@ class TestMerchandise:
         pytest.param(1.11, 0.9, 0, 1.11, 1),
     ])
     def test_total(self, list_price, count, discount, price, total):
-        m = _create_merch(
+        m = create_merch(
             list_price=list_price,
             count=count,
             discount=discount
@@ -73,7 +73,7 @@ class TestMerchandise:
         assert_that(m.total, is_(total))
 
     def test_get_item(self):
-        sample_merch = _create_merch()
+        sample_merch = create_merch()
         assert_that(sample_merch[0], is_(sample_merch.code))
         assert_that(sample_merch[1], is_(sample_merch.description))
         assert_that(sample_merch[2], is_(sample_merch.list_price))
@@ -103,16 +103,16 @@ class TestMerchandise:
             sample_merch[i] = 1
 
     def test_eq(self, sample_merch):
-        other = _create_merch(1)
+        other = create_merch(1)
         assert_that(sample_merch == other, is_(True))
 
     def test_not_eq(self, sample_merch):
-        other = _create_merch(2)
+        other = create_merch(2)
         assert_that(sample_merch == other, is_(False))
 
     def test_unit(self, sample_merch):
         # todo: other trans
-        item = _create_merch()
+        item = create_merch()
         assert_that(item.unit, is_("pc."))
         item.by_meter = True
         assert_that(item.unit, is_("m"))
@@ -121,7 +121,7 @@ class TestMerchandise:
 @pytest.fixture
 def sample_model():
     model = MerchandiseListModel()
-    model.add_item(_create_merch(discount=0))
+    model.add_item(create_merch(discount=0))
     return model
 
 
@@ -180,7 +180,7 @@ class TestMerchandiseListModel:
 
     def test_grand_total(self, sample_model):
         assert_that(sample_model.grand_total, is_(9.99))
-        m = _create_merch(count=10)
+        m = create_merch(count=10)
         sample_model.add_item(m)
         assert_that(sample_model.grand_total, is_(99.89))
 
@@ -242,7 +242,7 @@ class TestMerchandiseListModel:
         assert_that(len(sample_model.list), is_(1))
         assert_that(sample_model.list[0].count, is_(1))
 
-        sample_model.change_item_count(_create_merch(1, count=5))
+        sample_model.change_item_count(create_merch(1, count=5))
         assert_that(len(sample_model.list), is_(1))
         assert_that(sample_model.list[0].count, is_(6))
 
@@ -250,7 +250,7 @@ class TestMerchandiseListModel:
         assert_that(len(sample_model.list), is_(1))
         assert_that(sample_model.list[0].count, is_(1))
 
-        sample_model.change_item_count(_create_merch(2, count=5))
+        sample_model.change_item_count(create_merch(2, count=5))
         assert_that(len(sample_model.list), is_(2))
         assert_that(sample_model.list[0].count, is_(1))
         assert_that(sample_model.list[1].id, is_(2))
@@ -264,7 +264,7 @@ class TestMerchandiseListModel:
         assert_that(sample_model.rowCount(), is_(1))
 
     def test_move_rows_0(self, sample_model):
-        sample_model.add_item(_create_merch(2))
+        sample_model.add_item(create_merch(2))
         assert_that(sample_model.list[0].id, is_(1))
         assert_that(sample_model.list[1].id, is_(2))
 
@@ -275,7 +275,7 @@ class TestMerchandiseListModel:
         assert_that(sample_model.list[1].id, is_(2))
 
     def test_move_rows_1(self, sample_model):
-        sample_model.add_item(_create_merch(2))
+        sample_model.add_item(create_merch(2))
         assert_that(sample_model.list[0].id, is_(1))
         assert_that(sample_model.list[1].id, is_(2))
 
@@ -286,7 +286,7 @@ class TestMerchandiseListModel:
         assert_that(sample_model.list[1].id, is_(2))
 
     def test_move_rows_2(self, sample_model):
-        sample_model.add_item(_create_merch(2))
+        sample_model.add_item(create_merch(2))
         assert_that(sample_model.list[0].id, is_(1))
         assert_that(sample_model.list[1].id, is_(2))
 
@@ -300,7 +300,7 @@ class TestMerchandiseListModel:
         # todo: other translations
         assert_that(sample_model.data(sample_model.index(1, 6), Qt.DisplayRole), is_("Total:"))
         assert_that(sample_model.data(sample_model.index(1, 7), Qt.DisplayRole), is_("9.99"))
-        sample_model.add_item(_create_merch(2))
+        sample_model.add_item(create_merch(2))
         assert_that(sample_model.data(sample_model.index(2, 6), Qt.DisplayRole), is_("Total:"))
         assert_that(sample_model.data(sample_model.index(2, 7), Qt.DisplayRole), is_("18.98"))
 
@@ -319,7 +319,7 @@ class TestMerchandiseListModel:
         pytest.param("the", "second"),
     ])
     def test_set_discount(self, sample_model, ex, which):
-        other = _create_merch(2, discount=0)
+        other = create_merch(2, discount=0)
         other.code = "Other"
         other.description = "otheR one"
         sample_model.add_item(other)
@@ -353,7 +353,7 @@ class TestMerchandiseListModel:
         pytest.param("the", "second"),
     ])
     def test_highlight_rows(self, sample_model, ex, which):
-        other = _create_merch(2, discount=0)
+        other = create_merch(2, discount=0)
         other.code = "Other"
         other.description = "otheR one"
         sample_model.add_item(other)
@@ -419,7 +419,7 @@ class TestMerchandiseListDelegate:
 @pytest.mark.xfail  # Events are not processed correctly in QTest
 class TestMerchandiseListView:
     def test_drag_and_drop(self, qtbot, sample_model):
-        sample_model.add_item(_create_merch(2))
+        sample_model.add_item(create_merch(2))
         view = MerchandiseListView()
         qtbot.addWidget(view)
         view.setModel(sample_model)
@@ -441,8 +441,8 @@ class MockSourceModel(QAbstractItemModel):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.list_all = [
-            _create_merch(1, count=0, discount=0),
-            _create_merch(2, count=0, discount=0)
+            create_merch(1, count=0, discount=0),
+            create_merch(2, count=0, discount=0)
         ]
         self.list = self.list_all
 
@@ -528,7 +528,7 @@ class TestMerchandiseSelectionModel:
         assert_that(selection_model.selected, is_({}))
         for i in range(1, loops+1):
             selection_model.setData(selection_model.index(0, 0), i, Qt.EditRole)
-            assert_that(selection_model.selected, is_({1: _create_merch(1, count=i)}))
+            assert_that(selection_model.selected, is_({1: create_merch(1, count=i)}))
 
 
 class TestMerchandiseSelectoinDelegate:
@@ -584,13 +584,13 @@ class TestMerchandiseSelectionDialog:
         assert_that(dialog.selected, is_({}))
         for i in range(1, loops + 1):
             selection_model.setData(selection_model.index(0, 0), i, Qt.EditRole)
-            assert_that(dialog.selected, is_({1: _create_merch(1, count=i)}))
+            assert_that(dialog.selected, is_({1: create_merch(1, count=i)}))
 
 
 @pytest.mark.usefixtures("db")
 class TestMerchandiseSelectionDialogWithDB:
     def test_initial_state(self, qtbot):
-        dialog = create_merchandise_selection_dialog()
+        dialog = MerchandiseSelectionDialog.make()
         qtbot.addWidget(dialog)
 
         # todo: other translations
@@ -606,12 +606,12 @@ class TestMerchandiseSelectionDialogWithDB:
         pytest.param(5),
     ])
     def test_selected(self, qtbot, loops):
-        dialog = create_merchandise_selection_dialog()
+        dialog = MerchandiseSelectionDialog.make()
         qtbot.addWidget(dialog)
         assert_that(dialog.selected, is_({}))
         for i in range(1, loops + 1):
             dialog.model.setData(dialog.model.index(0, 0), i, Qt.EditRole)
-            assert_that(dialog.selected, is_({1: _create_merch(1, count=i)}))
+            assert_that(dialog.selected, is_({1: create_merch(1, count=i)}))
 
 
 @pytest.fixture
