@@ -128,7 +128,7 @@ class TermsChooserDialog(QDialog):
 
     @classmethod
     def make(cls, term_type: TermType, parent: QObject = None) -> TermsChooserDialog:
-        table = get_terms_table(term_type)
+        table = get_terms_table(term_type.name)
         model = TermModel(parent)
         for i in range(table.rowCount()):
             model.add(TermItem.from_record(term_type, table.record(i)))

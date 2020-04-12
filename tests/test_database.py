@@ -10,9 +10,11 @@
 #
 import pytest
 from PySide2.QtCore import Qt, QModelIndex
-from hamcrest import assert_that, is_, none, calling, raises
+from hamcrest import assert_that, is_, calling, raises
 
-from src.database import get_merchandise_sql_model, get_merchandise_record, get_user_record, get_new_offer_number
+from src.database import get_merchandise_sql_model, get_merchandise_record, get_user_record, \
+    get_new_offer_number, get_terms_table
+from src.terms import TermType
 
 
 @pytest.mark.usefixtures("db")
@@ -112,3 +114,47 @@ class TestUsers:
         assert_that(rec.value("phone"), is_("555 55 50"))
         assert_that(rec.value("char_for_offer_symbol"), is_("A"))
         assert_that(rec.value("business_symbol"), is_("X"))
+
+
+@pytest.mark.usefixtures("db")
+class TestTerms:
+    def test_billing_terms_table(self):
+        model = get_terms_table(TermType.billing.name)
+        assert_that(model.tableName(), is_("terms_billing"))
+        assert_that(model.rowCount(), is_(15))
+        assert_that(model.columnCount(), is_(3))
+        rec = model.record()
+        assert_that(rec.fieldName(0), is_("id"))
+        assert_that(rec.fieldName(1), is_("short_desc"))
+        assert_that(rec.fieldName(2), is_("long_desc"))
+
+    def test_delivery_terms_table(self):
+        model = get_terms_table(TermType.delivery.name)
+        assert_that(model.tableName(), is_("terms_delivery"))
+        assert_that(model.rowCount(), is_(14))
+        assert_that(model.columnCount(), is_(3))
+        rec = model.record()
+        assert_that(rec.fieldName(0), is_("id"))
+        assert_that(rec.fieldName(1), is_("short_desc"))
+        assert_that(rec.fieldName(2), is_("long_desc"))
+
+    def test_delivery_date_terms_table(self):
+        model = get_terms_table(TermType.delivery_date.name)
+        assert_that(model.tableName(), is_("terms_delivery_date"))
+        assert_that(model.rowCount(), is_(27))
+        assert_that(model.columnCount(), is_(3))
+        rec = model.record()
+        assert_that(rec.fieldName(0), is_("id"))
+        assert_that(rec.fieldName(1), is_("short_desc"))
+        assert_that(rec.fieldName(2), is_("long_desc"))
+
+    def test_offer_terms_table(self):
+        model = get_terms_table(TermType.offer.name)
+        assert_that(model.tableName(), is_("terms_offer"))
+        assert_that(model.rowCount(), is_(4))
+        assert_that(model.columnCount(), is_(3))
+        rec = model.record()
+        assert_that(rec.fieldName(0), is_("id"))
+        assert_that(rec.fieldName(1), is_("short_desc"))
+        assert_that(rec.fieldName(2), is_("long_desc"))
+
