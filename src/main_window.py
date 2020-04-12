@@ -81,7 +81,7 @@ class MainWindow(QMainWindow):
     @Slot()
     def select_customer(self) -> None:
         dialog = CustomerSelectionDialog.make(self)
-        if dialog.exec() == QDialog.Accepted and dialog.chosen_customer:
+        if dialog.exec_() == QDialog.Accepted and dialog.chosen_customer:
             self.ui.plain_text_edit_customer.setPlainText(dialog.chosen_customer.description)
             self.offer.customer = dialog.chosen_customer
 
@@ -93,7 +93,7 @@ class MainWindow(QMainWindow):
     def select_delivery_terms(self) -> None:
         term_type = TermType.delivery
         dialog = TermsChooserDialog.make(term_type, self)
-        if dialog.exec() == QDialog.Accepted and dialog.chosen_item:
+        if dialog.exec_() == QDialog.Accepted and dialog.chosen_item:
             self.ui.plain_text_edit_delivery.setPlainText(dialog.chosen_item.long_desc)
             self.offer.terms[term_type] = dialog.chosen_item
 
@@ -101,7 +101,7 @@ class MainWindow(QMainWindow):
     def select_offer_terms(self) -> None:
         term_type = TermType.offer
         dialog = TermsChooserDialog.make(term_type, self)
-        if dialog.exec() == QDialog.Accepted and dialog.chosen_item:
+        if dialog.exec_() == QDialog.Accepted and dialog.chosen_item:
             self.ui.plain_text_edit_offer.setPlainText(dialog.chosen_item.long_desc)
             self.offer.terms[term_type] = dialog.chosen_item
 
@@ -109,7 +109,7 @@ class MainWindow(QMainWindow):
     def select_billing_terms(self) -> None:
         term_type = TermType.billing
         dialog = TermsChooserDialog.make(term_type, self)
-        if dialog.exec() == QDialog.Accepted and dialog.chosen_item:
+        if dialog.exec_() == QDialog.Accepted and dialog.chosen_item:
             self.ui.plain_text_edit_billing.setPlainText(dialog.chosen_item.long_desc)
             self.offer.terms[term_type] = dialog.chosen_item
 
@@ -117,14 +117,14 @@ class MainWindow(QMainWindow):
     def select_delivery_date_terms(self) -> None:
         term_type = TermType.delivery_date
         dialog = TermsChooserDialog.make(term_type, self)
-        if dialog.exec() == QDialog.Accepted and dialog.chosen_item:
+        if dialog.exec_() == QDialog.Accepted and dialog.chosen_item:
             self.ui.plain_text_edit_delivery_date.setPlainText(dialog.chosen_item.long_desc)
             self.offer.terms[term_type] = dialog.chosen_item
 
     @Slot()
     def select_merchandise(self) -> None:
         dialog = MerchandiseSelectionDialog.make(self)
-        dialog.exec()
+        dialog.exec_()
         for item in dialog.selected.values():
             self.offer.merchandise_list.change_item_count(item)
 

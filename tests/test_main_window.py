@@ -9,11 +9,12 @@
 # If not, see <http://www.gnu.org/licenses/>.
 #
 
+from unittest.mock import MagicMock
+
 import pytest
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QDialog
 from hamcrest import assert_that, is_, none, not_none
-from mock import MagicMock
 from qtmatchers import disabled, enabled
 
 from src.main_window import MainWindow
@@ -67,7 +68,7 @@ def mock_new_offer(monkeypatch, expected_symbol, expected_next_symbol):
 @pytest.fixture
 def active_window(mocker, main_window, mock_new_offer):
     # mock setModel, so it doesn't fail when called with mocked MerchandiseListModel
-    _ = mocker.patch.object(main_window.ui.tableView, "setModel")
+    mocker.patch.object(main_window.ui.tableView, "setModel")
     main_window.new_offer()
     return main_window
 
@@ -92,7 +93,7 @@ class TestMainWindow:
 
         self._check_offer_ui(main_window, disabled())
 
-    @pytest.mark.parametrize("menu_name, action_name, slot", [
+    @pytest.mark.parametrize("menu_name, action_name, slot_name", [
         pytest.param("menu_offer", "action_new", "new_offer"),
         pytest.param("menu_offer", "action_open", "load_offer"),
         pytest.param("menu_offer", "action_save", "save_offer"),
@@ -103,8 +104,8 @@ class TestMainWindow:
         pytest.param("menu_help", "action_about", "about"),
         pytest.param("menu_help", "action_about_Qt", "about_qt"),
     ])
-    def test_slot_for_triggered(self, mocker, qtbot, active_window, menu_name, action_name, slot):
-        mock = mocker.patch(f"src.main_window.MainWindow.{slot}", autospec=True)
+    def test_slot_for_triggered(self, mocker, qtbot, active_window, menu_name, action_name, slot_name):
+        slot = mocker.patch.object(active_window, f'{slot_name}', autospec=True)
         menu = getattr(active_window.ui, menu_name)
         action = getattr(active_window.ui, action_name)
 
@@ -112,9 +113,9 @@ class TestMainWindow:
             rect = menu.actionGeometry(action)
             menu.show()
             qtbot.mouseClick(menu, Qt.LeftButton, Qt.NoModifier, rect.center())
-        mock.assert_called_once()
+        slot.assert_called_once()
 
-    @pytest.mark.parametrize("widget_name, slot", [
+    @pytest.mark.parametrize("widget_name, slot_name", [
         pytest.param("command_link_button_customer", "select_customer"),
         pytest.param("command_link_button_delivery", "select_delivery_terms"),
         pytest.param("command_link_button_offer", "select_offer_terms"),
@@ -124,32 +125,32 @@ class TestMainWindow:
         pytest.param("push_button_remove_row", "remove_row"),
         pytest.param("push_button_discount", "set_discount"),
     ])
-    def test_slot_for_clicked(self, mocker, qtbot, active_window, widget_name, slot):
-        mock = mocker.patch(f"src.main_window.MainWindow.{slot}", autospec=True)
+    def test_slot_for_clicked(self, mocker, qtbot, active_window, widget_name, slot_name):
+        slot = mocker.patch.object(active_window, f'{slot_name}', autospec=True)
         widget = getattr(active_window.ui, widget_name)
 
         with qtbot.wait_signal(widget.clicked):
             qtbot.mouseClick(widget, Qt.LeftButton)
-        mock.assert_called_once()
+        slot.assert_called_once()
 
-    @pytest.mark.parametrize("widget_name, slot", [
+    @pytest.mark.parametrize("widget_name, slot_name", [
         pytest.param("check_box_query_date", "inquiry_date_toggled"),
         pytest.param("check_box_query_number", "inquiry_number_toggled"),
     ])
-    def test_slot_state_changed(self, mocker, qtbot, active_window, widget_name, slot):
-        mock = mocker.patch(f"src.main_window.MainWindow.{slot}", autospec=True)
+    def test_slot_state_changed(self, mocker, qtbot, active_window, widget_name, slot_name):
+        slot = mocker.patch.object(active_window, f'{slot_name}', autospec=True)
         widget = getattr(active_window.ui, widget_name)
 
         with qtbot.wait_signal(widget.stateChanged):
             qtbot.mouseClick(widget, Qt.LeftButton)
-        mock.assert_called_once_with(active_window, Qt.Checked)
+        slot.assert_called_once_with(Qt.Checked)
 
-    @pytest.mark.parametrize("widget_name, slot", [
+    @pytest.mark.parametrize("widget_name, slot_name", [
         pytest.param("line_edit_query_number", "inquiry_number_changed"),
         pytest.param("plain_text_edit_remarks", "update_remarks"),
     ])
-    def test_slot_text_changed(self, mocker, qtbot, active_window, widget_name, slot):
-        mock = mocker.patch(f"src.main_window.MainWindow.{slot}", autospec=True)
+    def test_slot_text_changed(self, mocker, qtbot, active_window, widget_name, slot_name):
+        slot = mocker.patch.object(active_window, f'{slot_name}', autospec=True)
         text = "lorem ipsum"
         widget = getattr(active_window.ui, widget_name)
         widget.setEnabled(True)
@@ -157,11 +158,11 @@ class TestMainWindow:
         with qtbot.wait_signal(widget.textChanged):
             active_window.ui.tabWidget.setCurrentIndex(1)
             qtbot.keyClicks(widget, text)
-        mock.assert_called()
-        assert_that(mock.call_count, is_(len(text)))
+        slot.assert_called()
+        assert_that(slot.call_count, is_(len(text)))
 
     def test_new_offer(self, mocker, main_window, expected_symbol, mock_new_offer):
-        set_model = mocker.patch.object(main_window.ui.tableView, "setModel")
+        set_model = mocker.patch.object(main_window.ui.tableView, "setModel", autospec=True)
         assert_that(main_window.offer, is_(none()))
         self._check_offer_ui(main_window, disabled())
 
@@ -180,9 +181,9 @@ class TestMainWindow:
         assert_that(active_window.windowTitle(), is_(f"pyOffer - {expected_next_symbol}"))
 
     def test_select_customer(self, mocker, active_window, sample_customer):
-        dialog = mocker.patch("src.main_window.CustomerSelectionDialog")
+        dialog = mocker.patch("src.main_window.CustomerSelectionDialog", autospec=True)
         dialog.make.return_value = dialog
-        dialog.exec.return_value = QDialog.Accepted
+        dialog.exec_.return_value = QDialog.Accepted
         dialog.chosen_customer = sample_customer
 
         assert_that(active_window.offer.customer, is_(none()))
@@ -190,7 +191,7 @@ class TestMainWindow:
         active_window.select_customer()
 
         dialog.make.assert_called_once_with(active_window)
-        dialog.exec.assert_called_once()
+        dialog.exec_.assert_called_once()
         assert_that(active_window.offer.customer, is_(sample_customer))
         assert_that(active_window.ui.plain_text_edit_customer.toPlainText(), is_(sample_customer.description))
 
@@ -213,24 +214,24 @@ class TestMainWindow:
         method_under_test = getattr(active_window, f"select_{term_type.name}_terms")
         ui_under_test = getattr(active_window.ui, f"plain_text_edit_{term_type.name}")
 
-        dialog = mocker.patch("src.main_window.TermsChooserDialog")
+        dialog = mocker.patch("src.main_window.TermsChooserDialog", autospec=True)
         dialog.make.return_value = dialog
-        dialog.exec.return_value = QDialog.Accepted
+        dialog.exec_.return_value = QDialog.Accepted
         dialog.chosen_item = expected_item
 
         method_under_test()
 
         dialog.make.assert_called_once_with(term_type, active_window)
-        dialog.exec.assert_called_once()
+        dialog.exec_.assert_called_once()
         assert_that(active_window.offer.terms, is_({term_type: expected_item}))
         assert_that(ui_under_test.toPlainText(), is_(expected_item.long_desc))
 
     def test_select_1_merchandise(self, mocker, active_window, sample_customer):
         m1 = create_merch(1)
 
-        dialog = mocker.patch("src.main_window.MerchandiseSelectionDialog")
+        dialog = mocker.patch("src.main_window.MerchandiseSelectionDialog", autospec=True)
         dialog.make.return_value = dialog
-        dialog.exec.return_value = QDialog.Accepted
+        dialog.exec_.return_value = QDialog.Accepted
         dialog.selected = {m1.id: m1}
 
         assert_that(active_window.offer.customer, is_(none()))
@@ -238,16 +239,16 @@ class TestMainWindow:
         active_window.select_merchandise()
 
         dialog.make.assert_called_once_with(active_window)
-        dialog.exec.assert_called_once()
+        dialog.exec_.assert_called_once()
         active_window.offer.merchandise_list.change_item_count.assert_called_once_with(m1)
 
     def test_select_2_merchandise(self, mocker, active_window, sample_customer):
         m1 = create_merch(1)
         m2 = create_merch(2)
 
-        dialog = mocker.patch("src.main_window.MerchandiseSelectionDialog")
+        dialog = mocker.patch("src.main_window.MerchandiseSelectionDialog", autospec=True)
         dialog.make.return_value = dialog
-        dialog.exec.return_value = QDialog.Accepted
+        dialog.exec_.return_value = QDialog.Accepted
         dialog.selected = {m1.id: m1, m2.id: m2}
 
         assert_that(active_window.offer.customer, is_(none()))
@@ -255,7 +256,7 @@ class TestMainWindow:
         active_window.select_merchandise()
 
         dialog.make.assert_called_once_with(active_window)
-        dialog.exec.assert_called_once()
+        dialog.exec_.assert_called_once()
         active_window.offer.merchandise_list.change_item_count.assert_any_call(m1)
         active_window.offer.merchandise_list.change_item_count.assert_any_call(m2)
         assert_that(active_window.offer.merchandise_list.change_item_count.call_count, is_(2))
