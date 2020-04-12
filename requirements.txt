@@ -1,5 +1,6 @@
 pytest
 pytest-qt
+pytest-mock
 PyHamcrest
 pyhamcrest-qt
 pyside2
