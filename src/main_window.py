@@ -24,8 +24,7 @@ from src.user import User
 class MainWindow(QMainWindow):
     def __init__(self, user: User):
         super().__init__()
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
+        self.ui = Ui_MainWindow(self)
         self.set_offer_ui_enabled(False)
 
         self.offer = None

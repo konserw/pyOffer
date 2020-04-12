@@ -12,7 +12,7 @@
 import pytest
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QDialog
-from hamcrest import assert_that, is_, none, not_none, contains_inanyorder
+from hamcrest import assert_that, is_, none, not_none
 from mock import patch, MagicMock
 from qtmatchers import disabled, enabled
 
@@ -22,8 +22,8 @@ from src.terms import TermType
 from src.user import User
 # noinspection PyUnresolvedReferences
 from tests.test_customer import sample_customer  # noqa: F401
-from tests.test_terms import create_term_item
 from tests.test_merchandise import create_merch
+from tests.test_terms import create_term_item
 
 
 @pytest.fixture
@@ -53,7 +53,7 @@ def mock_new_offer(monkeypatch, expected_symbol, expected_next_symbol):
             self.parent = parent
             self.author = author
             self.symbol = expected_symbol
-            self.merchandise_list = MerchandiseListModel()  # MagicMock(spec_set=MerchandiseListModel)
+            self.merchandise_list = MagicMock(spec_set=MerchandiseListModel)
             self.remarks = ""
             self.customer = None
             self.terms = {}
@@ -65,8 +65,9 @@ def mock_new_offer(monkeypatch, expected_symbol, expected_next_symbol):
 
 
 @pytest.fixture
-def active_window(monkeypatch, main_window, mock_new_offer):
-    main_window.new_offer()
+def active_window(main_window, mock_new_offer):
+    with patch.object(main_window.ui.tableView, "setModel"):
+        main_window.new_offer()
     return main_window
 
 
@@ -158,13 +159,14 @@ class TestMainWindow:
         assert_that(main_window.offer, is_(none()))
         self._check_offer_ui(main_window, disabled())
 
-        main_window.new_offer()
+        with patch.object(main_window.ui.tableView, "setModel") as mock:
+            main_window.new_offer()
+            mock.assert_called_once_with(main_window.offer.merchandise_list)
 
         assert_that(main_window.windowTitle(), is_(f"pyOffer - {expected_symbol}"))
         assert_that(main_window.offer, is_(not_none()))
         assert_that(main_window.offer.author, is_(main_window.user))
         self._check_offer_ui(main_window, enabled())
-        assert_that(main_window.ui.tableView.model(), is_(main_window.offer.merchandise_list))
 
     def test_new_offer_symbol(self, monkeypatch, active_window, expected_symbol, expected_next_symbol):
         assert_that(active_window.windowTitle(), is_(f"pyOffer - {expected_symbol}"))
@@ -219,7 +221,23 @@ class TestMainWindow:
         assert_that(ui_under_test.toPlainText(), is_(expected_item.long_desc))
 
     @patch("src.main_window.MerchandiseSelectionDialog")
-    def test_select_merchandise(self, dialog, active_window, sample_customer):
+    def test_select_1_merchandise(self, dialog, active_window, sample_customer):
+        m1 = create_merch(1)
+
+        dialog.make.return_value = dialog
+        dialog.exec.return_value = QDialog.Accepted
+        dialog.selected = {m1.id: m1}
+
+        assert_that(active_window.offer.customer, is_(none()))
+
+        active_window.select_merchandise()
+
+        dialog.make.assert_called_once_with(active_window)
+        dialog.exec.assert_called_once()
+        active_window.offer.merchandise_list.change_item_count.assert_called_once_with(m1)
+
+    @patch("src.main_window.MerchandiseSelectionDialog")
+    def test_select_2_merchandise(self, dialog, active_window, sample_customer):
         m1 = create_merch(1)
         m2 = create_merch(2)
 
@@ -233,5 +251,6 @@ class TestMainWindow:
 
         dialog.make.assert_called_once_with(active_window)
         dialog.exec.assert_called_once()
-        assert_that(active_window.offer.merchandise_list.list,  contains_inanyorder(m1, m2))
-        # todo: dont rely on real MerchandiseListModel, mock it instead and check that change_item_count has been called
+        active_window.offer.merchandise_list.change_item_count.assert_any_call(m1)
+        active_window.offer.merchandise_list.change_item_count.assert_any_call(m2)
+        assert_that(active_window.offer.merchandise_list.change_item_count.call_count, is_(2))
