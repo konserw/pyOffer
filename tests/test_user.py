@@ -9,12 +9,13 @@
 # If not, see <http://www.gnu.org/licenses/>.
 #
 from datetime import date
+from unittest.mock import MagicMock
 
 import pytest
 from PySide2.QtCore import Qt
+from PySide2.QtSql import QSqlRecord
 from PySide2.QtWidgets import QDialogButtonBox
 from hamcrest import assert_that, is_, none, not_none
-from mock import patch
 
 from src.user import User, UserSelectionDialog
 
@@ -25,22 +26,6 @@ MALE = False
 PHONE = "555 55 55"
 CHAR_FOR_OFFER_SYMBOL = "N"
 BUSINESS_SYMBOL = "X"
-
-
-class FakeRecord:
-    def __init__(self):
-        self.dict = {
-            "user_id": USER_ID,
-            "name": NAME,
-            "mail": MAIL,
-            "male": MALE,
-            "phone": PHONE,
-            "char_for_offer_symbol": CHAR_FOR_OFFER_SYMBOL,
-            "business_symbol": BUSINESS_SYMBOL,
-        }
-
-    def value(self, key):
-        return self.dict[key]
 
 
 @pytest.fixture
@@ -58,7 +43,18 @@ def sample_user():
 
 class TestUser:
     def test_user_from_record(self):
-        user = User.from_sql_record(FakeRecord())
+        record = MagicMock(spec_set=QSqlRecord)
+        record.value.side_effect = lambda key: {
+            "user_id": USER_ID,
+            "name": NAME,
+            "mail": MAIL,
+            "male": MALE,
+            "phone": PHONE,
+            "char_for_offer_symbol": CHAR_FOR_OFFER_SYMBOL,
+            "business_symbol": BUSINESS_SYMBOL,
+        }[key]
+
+        user = User.from_sql_record(record)
 
         assert_that(user.id, is_(USER_ID))
         assert_that(user.name, is_(NAME))
@@ -76,14 +72,15 @@ class TestUser:
         sample_user.male = male
         assert_that(sample_user.gender_suffix, is_(suffix))
 
-    def test_new_offer_symbol(self, monkeypatch, sample_user):
-        with patch("src.user.date") as mock_date:
-            mock_date.today.return_value = date(2020, 12, 15)
-            mock_date.side_effect = lambda *args, **kw: date(*args, **kw)
+    def test_new_offer_symbol(self, mocker, sample_user):
+        mock_offer_number = mocker.patch("src.user.get_new_offer_number", autospec=True, return_value=8)
+        mock_date = mocker.patch("src.user.date", autospec=True)
+        mock_date.today.return_value = date(2020, 12, 15)
 
-            monkeypatch.setattr("src.user.get_new_offer_number", lambda _: 8)
-
-            assert_that(sample_user.new_offer_symbol(), is_("X2012N08"))
+        symbol = sample_user.new_offer_symbol()
+        mock_offer_number.assert_called_once()
+        mock_date.today.assert_called_once()
+        assert_that(symbol, is_("X2012N08"))
 
 
 @pytest.fixture
@@ -131,13 +128,14 @@ class TestUserDialogWithDb:
         assert_that(user_dialog.windowTitle(), is_("pyOffer - Choose user"))
         assert_that(user_dialog.list_view.currentIndex().row(), is_(row if row else 0))
 
-    def test_ok_slot_triggered(self, qtbot):
+    def test_ok_slot_triggered(self, mocker, qtbot):
         user_dialog = UserSelectionDialog.make()
+        slot_mock = mocker.patch.object(user_dialog, 'ok', autospec=True)
         button = user_dialog.buttons.button(QDialogButtonBox.Ok)
-        with patch(f"src.user.UserSelectionDialog.ok", autospec=True) as slot_mock:
-            with qtbot.wait_signal(button.clicked):
-                qtbot.mouseClick(button, Qt.LeftButton)
-            slot_mock.assert_called_once()
+
+        with qtbot.wait_signal(button.clicked):
+            qtbot.mouseClick(button, Qt.LeftButton)
+        slot_mock.assert_called_once()
 
     @pytest.mark.parametrize("row", [
         pytest.param(0),
