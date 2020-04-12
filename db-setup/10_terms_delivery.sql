@@ -26,11 +26,7 @@ VALUES (1, 'dostawcy pow 3000, bez rur', 'Na koszt dostawcy przy zamówieniu pow
        (9, 'odbiorcy, bez rur', 'Na koszt odbiorcy z magazynu w Oleśnicy (nie dotyczy rur).'),
        (12, 'dostawcy pow. 1500, bez rur', 'Na koszt dostawcy przy zamówieniach powyżej 1500,- zł netto (nie dot. rur).'),
        (13, 'patrz uwagi', 'patrz uwagi'),
-       (14, 'Na terenie', 'Na koszt dostawcy na terenie Warszawy i okolic.'),
-       (15, 'odbiorcy', 'Na koszt odbiorcy z magazynu w Warszawie.'),
-       (16, 'odbiorcy, bez rur', 'Na koszt odbiorcy z magazynu w Warszawie (nie dotyczy rur).'),
-       (21, 'Odbiór własny.', 'Odbiór własny z magazynu w Warszawie.'),
-       (22, 'exw', 'Ex work Oleśnica.'),
+       (21, 'Odbiór własny.', 'Odbiór własny z magazynu w Oleśnicy, po uprzednim uzgodnieniu.'),
        (25, 'Dostawcy powyżej 2500', 'Na koszt dostawcy przy zamówieniu powyżej 2.500,- zł. netto.'),
        (26, 'Dostawcy, rury przecięte', 'Na koszt dostawcy (rury przecięte na pół).');
 
