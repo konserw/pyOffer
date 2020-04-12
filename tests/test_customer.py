@@ -8,8 +8,11 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 #
+from unittest.mock import MagicMock
+
 import pytest
 from PySide2.QtCore import Qt, QPoint
+from PySide2.QtSql import QSqlRecord
 from PySide2.QtWidgets import QDialog
 from hamcrest import assert_that, is_, not_none
 
@@ -22,22 +25,6 @@ TITLE = "Mr."
 FIRST_NAME = "John"
 LAST_NAME = "Doe"
 ADDRESS = "255 Some street\nIn some town"
-
-
-class FakeRecord:
-    def __init__(self):
-        self.dict = {
-            "customer_id": CUSTOMER_ID,
-            "short_name": SHORT_NAME,
-            "full_name": FULL_NAME,
-            "title": TITLE,
-            "first_name": FIRST_NAME,
-            "last_name": LAST_NAME,
-            "address": "255 Some street\\nIn some town",
-        }
-
-    def value(self, key):
-        return self.dict[key]
 
 
 @pytest.fixture
@@ -55,7 +42,18 @@ def sample_customer():
 
 class TestCustomer:
     def test_customer_from_record(self):
-        customer = Customer.from_record(FakeRecord())
+        record = MagicMock(spec_set=QSqlRecord)
+        record.value.side_effect = lambda key: {
+            "customer_id": CUSTOMER_ID,
+            "short_name": SHORT_NAME,
+            "full_name": FULL_NAME,
+            "title": TITLE,
+            "first_name": FIRST_NAME,
+            "last_name": LAST_NAME,
+            "address": "255 Some street\\nIn some town",
+        }[key]
+
+        customer = Customer.from_record(record)
         assert_that(customer.is_valid, is_(True))
         assert_that(customer.id, is_(CUSTOMER_ID))
         assert_that(customer.short_name, is_(SHORT_NAME))
