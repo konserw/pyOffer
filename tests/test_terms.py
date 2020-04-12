@@ -8,9 +8,12 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 #
+from unittest.mock import MagicMock
+
 import pytest
-from hamcrest import assert_that, is_, none
 from PySide2.QtCore import Qt, QModelIndex
+from PySide2.QtSql import QSqlRecord
+from hamcrest import assert_that, is_, none
 
 from src.terms import TermItem, TermType, TermModel, TermsChooserDialog
 
@@ -27,21 +30,16 @@ def create_term_item(item_id=0, term_type=None):
     return item
 
 
-class MockSqlRecord:
-    values = {
-        "id": 0,
-        "short_desc": SHORT_DESCRIPTION,
-        "long_desc": LONG_DESCRIPTION
-    }
-
-    def value(self, field):
-        return self.values[field]
-
-
 class TestTerms:
     def test_from_record(self):
-        mock = MockSqlRecord()
-        term = TermItem.from_record(TermType.delivery, mock)
+        record = MagicMock(spec_set=QSqlRecord)
+        record.value.side_effect = lambda key: {
+            "id": 0,
+            "short_desc": SHORT_DESCRIPTION,
+            "long_desc": LONG_DESCRIPTION
+        }[key]
+
+        term = TermItem.from_record(TermType.delivery, record)
 
         assert_that(term.id, is_(0))
         assert_that(term.short_desc, is_(SHORT_DESCRIPTION))
