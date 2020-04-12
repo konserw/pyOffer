@@ -199,7 +199,7 @@ class TestMerchandiseListModel:
         pytest.param(7, Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled | Qt.ItemIsEnabled | Qt.ItemIsSelectable),
         pytest.param(8, Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled | Qt.ItemIsEnabled | Qt.ItemIsSelectable),
     ])
-    def test_normal_flags(self, sample_model, col: int, expected: Qt.ItemFlag):
+    def test_normal_flags(self, sample_model, col: int, expected: Qt.ItemFlags):
         assert_that(sample_model.flags(sample_model.index(0, col)), has_item_flags(expected))
 
     @pytest.mark.parametrize("col", [
@@ -536,7 +536,7 @@ class TestMerchandiseSelectoinDelegate:
         delegate = MerchandiseSelectionDelegate(selection_model)
         widget = QtWidgets.QWidget()
         qtbot.addWidget(widget)
-        editor = delegate.createEditor(widget, None, selection_model.index(0, 0))
+        editor = delegate.createEditor(widget, QtWidgets.QStyleOptionViewItem(), selection_model.index(0, 0))
 
         assert_that(editor, is_(instance_of(QtWidgets.QDoubleSpinBox)))
         assert_that(editor.singleStep(), is_(1))
@@ -548,7 +548,7 @@ class TestMerchandiseSelectoinDelegate:
         widget = QtWidgets.QWidget()
         qtbot.addWidget(widget)
         index = selection_model.index(0, 0)
-        editor = delegate.createEditor(widget, None, index)
+        editor = delegate.createEditor(widget, QtWidgets.QStyleOptionViewItem(), index)
         base = 0
         assert_that(selection_model.data(index, Qt.DisplayRole), is_(base))
 
@@ -681,7 +681,11 @@ class TestDiscountDialog:
         # todo: other translations
         assert_that(discount_dialog.windowTitle(), is_("Set discounts"))
         assert_that(discount_dialog.line_edit_expression.text(), is_(""))
-        assert_that(discount_dialog.label.text(), is_("Please enter regular expression\nif you want to limit discount to matching items,\nor leave empty to add discount to all items."))
+        assert_that(discount_dialog.label.text(), is_(
+            "Please enter regular expression\n"
+            "if you want to limit discount to matching items,\n"
+            "or leave empty to add discount to all items."
+        ))
         assert_that(discount_dialog.spinbox_discount.minimum(), is_(0))
         assert_that(discount_dialog.spinbox_discount.singleStep(), is_(5))
         assert_that(discount_dialog.spinbox_discount.maximum(), is_(100))

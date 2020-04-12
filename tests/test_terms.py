@@ -91,14 +91,14 @@ class TestTermModel:
 
 
 class TestTermsChhoserDialog:
-    @pytest.mark.parametrize("type", [
+    @pytest.mark.parametrize("term_type", [
         pytest.param(TermType.billing),
         pytest.param(TermType.delivery),
         pytest.param(TermType.delivery_date),
         pytest.param(TermType.offer)
     ])
-    def test_initial_state(self, qtbot, type):
-        dialog = TermsChooserDialog.make(type)
+    def test_initial_state(self, qtbot, term_type):
+        dialog = TermsChooserDialog.make(term_type)
         qtbot.addWidget(dialog)
 
         # todo: other translations
@@ -108,6 +108,6 @@ class TestTermsChhoserDialog:
             TermType.delivery_date: "Choose delivery date terms",
             TermType.offer: "Choose offer terms"
         }
-        assert_that(dialog.windowTitle(), is_(expected_titles[type]))
+        assert_that(dialog.windowTitle(), is_(expected_titles[term_type]))
         assert_that(dialog.chosen_item, is_(none()))
         assert_that(dialog.ui.plainTextEdit.toPlainText(), is_(""))

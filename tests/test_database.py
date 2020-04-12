@@ -157,4 +157,3 @@ class TestTerms:
         assert_that(rec.fieldName(0), is_("id"))
         assert_that(rec.fieldName(1), is_("short_desc"))
         assert_that(rec.fieldName(2), is_("long_desc"))
-

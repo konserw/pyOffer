@@ -46,5 +46,3 @@ class TestOffer:
         assert_that(offer.date, is_(expected_date))
         assert_that(offer.author, is_(sample_user))
         assert_that(offer.symbol, is_(expected_symbol))
-
-

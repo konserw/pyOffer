@@ -124,7 +124,7 @@ class TestMainWindow:
         pytest.param("push_button_remove_row", "remove_row"),
         pytest.param("push_button_discount", "set_discount"),
     ])
-    def test_slot_for_clicked(self,mocker, qtbot, active_window, widget_name, slot):
+    def test_slot_for_clicked(self, mocker, qtbot, active_window, widget_name, slot):
         mock = mocker.patch(f"src.main_window.MainWindow.{slot}", autospec=True)
         widget = getattr(active_window.ui, widget_name)
 
