@@ -11,7 +11,6 @@
 from datetime import date
 
 from hamcrest import assert_that, is_, instance_of, none
-from mock import patch
 
 from src.customer import Customer
 from src.merchandise import MerchandiseListModel
@@ -31,15 +30,14 @@ class TestOffer:
 
         assert_that(offer.symbol, is_(expected_symbol))
 
-    def test_create_empty(self, monkeypatch, sample_user):
+    def test_create_empty(self, mocker, sample_user):
         expected_date = date(2020, 12, 15)
         expected_symbol = "X2012N08"
+        mocker.patch.object(sample_user, "new_offer_symbol", autospec=True, return_value=expected_symbol)
+        mock_date = mocker.patch("src.offer.date", autospec=True)
+        mock_date.today.return_value = expected_date
 
-        with patch("src.offer.date", autospec=True) as mock_date:
-            mock_date.today.return_value = expected_date
-            mock_date.side_effect = lambda *args, **kw: date(*args, **kw)
-            monkeypatch.setattr("src.user.User.new_offer_symbol", lambda _: expected_symbol)
-            offer = Offer.create_empty(sample_user)
+        offer = Offer.create_empty(sample_user)
 
         assert_that(offer.merchandise_list, is_(instance_of(MerchandiseListModel)))
         assert_that(offer.customer, is_(instance_of(Customer)))
