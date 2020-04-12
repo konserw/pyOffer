@@ -6,15 +6,15 @@ DROP TABLE IF EXISTS terms_delivery_date;
 CREATE TABLE terms_delivery_date
 (
     id        SERIAL PRIMARY KEY,
-    shortDesc text,
-    longDesc  text
+    short_desc text,
+    long_desc  text
 );
 
 --
 -- data for table deliveryDateTerms
 --
 
-INSERT INTO terms_delivery_date (shortDesc, longDesc)
+INSERT INTO terms_delivery_date (short_desc, long_desc)
 VALUES ('1-2 dni', '1-2 dni roboczych od daty złożenia zamówienia.'),
        ('1-2 dni, magazyn 2 tyg', '1-2 dni roboczych od daty złożenia zamówienia; w przypadku braku towaru w magazynie w Oleśnicy - ok. 2 tygodnie robocze od daty złożenia zamówienia.'),
        ('1-2 dni, magazyn 2-3 tyg', '1-2 dni roboczych od daty złożenia zamówienia; w przypadku braku towaru w magazynie w Oleśnicy - 2 do 3 tygodni roboczych od daty złożenia zamówienia.'),

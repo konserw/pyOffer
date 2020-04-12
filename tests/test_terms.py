@@ -30,8 +30,8 @@ def create_term_item(item_id=0, term_type=None):
 class MockSqlRecord:
     values = {
         "id": 0,
-        "shortDesc": SHORT_DESCRIPTION,
-        "longDesc": LONG_DESCRIPTION
+        "short_desc": SHORT_DESCRIPTION,
+        "long_desc": LONG_DESCRIPTION
     }
 
     def value(self, field):

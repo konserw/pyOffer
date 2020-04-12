@@ -42,8 +42,8 @@ class TermItem:
         t = TermItem()
         t.type = term_type
         t.id = record.value("id")
-        t.short_desc = record.value("shortDesc")
-        t.long_desc = record.value("longDesc")
+        t.short_desc = record.value("short_desc")
+        t.long_desc = record.value("long_desc")
         return t
 
 

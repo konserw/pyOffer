@@ -6,15 +6,15 @@ DROP TABLE IF EXISTS terms_billing;
 CREATE TABLE terms_billing
 (
     id        SERIAL PRIMARY KEY,
-    shortDesc text,
-    longDesc  text
+    short_desc text,
+    long_desc  text
 );
 
 --
 -- data for table billingTerms
 --
 
-INSERT INTO terms_billing (shortDesc, longDesc)
+INSERT INTO terms_billing (short_desc, long_desc)
 VALUES ('Przelew 7', 'Przelewem w terminie 7 dni.'),
        ('przelew 14', 'Przelewem w terminie 14 dni od daty wystawienia faktury.'),
        ('przelew 21', 'Przelewem w terminie 21 dni od daty wystawienia faktury.'),

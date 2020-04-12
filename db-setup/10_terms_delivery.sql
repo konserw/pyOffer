@@ -6,15 +6,15 @@ DROP TABLE IF EXISTS terms_delivery;
 CREATE TABLE terms_delivery
 (
     id        SERIAL PRIMARY KEY,
-    shortDesc text,
-    longDesc  text
+    short_desc text,
+    long_desc  text
 );
 
 --
 -- data for table terms_delivery
 --
 
-INSERT INTO terms_delivery (shortDesc, longDesc)
+INSERT INTO terms_delivery (short_desc, long_desc)
 VALUES ('dostawcy', 'Na koszt dostawcy.'),
        ('dostawcy, rury przecięte', 'Na koszt dostawcy (rury przecięte na pół).'),
        ('dostawcy, bez rur', 'Na koszt dostawcy (nie dot. rur w odcinkach 5 i 6 m).'),
