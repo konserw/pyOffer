@@ -8,14 +8,12 @@ CREATE TABLE terms_offer
 );
 
 --
--- Dumping data for table terms_offer
+-- data for table terms_offer
 --
 
-INSERT INTO terms_offer
-VALUES (1, '3 miesiące', 'Niniejsza oferta jest ważna bez zobowiązań w okresie trzech miesięcy od daty jej sporządzenia.'),
-       (2, '1 miesiąc', 'Niniejsza oferta jest ważna bez zobowiązań w okresie jednego miesięca od daty jej sporządzenia.'),
-       (3, 'nic', ''),
-       (4, 'Do końca roku', 'Niniejsza oferta zachowuje ważność bez zobowiązań do końca bieżącego roku.')
+INSERT INTO terms_offer (shortDesc, longDesc)
+VALUES ('3 miesiące', 'Niniejsza oferta jest ważna bez zobowiązań w okresie trzech miesięcy od daty jej sporządzenia.'),
+       ('1 miesiąc', 'Niniejsza oferta jest ważna bez zobowiązań w okresie jednego miesięca od daty jej sporządzenia.'),
+       ('nic', ''),
+       ('Do końca roku', 'Niniejsza oferta zachowuje ważność bez zobowiązań do końca bieżącego roku.')
 ;
-
--- Dump completed on 2020-02-15 15:35:19

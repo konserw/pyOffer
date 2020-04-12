@@ -11,25 +11,23 @@ CREATE TABLE terms_billing
 );
 
 --
--- Dumping data for table billingTerms
+-- data for table billingTerms
 --
 
-INSERT INTO terms_billing
-VALUES (28, 'Przelew 7', 'Przelewem w terminie 7 dni.'),
-       (5, 'przelew 14', 'Przelewem w terminie 14 dni od daty wystawienia faktury.'),
-       (6, 'przelew 30', 'Przelewem w terminie 30 dni od daty wystawienia faktury.'),
-       (7, 'przedpłata', 'Przedpłata.'),
-       (8, 'pobranie', 'Za pobraniem.'),
-       (9, 'wg. ustaleń', 'Zgodnie z ustaleniami.'),
-       (12, 'dokumenty', 'Do uzgodnienia po otrzymaniu dokumentów firmy (tj. REGON, NIP, KRS).'),
-       (14, 'przelew 60', 'Przelewem w terminie 60 dni od daty wystawienia faktury.'),
-       (16, 'do uzgodnienia', 'Do uzgodnienia.'),
-       (18, 'przedpłata/pobranie', 'Przedpłata lub za pobraniem.'),
-       (20, 'przelew 21', 'Przelewem w terminie 21 dni od daty wystawienia faktury.'),
-       (21, 'bez zmian', 'Bez zmian.'),
-       (25, '50%przedp. / 50% po dost.', '50% przedpłata, 50% przelew po dostawie'),
-       (29, 'Przelew 90', 'Przelewem w terminie 90 dni od daty wystwienia faktury.'),
-       (30, 'przelew 45', 'Przelewem w terminie 45 dni od daty wystawienia faktury.')
+INSERT INTO terms_billing (shortDesc, longDesc)
+VALUES ('Przelew 7', 'Przelewem w terminie 7 dni.'),
+       ('przelew 14', 'Przelewem w terminie 14 dni od daty wystawienia faktury.'),
+       ('przelew 21', 'Przelewem w terminie 21 dni od daty wystawienia faktury.'),
+       ('przelew 30', 'Przelewem w terminie 30 dni od daty wystawienia faktury.'),
+       ('przelew 60', 'Przelewem w terminie 60 dni od daty wystawienia faktury.'),
+       ('przelew 45', 'Przelewem w terminie 45 dni od daty wystawienia faktury.'),
+       ('Przelew 90', 'Przelewem w terminie 90 dni od daty wystawienia faktury.'),
+       ('przedpłata', 'Przedpłata.'),
+       ('pobranie', 'Za pobraniem.'),
+       ('przedpłata/pobranie', 'Przedpłata lub za pobraniem.'),
+       ('50% przedp. / 50% po dost.', '50% przedpłata, 50% przelew po dostawie'),
+       ('wg. ustaleń', 'Zgodnie z ustaleniami.'),
+       ('dokumenty', 'Do uzgodnienia po otrzymaniu dokumentów firmy (tj. REGON, NIP, KRS).'),
+       ('do uzgodnienia', 'Do uzgodnienia.'),
+       ('bez zmian', 'Bez zmian.')
 ;
-
--- Dump completed on 2020-02-15 15:35:15
