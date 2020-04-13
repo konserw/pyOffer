@@ -25,8 +25,8 @@ from tests.test_terms import create_term_item
 
 
 @pytest.fixture
-def main_window(qtbot):
-    user = User()
+def main_window(qtbot, mocker):
+    user = mocker.create_autospec(User)
     user.char_for_offer_symbol = 'N'
     user.business_symbol = 'X'
     main_window = MainWindow(user)
