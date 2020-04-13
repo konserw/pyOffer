@@ -37,13 +37,15 @@ jobs:
         sudo apt install -y xvfb libxkbcommon-x11-0
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install coveralls coverage pytest-html
+        pip install coveralls pytest-cov pytest-html
     - name: Test with pytest and test db
       run: |
         docker run --rm -d --name postgres -e POSTGRES_PASSWORD=docker -e POSTGRES_DB=koferta_test -p 5432:5432 -v $GITHUB_WORKSPACE/db-setup:/docker-entrypoint-initdb.d postgres
         sleep 5
         ulimit -c unlimited
-        sudo catchsegv xvfb-run `which coverage` run -m pytest --html=test_report.html --self-contained-html
+        mkdir test_report
+        sudo catchsegv xvfb-run `which pytest` --cov=src --html=test_report/all.html --self-contained-html tests/
+        sudo catchsegv xvfb-run `which pytest` --cov=src --cov-append --e2e --html=test_report/e2e.html --self-contained-html tests/
     - name: Upload crash dumps
       if: failure()
       uses: actions/upload-artifact@master
@@ -54,8 +56,8 @@ jobs:
       if: always()
       uses: actions/upload-artifact@master
       with:
-        name: test_report.html
-        path: test_report.html
+        name: test_report
+        path: test_report
     - name: Publish coverage report
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
