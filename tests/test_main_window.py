@@ -295,3 +295,22 @@ class TestMainWindow:
         dialog.exec_.assert_called_once()
         active_window.offer.merchandise_list.set_discount.assert_called_once_with(expression, discount)
 
+    def test_inquiry_number_toggled(self, active_window):
+        assert_that(active_window.offer.inquiry_number, is_(None))
+        assert_that(active_window.ui.line_edit_query_number, is_(disabled()))
+
+        active_window.inquiry_number_toggled(Qt.Checked)  # enable
+        assert_that(active_window.ui.line_edit_query_number, is_(enabled()))
+
+        active_window.inquiry_number_toggled(Qt.Unchecked)  # disable
+        assert_that(active_window.ui.line_edit_query_number, is_(disabled()))
+        assert_that(active_window.offer.inquiry_number, is_(None))
+
+    def test_inquiry_number_changed(self, active_window):
+        inquiry = "Lorem ipsum"
+        assert_that(active_window.offer.inquiry_number, is_(none()))
+
+        active_window.inquiry_number_changed(inquiry)
+        assert_that(active_window.offer.inquiry_number, is_(inquiry))
+
+
