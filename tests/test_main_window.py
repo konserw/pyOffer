@@ -43,7 +43,7 @@ def expected_symbol():
 
 @pytest.fixture
 def expected_next_symbol():
-    return "X2012N08"
+    return "X2012N09"
 
 
 @pytest.fixture
