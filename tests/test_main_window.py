@@ -226,7 +226,7 @@ class TestMainWindow:
         assert_that(active_window.offer.terms, is_({term_type: expected_item}))
         assert_that(ui_under_test.toPlainText(), is_(expected_item.long_desc))
 
-    def test_select_1_merchandise(self, mocker, active_window, sample_customer):
+    def test_select_1_merchandise(self, mocker, active_window):
         m1 = create_merch(1)
 
         dialog = mocker.patch("src.main_window.MerchandiseSelectionDialog", autospec=True)
@@ -242,7 +242,7 @@ class TestMainWindow:
         dialog.exec_.assert_called_once()
         active_window.offer.merchandise_list.change_item_count.assert_called_once_with(m1)
 
-    def test_select_2_merchandise(self, mocker, active_window, sample_customer):
+    def test_select_2_merchandise(self, mocker, active_window):
         m1 = create_merch(1)
         m2 = create_merch(2)
 
@@ -260,3 +260,24 @@ class TestMainWindow:
         active_window.offer.merchandise_list.change_item_count.assert_any_call(m1)
         active_window.offer.merchandise_list.change_item_count.assert_any_call(m2)
         assert_that(active_window.offer.merchandise_list.change_item_count.call_count, is_(2))
+
+    @pytest.mark.parametrize("row", [
+        pytest.param(0),
+        pytest.param(1),
+        pytest.param(2),
+        pytest.param(3),
+    ])
+    def test_remove_row(self, mocker, active_window, row):
+        row_count = 2
+        active_window.offer.merchandise_list.rowCount.return_value = row_count
+        current_index = mocker.patch.object(active_window.ui.tableView, "currentIndex", autospec=True)
+        current_index.return_value.row.return_value = row
+        remove_row = active_window.offer.merchandise_list.removeRow
+
+        active_window.remove_row()
+        if row < row_count:
+            remove_row.assert_called_once_with(row)
+        else:
+            remove_row.assert_not_called()
+
+

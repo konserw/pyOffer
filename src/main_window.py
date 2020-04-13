@@ -131,7 +131,8 @@ class MainWindow(QMainWindow):
     @Slot()
     def remove_row(self) -> None:
         index = self.ui.tableView.currentIndex()
-        self.offer.merchandise_list.removeRow(index.row())
+        if index.row() < self.offer.merchandise_list.rowCount():
+            self.offer.merchandise_list.removeRow(index.row())
 
     @Slot()
     def set_discount(self) -> None:
