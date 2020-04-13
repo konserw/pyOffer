@@ -47,21 +47,26 @@ def expected_next_symbol():
 
 
 @pytest.fixture
-def mock_new_offer(monkeypatch, expected_symbol, expected_next_symbol):
-    class MockOffer:
-        def __init__(self, author, parent=None):
-            self.parent = parent
-            self.author = author
-            self.symbol = expected_symbol
-            self.merchandise_list = MagicMock(spec_set=MerchandiseListModel)
-            self.remarks = ""
-            self.customer = None
-            self.terms = {}
+def mock_new_offer(mocker, expected_symbol, expected_next_symbol):
+    offer = mocker.patch("src.main_window.Offer", autospec=True)
 
-        def new_symbol(self):
-            self.symbol = expected_next_symbol
+    def create(author, _parent=None):
+        instance = offer.return_value
+        instance.author = author
+        instance.merchandise_list = mocker.create_autospec(MerchandiseListModel, spec_set=True, instance=True)
+        instance.symbol = expected_symbol
+        instance.remarks = ""
+        instance.terms = {}
+        instance.inquiry_number = None
+        instance.customer = None
 
-    monkeypatch.setattr("src.offer.Offer.create_empty", lambda author, parent: MockOffer(author, parent))
+        def update_symbol():
+            instance.symbol = expected_next_symbol
+        instance.new_symbol.side_effect = update_symbol
+        return instance
+
+    offer.create_empty.side_effect = create
+    return offer
 
 
 @pytest.fixture
@@ -166,6 +171,7 @@ class TestMainWindow:
         self._check_offer_ui(main_window, disabled())
 
         main_window.new_offer()
+        mock_new_offer.create_empty.assert_called_once_with(main_window.user, main_window)
         set_model.assert_called_once_with(main_window.offer.merchandise_list)
 
         assert_that(main_window.windowTitle(), is_(f"pyOffer - {expected_symbol}"))
@@ -177,6 +183,7 @@ class TestMainWindow:
         assert_that(active_window.windowTitle(), is_(f"pyOffer - {expected_symbol}"))
 
         active_window.new_offer_symbol()
+        active_window.offer.new_symbol.assert_called_once_with()
         assert_that(active_window.windowTitle(), is_(f"pyOffer - {expected_next_symbol}"))
 
     def test_select_customer(self, mocker, active_window, sample_customer):
