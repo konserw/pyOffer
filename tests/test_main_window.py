@@ -233,8 +233,6 @@ class TestMainWindow:
         dialog.exec_.return_value = QDialog.Accepted
         dialog.selected = {m1.id: m1}
 
-        assert_that(active_window.offer.customer, is_(none()))
-
         active_window.select_merchandise()
 
         dialog.make.assert_called_once_with(active_window)
@@ -249,8 +247,6 @@ class TestMainWindow:
         dialog.make.return_value = dialog
         dialog.exec_.return_value = QDialog.Accepted
         dialog.selected = {m1.id: m1, m2.id: m2}
-
-        assert_that(active_window.offer.customer, is_(none()))
 
         active_window.select_merchandise()
 
