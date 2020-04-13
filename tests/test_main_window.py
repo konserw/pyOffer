@@ -17,7 +17,7 @@ from hamcrest import assert_that, is_, none, not_none
 from qtmatchers import disabled, enabled
 
 from src.main_window import MainWindow
-from src.merchandise import MerchandiseListModel
+from src.merchandise import MerchandiseListModel, DiscountDialog
 from src.terms import TermType
 from src.user import User
 # noinspection PyUnresolvedReferences
@@ -279,4 +279,19 @@ class TestMainWindow:
         else:
             remove_row.assert_not_called()
 
+    def test_set_discount(self, mocker, active_window):
+        expression = "ex"
+        discount = 50
+        dialog = MagicMock(set_specs=DiscountDialog)
+        dialog.exec_.return_value = QDialog.Accepted
+        dialog.filter_expression = expression
+        dialog.discount_value = discount
+        dialog_class = mocker.patch("src.main_window.DiscountDialog", autospec=True)
+        dialog_class.return_value = dialog
+
+        active_window.set_discount()
+
+        dialog_class.assert_called_once_with(active_window)
+        dialog.exec_.assert_called_once()
+        active_window.offer.merchandise_list.set_discount.assert_called_once_with(expression, discount)
 
