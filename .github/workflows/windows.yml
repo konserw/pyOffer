@@ -42,10 +42,12 @@ jobs:
       env:
         QT_DEBUG_PLUGINS: 1
       run: |
-        pytest --html=test_report.html --self-contained-html
+        mkdir test_report
+        pytest --html=test_report/all.html --self-contained-html tests/
+        pytest --html=test_report/e2e.html --self-contained-html tests/ --e2e
     - name: Upload test results
       if: always()
       uses: actions/upload-artifact@master
       with:
-        name: test_report.html
-        path: test_report.html
+        name: test_report
+        path: test_report
