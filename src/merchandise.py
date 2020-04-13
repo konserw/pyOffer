@@ -11,12 +11,13 @@
 from __future__ import annotations
 
 import typing
+from decimal import Decimal
 
 from PySide2 import QtGui, QtCore, QtWidgets
 from PySide2.QtCore import QObject, QAbstractTableModel, QModelIndex, Qt, Slot
 from PySide2.QtGui import QIcon, QPixmap, QColor
 from PySide2.QtSql import QSqlRecord
-from PySide2.QtWidgets import QWidget, QTableView, QItemDelegate, QDoubleSpinBox, QStyleOptionViewItem
+from PySide2.QtWidgets import QWidget, QTableView, QItemDelegate, QStyleOptionViewItem
 
 # noinspection PyUnresolvedReferences
 import resources.all  # noqa: F401
@@ -29,10 +30,34 @@ class Merchandise(QObject):
         self.id = merchandise_id
         self.code = None
         self.description = None
-        self.list_price = None
-        self.discount = 0
-        self.count = 0
+        self._list_price = None
+        self._discount = Decimal(0)
+        self._count = Decimal(0)
         self.by_meter = False  # by default by piece
+
+    @property
+    def list_price(self) -> Decimal:
+        return self._list_price
+
+    @list_price.setter
+    def list_price(self, value):
+        self._list_price = Decimal(value).quantize(Decimal(".01"))
+
+    @property
+    def discount(self) -> Decimal:
+        return self._discount
+
+    @discount.setter
+    def discount(self, value):
+        self._discount = Decimal(value).quantize(Decimal("0.1"))
+
+    @property
+    def count(self) -> Decimal:
+        return self._count
+
+    @count.setter
+    def count(self, value):
+        self._count = Decimal(value).quantize(Decimal("1"))
 
     @property
     def unit(self) -> str:
@@ -42,11 +67,11 @@ class Merchandise(QObject):
             return self.tr("pc.")
 
     @property
-    def price(self) -> float:
+    def price(self) -> Decimal:
         return round(self.list_price * (100 - self.discount) / 100, 2)
 
     @property
-    def total(self) -> float:
+    def total(self) -> Decimal:
         return round(self.price * self.count, 2)
 
     @staticmethod
@@ -161,14 +186,14 @@ class MerchandiseListModel(QAbstractTableModel):
                 elif col == 7:
                     return str(self.grand_total)
             elif row < len(self.list):
-                return self.list[row][col]
+                return str(self.list[row][col])
 
     @property
-    def grand_total(self) -> float:
-        sum = 0
+    def grand_total(self) -> Decimal:
+        total = Decimal("0.00")
         for item in self.list:
-            sum += item.total
-        return round(sum, 2)
+            total += item.total
+        return total
 
     def supportedDropActions(self) -> Qt.DropActions:
         return Qt.MoveAction
@@ -212,6 +237,9 @@ class MerchandiseListModel(QAbstractTableModel):
 
     def removeRows(self, row: int, count: int, parent: QModelIndex = QModelIndex()) -> bool:
         end = row + count - 1
+        if end >= len(self.list):
+            return False
+
         self.beginRemoveRows(QModelIndex(), row, end)
         for i in range(row, end + 1):
             self.list.pop(i)
@@ -278,7 +306,11 @@ class DiscountDialog(QtWidgets.QDialog):
 
         vertical_layout = QtWidgets.QVBoxLayout(self)
         self.label = QtWidgets.QLabel(self)
-        self.label.setText(self.tr("Please enter regular expression\nif you want to limit discount to matching items,\nor leave empty to add discount to all items."))
+        self.label.setText(self.tr(
+            "Please enter regular expression\n"
+            "if you want to limit discount to matching items,\n"
+            "or leave empty to add discount to all items."
+        ))
         vertical_layout.addWidget(self.label)
 
         self.line_edit_expression = QtWidgets.QLineEdit(self)
@@ -287,7 +319,8 @@ class DiscountDialog(QtWidgets.QDialog):
         spin_layout = QtWidgets.QHBoxLayout(self)
         spin_layout.addStretch()
         spin_layout.addWidget(QtWidgets.QLabel(self.tr("Discount:"), self))
-        self.spinbox_discount = QtWidgets.QSpinBox(self)
+        self.spinbox_discount = QtWidgets.QDoubleSpinBox(self)
+        self.spinbox_discount.setDecimals(1)
         self.spinbox_discount.setMinimum(0)
         self.spinbox_discount.setSingleStep(5)
         self.spinbox_discount.setMaximum(100)
@@ -302,7 +335,7 @@ class DiscountDialog(QtWidgets.QDialog):
         top_level_layout.addLayout(vertical_layout)
 
     @property
-    def discount_value(self) -> int:
+    def discount_value(self) -> float:
         self.spinbox_discount.interpretText()
         return self.spinbox_discount.value()
 
@@ -317,14 +350,17 @@ class MerchandiseListDelegate(QItemDelegate):
 
     def createEditor(self, parent: QWidget, _, index: QModelIndex) -> QWidget:
         if index.isValid():
-            editor = QDoubleSpinBox(parent)
-            editor.setSingleStep(1)
-            editor.setMinimum(0)
-            if index.column() == 5:
-                editor.setMaximum(999999)
-                return editor
-            elif index.column() == 3:
+            if index.column() == 3:  # discount
+                editor = QtWidgets.QDoubleSpinBox(parent)
+                editor.setDecimals(1)
+                editor.setMinimum(0)
+                editor.setSingleStep(5)
                 editor.setMaximum(100)
+                return editor
+            if index.column() == 5:  # count
+                editor = QtWidgets.QSpinBox(parent)
+                editor.setMinimum(1)
+                editor.setMaximum(999999)
                 return editor
         return QWidget(parent)
 
@@ -404,7 +440,7 @@ class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):
                 return self.selected[item_id].count
             return 0
         if index.isValid() and role == Qt.DisplayRole:
-            return self.get_column_value(index, col)
+            return self.sourceModel().data(index, Qt.DisplayRole)
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int = ...) -> typing.Any:
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
@@ -440,10 +476,9 @@ class MerchandiseSelectionDelegate(QtWidgets.QItemDelegate):
 
     def createEditor(self, parent: QWidget, option: QStyleOptionViewItem, index: QtCore.QModelIndex) -> QWidget:
         if index.isValid() and index.column() == 0:
-            editor = QDoubleSpinBox(parent)
+            editor = QtWidgets.QSpinBox(parent)
             editor.setMinimum(0)
             editor.setMaximum(999999)
-            editor.setSingleStep(1)
             return editor
         return QWidget(parent)
 

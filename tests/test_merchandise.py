@@ -8,6 +8,8 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 #
+from decimal import Decimal
+
 import pytest
 from PySide2 import QtWidgets
 from PySide2.QtCore import Qt, QModelIndex, QAbstractItemModel, QPoint, QSize
@@ -52,16 +54,16 @@ class TestMerchandise:
         assert_that(sample_merch.total, is_(0))
 
     @pytest.mark.parametrize("list_price, count, discount, price, total", [
-        pytest.param(100, 1, 0, 100, 100),
-        pytest.param(100, 1, 10, 90, 90),
-        pytest.param(100, 2, 10, 90, 180),
-        pytest.param(99, 1, 10, 89.1, 89.1),
-        pytest.param(99, 1, 23, 76.23, 76.23),
-        pytest.param(9.99, 1, 1, 9.89, 9.89),
-        pytest.param(9.99, 10000, 1, 9.89, 98900),
-        pytest.param(1.11, 1, 10, 1, 1),
-        pytest.param(1.11, 100, 10, 1, 100),
-        pytest.param(1.11, 0.9, 0, 1.11, 1),
+        pytest.param(100, 1, 0, "100", "100"),
+        pytest.param(100, 1, 10, "90", "90"),
+        pytest.param(100, 2, 10, "90", "180"),
+        pytest.param(99, 1, 10, "89.1", "89.1"),
+        pytest.param(99, 1, 23, "76.23", "76.23"),
+        pytest.param(9.99, 1, 1, "9.89", "9.89"),
+        pytest.param(9.99, 10000, 1, "9.89", "98900"),
+        pytest.param(1.11, 1, 10, "1", "1"),
+        pytest.param(1.11, 100, 10, "1", "100"),
+        pytest.param(1.11, 9, 90, "0.11", "0.99"),
     ])
     def test_total(self, list_price, count, discount, price, total):
         m = create_merch(
@@ -69,8 +71,8 @@ class TestMerchandise:
             count=count,
             discount=discount
         )
-        assert_that(m.price, is_(price))
-        assert_that(m.total, is_(total))
+        assert_that(m.price, is_(Decimal(price)))
+        assert_that(m.total, is_(Decimal(total)))
 
     def test_get_item(self):
         sample_merch = create_merch()
@@ -167,7 +169,7 @@ class TestMerchandiseListModel:
         assert_that(sample_model.list[0][col], is_(value))
 
     def test_data_display_role(self, sample_model):
-        for key, val in enumerate(("CODE", "DESCR", 9.99, 0, 9.99, 1, "pc.", 9.99)):
+        for key, val in enumerate(("CODE", "DESCR", "9.99", "0.0", "9.99", "1", "pc.", "9.99")):
             assert_that(sample_model.data(sample_model.index(0, key), Qt.DisplayRole), is_(val))
 
     def test_data_edit_role(self, sample_model):
@@ -179,10 +181,10 @@ class TestMerchandiseListModel:
             assert_that(sample_model.data(sample_model.index(0, key), Qt.TextAlignmentRole), is_(val))
 
     def test_grand_total(self, sample_model):
-        assert_that(sample_model.grand_total, is_(9.99))
+        assert_that(sample_model.grand_total, is_(Decimal("9.99")))
         m = create_merch(count=10)
         sample_model.add_item(m)
-        assert_that(sample_model.grand_total, is_(99.89))
+        assert_that(sample_model.grand_total, is_(Decimal("99.89")))
 
     def test_supported_drop_action(self):
         m = MerchandiseListModel()
@@ -380,24 +382,32 @@ class TestMerchandiseListModel:
 
 
 class TestMerchandiseListDelegate:
-    @pytest.mark.parametrize("col, maximum", [
-        pytest.param(3, 100),
-        pytest.param(5, 999999)
-    ])
-    def test_create_editor(self, qtbot, sample_model, col, maximum):
+    def test_create_editor_for_discount(self, qtbot, sample_model):
         delegate = MerchandiseListDelegate(sample_model)
         widget = QtWidgets.QWidget()
         qtbot.addWidget(widget)
-        editor = delegate.createEditor(widget, None, sample_model.index(0, col))
+        editor = delegate.createEditor(widget, None, sample_model.index(0, 3))
 
         assert_that(editor, is_(instance_of(QtWidgets.QDoubleSpinBox)))
-        assert_that(editor.singleStep(), is_(1))
+        assert_that(editor.decimals(), is_(1))
         assert_that(editor.minimum(), is_(0))
-        assert_that(editor.maximum(), is_(maximum))
+        assert_that(editor.singleStep(), is_(5))
+        assert_that(editor.maximum(), is_(100))
+
+    def test_create_editor_for_count(self, qtbot, sample_model):
+        delegate = MerchandiseListDelegate(sample_model)
+        widget = QtWidgets.QWidget()
+        qtbot.addWidget(widget)
+        editor = delegate.createEditor(widget, None, sample_model.index(0, 5))
+
+        assert_that(editor, is_(instance_of(QtWidgets.QSpinBox)))
+        assert_that(editor.minimum(), is_(1))
+        assert_that(editor.singleStep(), is_(1))
+        assert_that(editor.maximum(), is_(999999))
 
     @pytest.mark.parametrize("col, base", [
-        pytest.param(3, 0),
-        pytest.param(5, 1)
+        pytest.param(3, 0),  # discount
+        pytest.param(5, 1),  # count
     ])
     def test_update_data(self, qtbot, sample_model, col, base):
         delegate = MerchandiseListDelegate(sample_model)
@@ -405,15 +415,14 @@ class TestMerchandiseListDelegate:
         qtbot.addWidget(widget)
         index = sample_model.index(0, col)
         editor = delegate.createEditor(widget, None, index)
-        assert_that(sample_model.data(index, Qt.DisplayRole), is_(base))
+        assert_that(sample_model.data(index, Qt.EditRole), is_(base))
 
         delegate.setEditorData(editor, index)
         assert_that(editor.value(), is_(base))
 
-        target = 50
-        editor.setValue(target)
+        editor.setValue(50)
         delegate.setModelData(editor, sample_model, index)
-        assert_that(sample_model.data(index, Qt.DisplayRole), is_(target))
+        assert_that(sample_model.data(index, Qt.DisplayRole), is_("50.0" if col == 3 else "50"))
 
 
 @pytest.mark.xfail  # Events are not processed correctly in QTest
@@ -469,7 +478,7 @@ class MockSourceModel(QAbstractItemModel):
         return 8
 
     def record(self, row):
-        names = ("merchandise_id", "code", "description", "unit", "list_prine")
+        names = ("merchandise_id", "code", "description", "unit", "list_price")
         rec = QSqlRecord()
         for i, name in enumerate(names):
             f = QSqlField(name)
@@ -501,7 +510,7 @@ class TestMerchandiseSelectionModel:
         assert_that(selection_model.data(selection_model.index(0, 1, QModelIndex()), Qt.DisplayRole), is_("CODE"))
         assert_that(selection_model.data(selection_model.index(0, 2, QModelIndex()), Qt.DisplayRole), is_("DESCR"))
         assert_that(selection_model.data(selection_model.index(0, 3, QModelIndex()), Qt.DisplayRole), is_("pc."))
-        assert_that(selection_model.data(selection_model.index(0, 4, QModelIndex()), Qt.DisplayRole), is_(9.99))
+        assert_that(selection_model.data(selection_model.index(0, 4, QModelIndex()), Qt.DisplayRole), is_(Decimal("9.99")))
 
     def test_row_count(self, selection_model):
         assert_that(selection_model.rowCount(), is_(2))
@@ -531,16 +540,16 @@ class TestMerchandiseSelectionModel:
             assert_that(selection_model.selected, is_({1: create_merch(1, count=i)}))
 
 
-class TestMerchandiseSelectoinDelegate:
+class TestMerchandiseSelectionDelegate:
     def test_create_editor(self, qtbot, selection_model):
         delegate = MerchandiseSelectionDelegate(selection_model)
         widget = QtWidgets.QWidget()
         qtbot.addWidget(widget)
         editor = delegate.createEditor(widget, QtWidgets.QStyleOptionViewItem(), selection_model.index(0, 0))
 
-        assert_that(editor, is_(instance_of(QtWidgets.QDoubleSpinBox)))
-        assert_that(editor.singleStep(), is_(1))
+        assert_that(editor, is_(instance_of(QtWidgets.QSpinBox)))
         assert_that(editor.minimum(), is_(0))
+        assert_that(editor.singleStep(), is_(1))
         assert_that(editor.maximum(), is_(999999))
 
     def test_update_data(self, qtbot, selection_model):
