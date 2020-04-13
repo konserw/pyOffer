@@ -7,15 +7,15 @@
 # See the GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
-#
+
 from __future__ import annotations
 
 import typing
 from enum import Enum, unique
 
 from PySide2.QtCore import QAbstractTableModel, QModelIndex, Qt, Slot, QObject
-from PySide2.QtWidgets import QDialog
 from PySide2.QtSql import QSqlRecord
+from PySide2.QtWidgets import QDialog
 
 from forms.ui_terms_chooser_dialog import Ui_TermsChooserDialog
 from src.database import get_terms_table
