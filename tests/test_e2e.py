@@ -7,6 +7,7 @@
 #  See the GNU General Public License for more details.
 #  You should have received a copy of the GNU General Public License along with this program.
 #  If not, see <http://www.gnu.org/licenses/>.
+from datetime import date
 
 import pytest
 from PySide2.QtCore import Qt, QPoint
@@ -74,6 +75,23 @@ class TestEndToEnd:
         y = active_window.ui.tableView.rowViewportPosition(expected_item_count) + 5
         grand_total = active_window.ui.tableView.indexAt(QPoint(x, y)).data(Qt.DisplayRole)
         assert_that(grand_total, is_(expected_grand_total))
+
+    def test_inquiry_date_toggled(self, active_window):
+        expected_date = f"{date.today():%d.%m.%Y}"
+
+        assert_that(active_window.offer.inquiry_date, is_(none()))
+        assert_that(active_window.ui.line_edit_query_date, is_(disabled()))
+        assert_that(active_window.ui.line_edit_query_date.text(), is_(empty()))
+
+        active_window.inquiry_date_toggled(Qt.Checked)  # enable
+        assert_that(active_window.ui.line_edit_query_date, is_(enabled()))
+        assert_that(active_window.ui.line_edit_query_date.text(), is_(expected_date))
+        assert_that(active_window.offer.inquiry_date, is_(expected_date))
+
+        active_window.inquiry_date_toggled(Qt.Unchecked)  # disable
+        assert_that(active_window.ui.line_edit_query_date, is_(disabled()))
+        assert_that(active_window.ui.line_edit_query_date.text(), is_(""))
+        assert_that(active_window.offer.inquiry_date, is_(empty()))
 
     def test_inquiry_number_toggled(self, qtbot, active_window):
         expected_query_number = "Lorem ipsum"

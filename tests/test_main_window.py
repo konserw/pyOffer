@@ -8,6 +8,7 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 
+from datetime import date
 import pytest
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QDialog
@@ -56,6 +57,7 @@ def mock_new_offer(mocker, expected_symbol, expected_next_symbol):
         instance.remarks = ""
         instance.terms = {}
         instance.inquiry_number = None
+        instance.inquiry_date = None
         instance.customer = None
 
         def update_symbol():
@@ -149,6 +151,7 @@ class TestMainWindow:
 
     @pytest.mark.parametrize("widget_name, slot_name", [
         pytest.param("line_edit_query_number", "inquiry_number_changed"),
+        pytest.param("line_edit_query_date", "inquiry_date_text_changed"),
         pytest.param("plain_text_edit_remarks", "update_remarks"),
     ])
     def test_slot_text_changed(self, mocker, qtbot, active_window, widget_name, slot_name):
@@ -294,6 +297,37 @@ class TestMainWindow:
         dialog_class.assert_called_once_with(active_window)
         dialog.exec_.assert_called_once()
         active_window.offer.merchandise_list.set_discount.assert_called_once_with(expression, discount)
+
+    def test_inquiry_date_enabled(self, mocker, active_window):
+        mock_date = mocker.patch("src.main_window.date", autospec=True)
+        expected_date = date(2020, 12, 30)
+        mock_date.today.return_value = expected_date
+
+        assert_that(active_window.ui.line_edit_query_date, is_(disabled()))
+        assert_that(active_window.ui.line_edit_query_date.text(), is_(empty()))
+
+        active_window.inquiry_date_toggled(Qt.Checked)  # enable
+        assert_that(active_window.ui.line_edit_query_date, is_(enabled()))
+        assert_that(active_window.ui.line_edit_query_date.text(), is_("30.12.2020"))
+
+    def test_inquiry_date_disabled(self, active_window):
+        active_window.ui.line_edit_query_date.setEnabled(True)
+        active_window.ui.line_edit_query_date.setText("lorem ipsum")
+
+        active_window.inquiry_date_toggled(Qt.Unchecked)  # disable
+        assert_that(active_window.ui.line_edit_query_date, is_(disabled()))
+        assert_that(active_window.ui.line_edit_query_date.text(), is_(empty()))
+
+    @pytest.mark.parametrize("text", [
+        pytest.param("30.12.2020"),
+        pytest.param("lorem ipsum"),
+        pytest.param(""),
+    ])
+    def test_inquiry_date_text_changed(self, active_window, text):
+        assert_that(active_window.offer.inquiry_date, is_(none()))
+
+        active_window.inquiry_date_text_changed(text)
+        assert_that(active_window.offer.inquiry_date, is_(text))
 
     def test_inquiry_number_enabled(self, active_window):
         assert_that(active_window.ui.line_edit_query_number, is_(disabled()))
