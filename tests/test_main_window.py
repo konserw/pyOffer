@@ -11,7 +11,7 @@
 import pytest
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QDialog
-from hamcrest import assert_that, is_, none, not_none
+from hamcrest import assert_that, is_, none, not_none, empty
 from qtmatchers import disabled, enabled
 
 from src.main_window import MainWindow
@@ -295,11 +295,25 @@ class TestMainWindow:
         dialog.exec_.assert_called_once()
         active_window.offer.merchandise_list.set_discount.assert_called_once_with(expression, discount)
 
+    def test_inquiry_number_enabled(self, active_window):
+        assert_that(active_window.ui.line_edit_query_number, is_(disabled()))
+        assert_that(active_window.ui.line_edit_query_number.text(), is_(empty()))
+
+        active_window.inquiry_number_toggled(Qt.Checked)  # enable
+        assert_that(active_window.ui.line_edit_query_number, is_(enabled()))
+
+    def test_inquiry_number_disabled(self, active_window):
+        # enable and fill with anything so it can be cleared
+        active_window.ui.line_edit_query_number.setEnabled(True)
+        active_window.ui.line_edit_query_number.setText("Lorem ipsum")
+
+        active_window.inquiry_number_toggled(Qt.Unchecked)  # disable
+        assert_that(active_window.ui.line_edit_query_number, is_(disabled()))
+        assert_that(active_window.ui.line_edit_query_number.text(), is_(empty()))
+
     def test_inquiry_number_changed(self, active_window):
         inquiry = "Lorem ipsum"
         assert_that(active_window.offer.inquiry_number, is_(none()))
 
         active_window.inquiry_number_changed(inquiry)
         assert_that(active_window.offer.inquiry_number, is_(inquiry))
-
-
