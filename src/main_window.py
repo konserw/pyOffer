@@ -10,6 +10,8 @@
 
 from __future__ import annotations
 
+from datetime import date
+
 from PySide2.QtCore import Slot, Qt
 from PySide2.QtWidgets import QMainWindow, QDialog, QApplication
 
@@ -48,6 +50,7 @@ class MainWindow(QMainWindow):
 
         self.ui.command_link_button_customer.clicked.connect(self.select_customer)
         self.ui.check_box_query_date.stateChanged.connect(self.inquiry_date_toggled)
+        self.ui.line_edit_query_date.textChanged.connect(self.inquiry_date_text_changed)
         self.ui.check_box_query_number.stateChanged.connect(self.inquiry_number_toggled)
         self.ui.line_edit_query_number.textChanged.connect(self.inquiry_number_changed)
 
@@ -146,17 +149,22 @@ class MainWindow(QMainWindow):
     @Slot(int)
     def inquiry_date_toggled(self, state: int) -> None:
         enabled = state == Qt.Checked
-        self.ui.push_button_query_date.setEnabled(enabled)
-#        self.ui.line_edit_query_date
-        if not enabled:
-            self.offer.inquiry_date = None
+        self.ui.line_edit_query_date.setEnabled(enabled)
+        if enabled:
+            self.ui.line_edit_query_date.setText(f"{date.today():%d.%m.%Y}")
+        else:
+            self.ui.line_edit_query_date.clear()
+
+    @Slot(str)
+    def inquiry_date_text_changed(self, text: str) -> None:
+        self.offer.inquiry_date = text
 
     @Slot(int)
     def inquiry_number_toggled(self, state: int) -> None:
         enabled = state == Qt.Checked
         self.ui.line_edit_query_number.setEnabled(enabled)
         if not enabled:
-            self.offer.inquiry_number = None
+            self.ui.line_edit_query_number.clear()
 
     @Slot(str)
     def inquiry_number_changed(self, text: str) -> None:
