@@ -15,32 +15,33 @@ from hamcrest import assert_that, is_, instance_of, none
 from src.customer import Customer
 from src.merchandise import MerchandiseListModel
 from src.offer import Offer
-# noinspection PyUnresolvedReferences
-from tests.test_user import sample_user  # noqa: F401
+from src.user import User
 
 
 class TestOffer:
-    def test_new_symbol(self, monkeypatch, sample_user):
+    def test_new_symbol(self, mocker):
         expected_symbol = "X2012N08"
-        offer = Offer(sample_user)
+        user = mocker.create_autospec(User, instance=True)
+        user.new_offer_symbol.return_value = expected_symbol
+
+        offer = Offer(user)
         assert_that(offer.symbol, is_(none()))
-
-        monkeypatch.setattr("src.user.User.new_offer_symbol", lambda _: expected_symbol)
         offer.new_symbol()
-
         assert_that(offer.symbol, is_(expected_symbol))
 
-    def test_create_empty(self, mocker, sample_user):
-        expected_date = date(2020, 12, 15)
+    def test_create_empty(self, mocker):
         expected_symbol = "X2012N08"
-        mocker.patch.object(sample_user, "new_offer_symbol", autospec=True, return_value=expected_symbol)
+        user = mocker.create_autospec(User, instance=True)
+        user.new_offer_symbol.return_value = expected_symbol
+
+        expected_date = date(2020, 12, 15)
         mock_date = mocker.patch("src.offer.date", autospec=True)
         mock_date.today.return_value = expected_date
 
-        offer = Offer.create_empty(sample_user)
+        offer = Offer.create_empty(user)
 
         assert_that(offer.merchandise_list, is_(instance_of(MerchandiseListModel)))
         assert_that(offer.customer, is_(instance_of(Customer)))
         assert_that(offer.date, is_(expected_date))
-        assert_that(offer.author, is_(sample_user))
+        assert_that(offer.author, is_(user))
         assert_that(offer.symbol, is_(expected_symbol))
