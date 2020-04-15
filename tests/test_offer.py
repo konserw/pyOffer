@@ -7,7 +7,7 @@
 # See the GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
-
+import pytest
 from datetime import date
 
 from hamcrest import assert_that, is_, instance_of, none
@@ -45,3 +45,17 @@ class TestOffer:
         assert_that(offer.date, is_(expected_date))
         assert_that(offer.author, is_(user))
         assert_that(offer.symbol, is_(expected_symbol))
+
+    @pytest.mark.parametrize("i_date, i_number, expected_text", [
+        pytest.param(None, None, "W odpowiedzi na zapytanie, przedstawiamy ofertę na dostawę następujących produktów:"),
+        pytest.param("30.12.2020", None, "W odpowiedzi na zapytanie z dnia 30.12.2020, przedstawiamy ofertę na dostawę następujących produktów:"),
+        pytest.param(None, "123", "W odpowiedzi na zapytanie numer 123, przedstawiamy ofertę na dostawę następujących produktów:"),
+        pytest.param("30.12.2020", "123", "W odpowiedzi na zapytanie numer 123 z dnia 30.12.2020, przedstawiamy ofertę na dostawę następujących produktów:"),
+    ])
+    def test_inquiry_text(self, mocker, i_date, i_number, expected_text):
+        user = mocker.create_autospec(User, instance=True)
+        offer = Offer(user)
+        offer.inquiry_date = i_date
+        offer.inquiry_number = i_number
+
+        assert_that(offer.inquiry_text, is_(expected_text))

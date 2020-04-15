@@ -33,6 +33,16 @@ class Offer(QObject):
         self.author = author
         self.remarks = ""
 
+    @property
+    def inquiry_text(self) -> str:
+        s = "W odpowiedzi na zapytanie"
+        if self.inquiry_number:
+            s += f" numer {self.inquiry_number}"
+        if self.inquiry_date:
+            s += f" z dnia {self.inquiry_date}"
+        s += ", przedstawiamy ofertę na dostawę następujących produktów:"
+        return s
+
     def new_symbol(self) -> None:
         self.symbol = self.author.new_offer_symbol()
 
