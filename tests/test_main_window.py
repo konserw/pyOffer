@@ -36,17 +36,22 @@ def main_window(qtbot, mocker):
 
 
 @pytest.fixture
-def expected_symbol():
+def expected_symbol() -> str:
     return "X2012N08"
 
 
 @pytest.fixture
-def expected_next_symbol():
+def expected_next_symbol() -> str:
     return "X2012N09"
 
 
 @pytest.fixture
-def mock_new_offer(mocker, expected_symbol, expected_next_symbol):
+def expected_inquiry_text() -> str:
+    return "initial value"
+
+
+@pytest.fixture
+def mock_new_offer(mocker, expected_symbol, expected_next_symbol, expected_inquiry_text):
     offer = mocker.patch("src.main_window.Offer", autospec=True)
 
     def create(author, _parent=None):
@@ -56,6 +61,7 @@ def mock_new_offer(mocker, expected_symbol, expected_next_symbol):
         instance.symbol = expected_symbol
         instance.remarks = ""
         instance.terms = {}
+        instance.inquiry_text = expected_inquiry_text
         instance.inquiry_number = None
         instance.inquiry_date = None
         instance.customer = None
@@ -175,7 +181,7 @@ class TestMainWindow:
         slot.assert_called()
         assert_that(slot.call_count, is_(len(text)))
 
-    def test_new_offer(self, mocker, main_window, expected_symbol, mock_new_offer):
+    def test_new_offer(self, mocker, main_window, expected_symbol, mock_new_offer, expected_inquiry_text):
         set_model = mocker.patch.object(main_window.ui.tableView, "setModel", autospec=True)
         assert_that(main_window.offer, is_(none()))
         self._check_offer_ui(main_window, disabled())
@@ -185,6 +191,7 @@ class TestMainWindow:
         set_model.assert_called_once_with(main_window.offer.merchandise_list)
 
         assert_that(main_window.windowTitle(), is_(f"pyOffer - {expected_symbol}"))
+        assert_that(main_window.ui.plain_text_edit_query.toPlainText(), is_(expected_inquiry_text))
         assert_that(main_window.offer, is_(not_none()))
         assert_that(main_window.offer.author, is_(main_window.user))
         self._check_offer_ui(main_window, enabled())
@@ -349,11 +356,13 @@ class TestMainWindow:
         pytest.param("lorem ipsum"),
         pytest.param(""),
     ])
-    def test_inquiry_date_text_changed(self, active_window, text):
+    def test_inquiry_date_text_changed(self, mocker, active_window, text):
+        update_inquiry_text = mocker.patch.object(active_window, "update_inquiry_text", autospec=True)
         assert_that(active_window.offer.inquiry_date, is_(none()))
 
         active_window.inquiry_date_text_changed(text)
         assert_that(active_window.offer.inquiry_date, is_(text))
+        update_inquiry_text.assert_called_once_with()
 
     def test_inquiry_number_enabled(self, active_window):
         assert_that(active_window.ui.line_edit_query_number, is_(disabled()))
@@ -371,9 +380,18 @@ class TestMainWindow:
         assert_that(active_window.ui.line_edit_query_number, is_(disabled()))
         assert_that(active_window.ui.line_edit_query_number.text(), is_(empty()))
 
-    def test_inquiry_number_changed(self, active_window):
+    def test_inquiry_number_changed(self, mocker, active_window):
+        update_inquiry_text = mocker.patch.object(active_window, "update_inquiry_text", autospec=True)
         inquiry = "Lorem ipsum"
         assert_that(active_window.offer.inquiry_number, is_(none()))
 
         active_window.inquiry_number_changed(inquiry)
         assert_that(active_window.offer.inquiry_number, is_(inquiry))
+        update_inquiry_text.assert_called_once_with()
+
+    def test_update_inquiry_text(self, active_window):
+        expected_text = "Lorem ipsum"
+        active_window.offer.inquiry_text = expected_text
+
+        active_window.update_inquiry_text()
+        assert_that(active_window.ui.plain_text_edit_query.toPlainText(), is_(expected_text))

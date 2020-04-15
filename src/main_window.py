@@ -74,12 +74,16 @@ class MainWindow(QMainWindow):
         self.ui.tab.setEnabled(enable)
         self.ui.tab_2.setEnabled(enable)
 
+    def update_inquiry_text(self) -> None:
+        self.ui.plain_text_edit_query.setPlainText(self.offer.inquiry_text)
+
     @Slot()
     def new_offer(self) -> None:
         self.offer = Offer.create_empty(self.user, self)
         self.set_offer_ui_enabled(True)
         self.setWindowTitle(f"pyOffer - {self.offer.symbol}")
         self.ui.tableView.setModel(self.offer.merchandise_list)
+        self.update_inquiry_text()
 
     @Slot()
     def new_offer_symbol(self) -> None:
@@ -173,6 +177,7 @@ class MainWindow(QMainWindow):
     @Slot(str)
     def inquiry_date_text_changed(self, text: str) -> None:
         self.offer.inquiry_date = text
+        self.update_inquiry_text()
 
     @Slot(int)
     def inquiry_number_toggled(self, state: int) -> None:
@@ -184,6 +189,7 @@ class MainWindow(QMainWindow):
     @Slot(str)
     def inquiry_number_changed(self, text: str) -> None:
         self.offer.inquiry_number = text
+        self.update_inquiry_text()
 
     @Slot()
     def load_offer(self) -> None:
