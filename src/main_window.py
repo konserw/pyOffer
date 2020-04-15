@@ -12,8 +12,8 @@ from __future__ import annotations
 
 from datetime import date
 
-from PySide2.QtCore import Slot, Qt
-from PySide2.QtWidgets import QMainWindow, QDialog, QApplication
+from PySide2.QtCore import Slot, Qt, QDate
+from PySide2.QtWidgets import QMainWindow, QDialog, QApplication, QCalendarWidget
 
 from forms.ui_mainwindow import Ui_MainWindow
 from src.customer import CustomerSelectionDialog
@@ -31,6 +31,7 @@ class MainWindow(QMainWindow):
 
         self.offer = None
         self.user = user
+        self.calendar = QCalendarWidget()
 
         self.ui.action_new.triggered.connect(self.new_offer)
         self.ui.action_open.triggered.connect(self.load_offer)
@@ -51,6 +52,7 @@ class MainWindow(QMainWindow):
         self.ui.command_link_button_customer.clicked.connect(self.select_customer)
         self.ui.check_box_query_date.stateChanged.connect(self.inquiry_date_toggled)
         self.ui.line_edit_query_date.textChanged.connect(self.inquiry_date_text_changed)
+        self.ui.push_button_query_date.clicked.connect(self.inquiry_date_button_clicked)
         self.ui.check_box_query_number.stateChanged.connect(self.inquiry_number_toggled)
         self.ui.line_edit_query_number.textChanged.connect(self.inquiry_number_changed)
 
@@ -59,6 +61,9 @@ class MainWindow(QMainWindow):
         self.ui.command_link_button_billing.clicked.connect(self.select_billing_terms)
         self.ui.command_link_button_delivery_date.clicked.connect(self.select_delivery_date_terms)
         self.ui.plain_text_edit_remarks.textChanged.connect(self.update_remarks)
+
+        # must be connected at the end or will break tests
+        self.calendar.clicked.connect(self.inquiry_date_changed)
 
     def set_offer_ui_enabled(self, enable: bool) -> None:
         # menus
@@ -145,6 +150,16 @@ class MainWindow(QMainWindow):
         if dialog.exec_() == QDialog.Accepted:
             self.offer.merchandise_list.set_discount(dialog.filter_expression, dialog.discount_value)
         self.offer.merchandise_list.highlight_rows(None)
+
+    @Slot()
+    def inquiry_date_button_clicked(self) -> None:
+        self.ui.check_box_query_date.setChecked(Qt.Checked)
+        self.calendar.show()
+
+    @Slot(QDate)
+    def inquiry_date_changed(self, d: QDate) -> None:
+        self.ui.line_edit_query_date.setText(f"{d.toPython():%d.%m.%Y}")
+        self.calendar.close()
 
     @Slot(int)
     def inquiry_date_toggled(self, state: int) -> None:

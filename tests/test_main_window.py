@@ -10,7 +10,7 @@
 
 from datetime import date
 import pytest
-from PySide2.QtCore import Qt
+from PySide2.QtCore import Qt, QDate
 from PySide2.QtWidgets import QDialog
 from hamcrest import assert_that, is_, none, not_none, empty
 from qtmatchers import disabled, enabled
@@ -109,7 +109,7 @@ class TestMainWindow:
         pytest.param("menu_help", "action_about_Qt", "about_qt"),
     ])
     def test_slot_for_triggered(self, mocker, qtbot, active_window, menu_name, action_name, slot_name):
-        slot = mocker.patch.object(active_window, f'{slot_name}', autospec=True)
+        slot = mocker.patch.object(active_window, slot_name, autospec=True)
         menu = getattr(active_window.ui, menu_name)
         action = getattr(active_window.ui, action_name)
 
@@ -128,21 +128,30 @@ class TestMainWindow:
         pytest.param("push_button_add_merchandise", "select_merchandise"),
         pytest.param("push_button_remove_row", "remove_row"),
         pytest.param("push_button_discount", "set_discount"),
+        pytest.param("push_button_query_date", "inquiry_date_button_clicked"),
     ])
     def test_slot_for_clicked(self, mocker, qtbot, active_window, widget_name, slot_name):
-        slot = mocker.patch.object(active_window, f'{slot_name}', autospec=True)
+        slot = mocker.patch.object(active_window, slot_name, autospec=True)
         widget = getattr(active_window.ui, widget_name)
 
         with qtbot.wait_signal(widget.clicked):
             qtbot.mouseClick(widget, Qt.LeftButton)
-        slot.assert_called_once()
+        slot.assert_called_once_with()
+
+    def test_slot_for_calendar(self, mocker, active_window):
+        """qtbot.clicked didn't work with calendar for some reason, so I'm left with this simple test"""
+        date_changed_slot = mocker.patch.object(active_window, "inquiry_date_changed", autospec=True)
+
+        expected_date = date(2020, 12, 30)
+        active_window.calendar.clicked.emit(expected_date)
+        date_changed_slot.assert_called_once_with(expected_date)
 
     @pytest.mark.parametrize("widget_name, slot_name", [
         pytest.param("check_box_query_date", "inquiry_date_toggled"),
         pytest.param("check_box_query_number", "inquiry_number_toggled"),
     ])
     def test_slot_state_changed(self, mocker, qtbot, active_window, widget_name, slot_name):
-        slot = mocker.patch.object(active_window, f'{slot_name}', autospec=True)
+        slot = mocker.patch.object(active_window, slot_name, autospec=True)
         widget = getattr(active_window.ui, widget_name)
 
         with qtbot.wait_signal(widget.stateChanged):
@@ -155,7 +164,7 @@ class TestMainWindow:
         pytest.param("plain_text_edit_remarks", "update_remarks"),
     ])
     def test_slot_text_changed(self, mocker, qtbot, active_window, widget_name, slot_name):
-        slot = mocker.patch.object(active_window, f'{slot_name}', autospec=True)
+        slot = mocker.patch.object(active_window, slot_name, autospec=True)
         text = "lorem ipsum"
         widget = getattr(active_window.ui, widget_name)
         widget.setEnabled(True)
@@ -297,6 +306,23 @@ class TestMainWindow:
         dialog_class.assert_called_once_with(active_window)
         dialog.exec_.assert_called_once()
         active_window.offer.merchandise_list.set_discount.assert_called_once_with(expression, discount)
+
+    def test_inquiry_date_button_clicked(self, mocker, active_window):
+        show_calendar = mocker.patch.object(active_window.calendar, 'show', autospec=True)
+        assert_that(active_window.ui.check_box_query_date.isChecked(), is_(False))
+
+        active_window.inquiry_date_button_clicked()
+        show_calendar.assert_called_once_with()
+        assert_that(active_window.ui.check_box_query_date.isChecked(), is_(True))
+
+    def test_inquiry_date_changed(self, mocker, active_window):
+        close = mocker.patch.object(active_window.calendar, "close", autospec=True)
+        active_window.ui.line_edit_query_date.setEnabled(True)
+        assert_that(active_window.ui.line_edit_query_date.text(), is_(empty()))
+
+        active_window.inquiry_date_changed(QDate(2020, 12, 30))
+        assert_that(active_window.ui.line_edit_query_date.text(), is_("30.12.2020"))
+        close.assert_called_once_with()
 
     def test_inquiry_date_enabled(self, mocker, active_window):
         mock_date = mocker.patch("src.main_window.date", autospec=True)
