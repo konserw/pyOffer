@@ -162,3 +162,10 @@ class TestTerms:
         name, address = db.get_company_address()
         assert_that(name, is_("Nicoll Polska Sp. z o.o."))
         assert_that(address, is_("ul. Energetyczna 6, 56-400 Oleśnica"))
+
+    @pytest.mark.parametrize("key, expected_value", [
+        pytest.param("order email", "biuro.pl@aliaxis.com")
+    ])
+    def test_get_var(self, db, key, expected_value):
+        value = db.get_var(key)
+        assert_that(value, is_(expected_value))

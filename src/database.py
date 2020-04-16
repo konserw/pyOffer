@@ -75,6 +75,17 @@ def get_company_address() -> tuple:
     return record.value("full_name"), record.value("address")
 
 
+def get_var(key: str) -> str:
+    text = f"SELECT value FROM public.vars WHERE key = '{key}'"
+    query = QSqlQuery(text)
+    if not query.next():
+        logging.error(f"Query failed: {text}")
+        logging.error(query.lastError().text())
+        raise RuntimeError("Error accessing database")
+    record = query.record()
+    return record.value("value")
+
+
 def get_terms_table(term_type_name: str) -> QSqlTableModel:
     model = QSqlTableModel()
     model.setTable(F"terms_{term_type_name}")
