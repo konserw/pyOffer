@@ -29,3 +29,8 @@ select customers.customer_id AS customer_id,
 FROM customers
          natural join companies;
 
+-- company address
+
+INSERT INTO public.companies(company_id, short_name, full_name, address)
+VALUES (0, 'HQ', 'Nicoll Polska Sp. z o.o.', 'ul. Energetyczna 6, 56-400 Oleśnica');
+

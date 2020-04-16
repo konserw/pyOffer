@@ -64,6 +64,17 @@ def get_new_offer_number(user_id: int) -> int:
     return query.record().value(0)
 
 
+def get_company_address() -> tuple:
+    text = f"SELECT full_name, address FROM public.companies WHERE company_id = 0"
+    query = QSqlQuery(text)
+    if not query.next():
+        logging.error(f"Query failed: {text}")
+        logging.error(query.lastError().text())
+        raise RuntimeError("Error accessing database")
+    record = query.record()
+    return record.value("full_name"), record.value("address")
+
+
 def get_terms_table(term_type_name: str) -> QSqlTableModel:
     model = QSqlTableModel()
     model.setTable(F"terms_{term_type_name}")
