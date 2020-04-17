@@ -15,12 +15,13 @@ from datetime import date
 from PySide2.QtCore import QObject
 
 from src.customer import Customer
+from src.database import get_company_address, get_var
 from src.merchandise import MerchandiseListModel
 from src.user import User
 
 
 class Offer(QObject):
-    def __init__(self, author, parent=None):
+    def __init__(self, author: User, parent=None):
         super().__init__(parent)
         self.merchandise_list = None
         self.customer = None
@@ -32,6 +33,8 @@ class Offer(QObject):
         self.symbol = None
         self.author = author
         self.remarks = ""
+        self.company_address = ""
+        self.order_email = ""
 
     @property
     def inquiry_text(self) -> str:
@@ -53,4 +56,6 @@ class Offer(QObject):
         offer.customer = Customer()
         offer.date = date.today()
         offer.new_symbol()
+        offer.company_address = "<br />\n".join(get_company_address())
+        offer.order_email = get_var("order email")
         return offer

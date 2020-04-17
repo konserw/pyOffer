@@ -38,6 +38,10 @@ class TestOffer:
         mock_date = mocker.patch("src.offer.date", autospec=True)
         mock_date.today.return_value = expected_date
 
+        expected_email = "order@company.com"
+        mocker.patch("src.offer.get_company_address", return_value=("lorem", "ipsum"))
+        mocker.patch("src.offer.get_var", return_value=expected_email)
+
         offer = Offer.create_empty(user)
 
         assert_that(offer.merchandise_list, is_(instance_of(MerchandiseListModel)))
@@ -45,6 +49,8 @@ class TestOffer:
         assert_that(offer.date, is_(expected_date))
         assert_that(offer.author, is_(user))
         assert_that(offer.symbol, is_(expected_symbol))
+        assert_that(offer.company_address, is_("lorem<br />\nipsum"))
+        assert_that(offer.order_email, is_(expected_email))
 
     @pytest.mark.parametrize("i_date, i_number, expected_text", [
         pytest.param(None, None, "W odpowiedzi na zapytanie, przedstawiamy ofertę na dostawę następujących produktów:"),
