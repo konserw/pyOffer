@@ -7,7 +7,6 @@
 # See the GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
-
 from unittest.mock import MagicMock
 
 import pytest
@@ -21,9 +20,8 @@ SHORT_DESCRIPTION = "short description"
 LONG_DESCRIPTION = "long description"
 
 
-def create_term_item(item_id=0, term_type=None):
-    item = TermItem()
-    item.type = term_type
+def create_term_item(item_id=0, term_type=TermType.remarks):
+    item = TermItem(term_type)
     item.id = item_id
     item.short_desc = SHORT_DESCRIPTION
     item.long_desc = LONG_DESCRIPTION

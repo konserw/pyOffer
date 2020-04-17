@@ -31,15 +31,24 @@ class TermType(Enum):
 
 
 class TermItem:
-    def __init__(self):
-        self.type = None
+    pl_type_descs = {
+        TermType.delivery: "Warunki dostawy",
+        TermType.offer: "Warunki oferty",
+        TermType.billing: "Warunki plałatności",
+        TermType.delivery_date: "Termin dostawy",
+        TermType.remarks: "Uwagi"
+    }
+
+    def __init__(self, term_type: TermType):
+        self.type = term_type
         self.id = None
         self.short_desc = None
         self.long_desc = None
+        self.type_description = self.pl_type_descs[term_type]
 
     @staticmethod
     def from_record(term_type: TermType, record: QSqlRecord) -> TermItem:
-        t = TermItem()
+        t = TermItem(term_type)
         t.type = term_type
         t.id = record.value("id")
         t.short_desc = record.value("short_desc")
