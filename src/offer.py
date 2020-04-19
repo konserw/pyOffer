@@ -71,8 +71,8 @@ class Offer(QObject):
 
         phone = f"Tel.: {self.author.phone}\n" if self.author.phone else ""
         style = """
-    body { font-family: Arial, Helvetica, sans-serif; font-size:14○px; } 
-    .spec { font-size: 12px; } 
+    body { font-family: Arial, Helvetica, sans-serif; font-size:12; } 
+    .spec { font-size: 10; } 
     .row0 { background: #efefef; } 
     .row1 { background: #dadada; } 
 """
@@ -143,15 +143,7 @@ class Offer(QObject):
 <tr><td>
     <table>
     <tr>
-        <td colspan=2 align=left valign=bottom>
-            <img src=:/aliaxis height=50 ><br />
-        </td>
-        <td align=center valign=bottom >
-            <img src=:/fip height=50 ><br />
-        </td>
-    </tr>
-    <tr>
-        <td valign=top width={dd}>
+        <td valign=top width={document_width/2}>
             Oferta nr: <b>{self.symbol}</b><br />
             Z dnia: {self.date:%d.%m.%Y}<br />
             Dla:<br />
@@ -159,17 +151,16 @@ class Offer(QObject):
             {self.customer.html_address}<br />
             {self.customer.concated_name}
         </td>
-        <td width={dd+50}>
+        <td width={document_width/2}>
+            <img src=:/aliaxis height=50 ><br />
             {self.company_address}<br />
             <b>{self.author.name}</b><br />
             {self.author.mail}<br />
             {phone}
         </td>
-        <td width={dd-50}> <!-- todo: remove this cell? -->
-        </td>
     </tr>
     <tr>
-        <td colspan=3>
+        <td colspan=2>
             <hr width=100%>
         </td>
     </tr>

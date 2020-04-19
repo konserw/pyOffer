@@ -100,8 +100,8 @@ class TestOffer:
 <title>Oferta</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head>
 <style>
-    body { font-family: Arial, Helvetica, sans-serif; font-size:14○px; } 
-    .spec { font-size: 12px; } 
+    body { font-family: Arial, Helvetica, sans-serif; font-size:12; } 
+    .spec { font-size: 10; } 
     .row0 { background: #efefef; } 
     .row1 { background: #dadada; } 
 </style>
@@ -112,15 +112,7 @@ class TestOffer:
 <tr><td>
     <table>
     <tr>
-        <td colspan=2 align=left valign=bottom>
-            <img src=:/aliaxis height=50 ><br />
-        </td>
-        <td align=center valign=bottom >
-            <img src=:/fip height=50 ><br />
-        </td>
-    </tr>
-    <tr>
-        <td valign=top width=248>
+        <td valign=top width=372.5>
             Oferta nr: <b>X2012N08</b><br />
             Z dnia: 15.12.2020<br />
             Dla:<br />
@@ -128,7 +120,8 @@ class TestOffer:
             <br />
               
         </td>
-        <td width=298>
+        <td width=372.5>
+            <img src=:/aliaxis height=50 ><br />
             lorem<br />
 ipsum<br />
             <b>Author Name</b><br />
@@ -136,11 +129,9 @@ ipsum<br />
             Tel.: 123 456 789
 
         </td>
-        <td width=198> <!-- todo: remove this cell? -->
-        </td>
     </tr>
     <tr>
-        <td colspan=3>
+        <td colspan=2>
             <hr width=100%>
         </td>
     </tr>
