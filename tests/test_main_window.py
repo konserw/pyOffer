@@ -10,7 +10,9 @@
 
 from datetime import date
 import pytest
-from PySide2.QtCore import Qt, QDate
+from PySide2.QtCore import Qt, QDate, QSizeF
+from PySide2.QtGui import QTextDocument
+from PySide2.QtPrintSupport import QPrinter, QPrintPreviewDialog
 from PySide2.QtWidgets import QDialog
 from hamcrest import assert_that, is_, none, not_none, empty
 from qtmatchers import disabled, enabled
@@ -65,6 +67,7 @@ def mock_new_offer(mocker, expected_symbol, expected_next_symbol, expected_inqui
         instance.inquiry_number = None
         instance.inquiry_date = None
         instance.customer = None
+        instance.document = "Lorem ipsum"
 
         def update_symbol():
             instance.symbol = expected_next_symbol
@@ -395,3 +398,27 @@ class TestMainWindow:
 
         active_window.update_inquiry_text()
         assert_that(active_window.ui.plain_text_edit_query.toPlainText(), is_(expected_text))
+
+    def test_print(self, mocker, active_window):
+        size = QSizeF(100, 100)
+        printer = mocker.create_autospec(QPrinter)
+        printer.pageRect.return_value.size.return_value = size
+        doc = mocker.create_autospec(QTextDocument, instance=True)
+        mocker.patch("src.main_window.QTextDocument").return_value = doc
+
+        active_window.print(printer)
+
+        printer.setPageSize.assert_called_once_with(QPrinter.A4)
+        printer.setPageMargins.assert_called_once_with(5, 5, 5, 5, QPrinter.Millimeter)
+        printer.setResolution.assert_called_once_with(96)
+
+        doc.setHtml.assert_called_once_with("Lorem ipsum")
+        doc.setPageSize.assert_called_once_with(size)
+        doc.print_.assert_called_once_with(printer)
+
+    def test_print_preview(self, mocker, active_window):
+        dialog = mocker.MagicMock(spec=QPrintPreviewDialog)
+        mocker.patch("src.main_window.QPrintPreviewDialog").return_value = dialog
+        active_window.print_preview()
+        dialog.paintRequested.connect.assert_called_once_with(active_window.print)
+        dialog.exec_.assert_called_once_with()
