@@ -94,6 +94,7 @@ class TestOffer:
         customer.html_address = "255 Some street<br />\nIn some town"
 
         offer.merchandise_list.add_item(create_merch())
+        offer.remarks = "Some remarks"
 
         expected_document = """<html>
 <head>
@@ -183,7 +184,7 @@ ipsum<br />
 <table cellspacing=3>
     <tr>
         <td width=140>Uwagi:</td>
-        <td width=602></td>
+        <td width=602>Some remarks</td>
     </tr>
 </table>
 

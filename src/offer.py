@@ -123,7 +123,8 @@ class Offer(QObject):
         <td width={document_width-left_col_width-3}>{term.long_desc}</td>
     </tr>
 """
-        term_table += f"""
+        if self.remarks:
+            term_table += f"""
     <tr>
         <td width={left_col_width}>Uwagi:</td>
         <td width={document_width - left_col_width - 3}>{remarks}</td>
