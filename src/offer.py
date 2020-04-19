@@ -69,13 +69,13 @@ class Offer(QObject):
         col_width_narrow = 70
         col_width_symbol = document_width - 40 - (col_width_price * 3) - (col_width_narrow * 2) - (4*7)
 
-        phone = f"\t\t\tTel.: {self.author.phone}\n" if self.author.phone else ""
+        phone = f"Tel.: {self.author.phone}\n" if self.author.phone else ""
         style = """
     body { font-family: Arial, Helvetica, sans-serif; font-size:14○px; } 
     .spec { font-size: 12px; } 
     .row0 { background: #efefef; } 
     .row1 { background: #dadada; } 
-        """
+"""
 
         merchandise_list = f"""
     <table cellspacing=0>
@@ -90,9 +90,9 @@ class Offer(QObject):
         </tr></thead>
 """
         for i, item in enumerate(self.merchandise_list.list):
-            style = 'row0' if i % 2 else 'row1'
+            row_style = 'row0' if i % 2 else 'row1'
             merchandise_list += f"""
-        <tr class="{style}">
+        <tr class="{row_style}">
             <td>{i + 1}</td>
             <td>{item.code}</td>
             <td align=right>{item.list_price}</td>
@@ -101,7 +101,7 @@ class Offer(QObject):
             <td align=right>{item.count}</td>
             <td align=right>{item.total}</td>
         </tr>
-        <tr class="{style} spec">
+        <tr class="{row_style} spec">
             <td></td>
             <td colspan=6>{item.description}</td>
         </tr>
@@ -138,7 +138,7 @@ class Offer(QObject):
 <style>{style}</style>
 </head>
 <body>
-<table >
+<table>
 <thead>
 <tr><td>
     <table>
