@@ -59,3 +59,150 @@ class Offer(QObject):
         offer.company_address = "<br />\n".join(get_company_address())
         offer.order_email = get_var("order email")
         return offer
+
+    @property
+    def document(self) -> str:
+        document_width = 745
+        dd = 248
+        left_col_width = 140
+        col_width_price = 90
+        col_width_narrow = 70
+        col_width_symbol = document_width - 40 - (col_width_price * 3) - (col_width_narrow * 2) - (4*7)
+
+        phone = f"\t\t\tTel.: {self.author.phone}\n" if self.author.phone else ""
+        style = """
+    body { font-family: Arial, Helvetica, sans-serif; font-size:14○px; } 
+    .spec { font-size: 12px; } 
+    .row0 { background: #efefef; } 
+    .row1 { background: #dadada; } 
+        """
+
+        merchandise_list = f"""
+    <table cellspacing=0>
+        <thead><tr class="header">
+            <td width=40><b>Lp.</b></td>
+            <td width={col_width_symbol}><b>Towar</b></td>
+            <td width={col_width_price} align=right><b>Cena kat.</b></td>
+            <td width={col_width_narrow} align=right><b>Rabat</b></td>
+            <td width={col_width_price} align=right><b>Cena</b></td>
+            <td width={col_width_narrow} align=right><b>Ilość</b></td>
+            <td width={col_width_price} align=right><b>Wartość</b></td>
+        </tr></thead>
+"""
+        for i, item in enumerate(self.merchandise_list.list):
+            style = 'row0' if i % 2 else 'row1'
+            merchandise_list += f"""
+        <tr class="{style}">
+            <td>{i + 1}</td>
+            <td>{item.code}</td>
+            <td align=right>{item.list_price}</td>
+            <td align=right>{item.discount}</td>
+            <td align=right>{item.price}</td>
+            <td align=right>{item.count}</td>
+            <td align=right>{item.total}</td>
+        </tr>
+        <tr class="{style} spec">
+            <td></td>
+            <td colspan=6>{item.description}</td>
+        </tr>
+"""
+        merchandise_list += f"""
+        <tr style="font-weight:bold;">
+            <td align=right colspan=6>Razem:</td>
+            <td align=right>{self.merchandise_list.grand_total}</td>
+        </tr>
+    </table>
+"""
+
+        remarks = self.remarks.replace("\n", "<br />\n")
+        term_table = "<table cellspacing=3>"
+        for term in self.terms.values():
+            term_table += f"""
+    <tr>
+        <td width={left_col_width}>{term.type_description}:</td>
+        <td width={document_width-left_col_width-3}>{term.long_desc}</td>
+    </tr>
+"""
+        term_table += f"""
+    <tr>
+        <td width={left_col_width}>Uwagi:</td>
+        <td width={document_width - left_col_width - 3}>{remarks}</td>
+    </tr>
+</table>
+"""
+
+        doc = f"""<html>
+<head>
+<title>Oferta</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head>
+<style>{style}</style>
+</head>
+<body>
+<table >
+<thead>
+<tr><td>
+    <table>
+    <tr>
+        <td colspan=2 align=left valign=bottom>
+            <img src=:/aliaxis height=50 ><br />
+        </td>
+        <td align=center valign=bottom >
+            <img src=:/fip height=50 ><br />
+        </td>
+    </tr>
+    <tr>
+        <td valign=top width={dd}>
+            Oferta nr: <b>{self.symbol}</b><br />
+            Z dnia: {self.date:%d.%m.%Y}<br />
+            Dla:<br />
+            <b>{self.customer.full_name}</b><br />
+            {self.customer.html_address}<br />
+            {self.customer.concated_name}
+        </td>
+        <td width={dd+50}>
+            {self.company_address}<br />
+            <b>{self.author.name}</b><br />
+            {self.author.mail}<br />
+            {phone}
+        </td>
+        <td width={dd-50}> <!-- todo: remove this cell? -->
+        </td>
+    </tr>
+    <tr>
+        <td colspan=3>
+            <hr width=100%>
+        </td>
+    </tr>
+    </table>
+</td></tr>
+</thead>
+<tbody>
+<tr><td>
+    {self.inquiry_text}
+</td></tr>
+<tr><td>
+    {merchandise_list}
+</td></tr>
+<tr><td>
+    Podane ceny nie zawierają podatku VAT<br />
+</td></tr>
+<tr><td>
+{term_table}
+</td></tr>
+<tr><td>
+    <p>
+    <b>Zamówienia prosimy kierować na adres:</b> {self.order_email} z kopią do autora oferty.<br />
+    <br />
+    Łączymy pozdrowienia.
+    </p>
+    <p align=center style="margin-left: 500">
+        Ofertę przygotował{self.author.gender_suffix}<br /><br /><br />
+        {self.author.name}
+    </p>
+</td></tr>
+</tbody>
+</table>
+</body>
+</html>
+"""
+        return doc

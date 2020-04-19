@@ -13,6 +13,8 @@ from __future__ import annotations
 from datetime import date
 
 from PySide2.QtCore import Slot, Qt, QDate
+from PySide2.QtGui import QTextDocument
+from PySide2.QtPrintSupport import QPrinter, QPrintPreviewDialog
 from PySide2.QtWidgets import QMainWindow, QDialog, QApplication, QCalendarWidget
 
 from forms.ui_mainwindow import Ui_MainWindow
@@ -204,9 +206,28 @@ class MainWindow(QMainWindow):
         """Forward to QMainWindow.close, but keep here for sake of tests"""
         super().close()
 
+    @Slot(QPrinter)
+    def print(self, printer: QPrinter) -> None:
+        margin = 5
+        printer.setPageSize(QPrinter.A4)
+        printer.setPageMargins(margin, margin, margin, margin, QPrinter.Millimeter)
+        printer.setResolution(96)
+
+        doc = QTextDocument()
+        doc.setHtml(self.offer.document)
+        doc.setPageSize(printer.pageRect().size())
+        doc.print_(printer)
+
     @Slot()
     def print_preview(self) -> None:
-        pass
+        printer = QPrinter()
+        printer.setOutputFormat(QPrinter.NativeFormat)
+
+        dialog = QPrintPreviewDialog(printer, self)
+        dialog.setWindowFlags(Qt.Window)
+        dialog.paintRequested.connect(self.print)
+        dialog.showMaximized()
+        dialog.exec_()
 
     @Slot()
     def print_pdf(self) -> None:
