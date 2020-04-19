@@ -15,7 +15,7 @@ from datetime import date
 from PySide2.QtCore import Slot, Qt, QDate
 from PySide2.QtGui import QTextDocument
 from PySide2.QtPrintSupport import QPrinter, QPrintPreviewDialog
-from PySide2.QtWidgets import QMainWindow, QDialog, QApplication, QCalendarWidget
+from PySide2.QtWidgets import QMainWindow, QDialog, QApplication, QCalendarWidget, QFileDialog
 
 from forms.ui_mainwindow import Ui_MainWindow
 from src.customer import CustomerSelectionDialog
@@ -231,7 +231,14 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def print_pdf(self) -> None:
-        pass
+        file_name = QFileDialog.getSaveFileName(self, self.tr("Save to .pdf"), filter=self.tr("Portable Document Format (*.pdf)"))[0]
+        if not file_name:
+            return
+
+        printer = QPrinter()
+        printer.setOutputFormat(QPrinter.PdfFormat)
+        printer.setOutputFileName(file_name)
+        self.print(printer)
 
     @Slot()
     def about(self) -> None:

@@ -422,3 +422,14 @@ class TestMainWindow:
         active_window.print_preview()
         dialog.paintRequested.connect.assert_called_once_with(active_window.print)
         dialog.exec_.assert_called_once_with()
+
+    def test_print_pdf(self, mocker, active_window):
+        file_name = "file.pdf"
+        mocker.patch("src.main_window.QFileDialog.getSaveFileName").return_value = (file_name, "Portable Document Format (*.pdf)")
+        print_mock = mocker.patch.object(active_window, "print")
+
+        active_window.print_pdf()
+        print_mock.assert_called_once()
+        printer = print_mock.call_args.args[0]
+        assert_that(printer.outputFormat(), is_(QPrinter.PdfFormat))
+        assert_that(printer.outputFileName(), is_(file_name))
