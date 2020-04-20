@@ -122,7 +122,7 @@ class TestOffer:
               
         </td>
         <td width=372.5>
-            <img src=:/aliaxis height=50 ><br />
+            <img src=:/logos height=60><br />
             lorem<br />
 ipsum<br />
             <b>Author Name</b><br />
