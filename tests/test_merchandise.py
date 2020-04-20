@@ -506,7 +506,8 @@ class TestMerchandiseSelectionModel:
         assert_that(selection_model.headerData(4, Qt.Horizontal, Qt.DisplayRole), is_("List price"))
 
     def test_data(self, selection_model):
-        assert_that(selection_model.data(selection_model.index(0, 0, QModelIndex()), Qt.DisplayRole), is_(0))
+        assert_that(selection_model.data(selection_model.index(0, 0, QModelIndex()), Qt.EditRole), is_(0))
+        assert_that(selection_model.data(selection_model.index(0, 0, QModelIndex()), Qt.DisplayRole), is_("0"))
         assert_that(selection_model.data(selection_model.index(0, 1, QModelIndex()), Qt.DisplayRole), is_("CODE"))
         assert_that(selection_model.data(selection_model.index(0, 2, QModelIndex()), Qt.DisplayRole), is_("DESCR"))
         assert_that(selection_model.data(selection_model.index(0, 3, QModelIndex()), Qt.DisplayRole), is_("pc."))
@@ -558,16 +559,14 @@ class TestMerchandiseSelectionDelegate:
         qtbot.addWidget(widget)
         index = selection_model.index(0, 0)
         editor = delegate.createEditor(widget, QtWidgets.QStyleOptionViewItem(), index)
-        base = 0
-        assert_that(selection_model.data(index, Qt.DisplayRole), is_(base))
+        assert_that(selection_model.data(index, Qt.DisplayRole), is_("0"))
 
         delegate.setEditorData(editor, index)
-        assert_that(editor.value(), is_(base))
+        assert_that(editor.value(), is_(0))
 
-        target = 50
-        editor.setValue(target)
+        editor.setValue(50)
         delegate.setModelData(editor, selection_model, index)
-        assert_that(selection_model.data(index, Qt.DisplayRole), is_(target))
+        assert_that(selection_model.data(index, Qt.DisplayRole), is_("50"))
 
 
 class TestMerchandiseSelectionDialog:
@@ -643,14 +642,14 @@ class TestMerchandiseSelectionModelWithDB:
         assert_that(selection_model_with_db.headerData(4, Qt.Horizontal, Qt.DisplayRole), is_("List price"))
 
     def test_data_1(self, selection_model_with_db):
-        assert_that(selection_model_with_db.data(selection_model_with_db.index(0, 0, QModelIndex()), Qt.DisplayRole), is_(0))  # count
+        assert_that(selection_model_with_db.data(selection_model_with_db.index(0, 0, QModelIndex()), Qt.DisplayRole), is_("0"))  # count
         assert_that(selection_model_with_db.data(selection_model_with_db.index(0, 1, QModelIndex()), Qt.DisplayRole), is_("CODE123"))
         assert_that(selection_model_with_db.data(selection_model_with_db.index(0, 2, QModelIndex()), Qt.DisplayRole), is_("some description"))
         assert_that(selection_model_with_db.data(selection_model_with_db.index(0, 3, QModelIndex()), Qt.DisplayRole), is_("pc."))
         assert_that(selection_model_with_db.data(selection_model_with_db.index(0, 4, QModelIndex()), Qt.DisplayRole), is_(19.99))
 
     def test_data_2(self, selection_model_with_db):
-        assert_that(selection_model_with_db.data(selection_model_with_db.index(1, 0, QModelIndex()), Qt.DisplayRole), is_(0))  # count
+        assert_that(selection_model_with_db.data(selection_model_with_db.index(1, 0, QModelIndex()), Qt.DisplayRole), is_("0"))  # count
         assert_that(selection_model_with_db.data(selection_model_with_db.index(1, 1, QModelIndex()), Qt.DisplayRole), is_("CODE456"))
         assert_that(selection_model_with_db.data(selection_model_with_db.index(1, 2, QModelIndex()), Qt.DisplayRole), is_("some other description"))
         assert_that(selection_model_with_db.data(selection_model_with_db.index(1, 3, QModelIndex()), Qt.DisplayRole), is_("m"))

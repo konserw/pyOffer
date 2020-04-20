@@ -432,15 +432,20 @@ class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):
         return 5
 
     def data(self, index: QModelIndex, role: int):
+        if not index.isValid() or role not in (Qt.DisplayRole, Qt.EditRole):
+            return
+
         col = index.column()
         row = index.row()
-        if index.isValid() and col == 0 and role in (Qt.DisplayRole, Qt.EditRole):
+        if col == 0:
             item_id = self.get_item_id(row)
-            if item_id in self.selected:
-                return self.selected[item_id].count
-            return 0
-        if index.isValid() and role == Qt.DisplayRole:
-            return self.sourceModel().data(index, Qt.DisplayRole)
+            count = self.selected[item_id].count if item_id in self.selected else 0
+            if role == Qt.DisplayRole:
+                return str(count)
+            else:
+                return count
+        else:
+            return self.sourceModel().data(index, role)
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int = ...) -> typing.Any:
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
