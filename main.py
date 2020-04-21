@@ -12,6 +12,7 @@ import logging
 import sys
 from datetime import datetime
 
+from PySide2.QtCore import QSettings
 from PySide2.QtWidgets import QApplication, QDialog
 
 from src import database
@@ -27,7 +28,16 @@ if __name__ == '__main__':
     app.setOrganizationName("KonserwSoft")
     app.setApplicationName("pyOffer")
 
-    database.connect()
+    settings = QSettings()
+    settings.beginGroup("database")
+    host_name = settings.value("host_name", "127.0.0.1")
+    database_name = settings.value("database_name", "koferta_test")
+    user_name = settings.value("user_name", "postgres")
+    password = settings.value("password", "docker")
+    settings.endGroup()
+
+    database.connect(host_name, database_name, user_name, password)
+
     user_dialog = UserSelectionDialog.make()
     if user_dialog.exec_() == QDialog.Accepted:
         user = User.from_sql_record(user_dialog.chosen_user_record)

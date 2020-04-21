@@ -18,13 +18,13 @@ from datetime import date
 from PySide2.QtSql import QSqlDatabase, QSqlTableModel, QSqlQuery, QSqlQueryModel, QSqlRecord
 
 
-def connect() -> None:
+def connect(host_name: str, database_name: str, user_name: str, password: str) -> None:
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
     database = QSqlDatabase.addDatabase("QPSQL")
-    database.setHostName("127.0.0.1")
-    database.setDatabaseName("koferta_test")
-    database.setUserName("postgres")
-    database.setPassword("docker")
+    database.setHostName(host_name)
+    database.setDatabaseName(database_name)
+    database.setUserName(user_name)
+    database.setPassword(password)
     if not database.open():
         logging.error("Failed to open database")
         logging.error(f"Plugins: {database.drivers()}")

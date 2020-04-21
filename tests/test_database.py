@@ -13,7 +13,7 @@ from PySide2.QtCore import Qt, QModelIndex
 from hamcrest import assert_that, is_, calling, raises
 
 from src.database import get_merchandise_sql_model, get_merchandise_record, get_user_record, \
-    get_new_offer_number, get_terms_table
+    get_new_offer_number, get_terms_table, connect
 from src.terms import TermType
 
 
@@ -169,3 +169,9 @@ class TestTerms:
     def test_get_var(self, db, key, expected_value):
         value = db.get_var(key)
         assert_that(value, is_(expected_value))
+
+
+class TestNoConnection:
+    @pytest.mark.skip("this test breaks other tests using db")
+    def test_connect_failed(self):
+        assert_that(calling(connect).with_args("127.0.0.1", "name", "name", "pass"), raises(RuntimeError, "Failed to connect to db"))

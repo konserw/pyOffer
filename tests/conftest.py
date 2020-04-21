@@ -16,7 +16,12 @@ from src import database
 @pytest.fixture(scope="session")
 def db():
     try:
-        database.connect()
+        database.connect(
+            host_name="127.0.0.1",
+            database_name="koferta_test",
+            user_name="postgres",
+            password="docker"
+        )
     except RuntimeError:
         pytest.skip("Failed to connect to test db")
     return database
