@@ -5,3 +5,4 @@ PyHamcrest
 pyhamcrest-qt
 pyside2
 mock
+cx-freeze
