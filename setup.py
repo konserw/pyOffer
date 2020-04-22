@@ -12,8 +12,8 @@ buildOptions = {
                       os.path.join(plugins_path, "platforms"),
                       os.path.join(plugins_path, "printsupport"),
                       ],
-    "excludes": [],
-    "zip_include_packages": "PySide2",
+    "excludes": ["tkinter", "unittest", "email", "http", "xml", "pydoc", "pdb"],
+    "zip_include_packages": ["PySide2", "shiboken2", "encodings"],
     "optimize": 2
 }
 
