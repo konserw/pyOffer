@@ -2,7 +2,7 @@
 -- Table structure for table terms
 --
 
-DROP TABLE IF EXISTS terms_billing;
+DROP TABLE IF EXISTS terms;
 CREATE TABLE terms
 (
     term_id    SERIAL PRIMARY KEY,
