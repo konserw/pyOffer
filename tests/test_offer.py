@@ -92,6 +92,7 @@ class TestOffer:
         customer.full_name = "Full business name"
         customer.concated_name = "Mr John Doe"
         customer.html_address = "255 Some street<br />\nIn some town"
+        offer.customer = customer
 
         offer.merchandise_list.add_item(create_merch())
         offer.remarks = "Some remarks"
@@ -102,9 +103,9 @@ class TestOffer:
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head>
 <style>
     body { font-family: Arial, Helvetica, sans-serif; font-size:12; } 
-    .spec { font-size: 10; } 
-    .row0 { background: #efefef; } 
-    .row1 { background: #dadada; } 
+    .spec { font-size: 10; }
+    .row0 { background: #efefef; }
+    .row1 { background: #dadada; }
 </style>
 </head>
 <body>
@@ -117,9 +118,10 @@ class TestOffer:
             Oferta nr: <b>X2012N08</b><br />
             Z dnia: 15.12.2020<br />
             Dla:<br />
-            <b></b><br />
-            <br />
-              
+            <b>Full business name</b><br />
+            255 Some street<br />
+In some town<br />
+            Mr John Doe
         </td>
         <td width=372.5>
             <img src=:/logos height=60><br />
@@ -128,7 +130,6 @@ ipsum<br />
             <b>Author Name</b><br />
             author@company.com<br />
             Tel.: 123 456 789
-
         </td>
     </tr>
     <tr>

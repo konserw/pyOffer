@@ -63,18 +63,17 @@ class Offer(QObject):
     @property
     def document(self) -> str:
         document_width = 745
-        dd = 248
         left_col_width = 140
         col_width_price = 90
         col_width_narrow = 70
         col_width_symbol = document_width - 40 - (col_width_price * 3) - (col_width_narrow * 2) - (4*7)
 
-        phone = f"Tel.: {self.author.phone}\n" if self.author.phone else ""
+        phone = f"Tel.: {self.author.phone}" if self.author.phone else ""
         style = """
     body { font-family: Arial, Helvetica, sans-serif; font-size:12; } 
-    .spec { font-size: 10; } 
-    .row0 { background: #efefef; } 
-    .row1 { background: #dadada; } 
+    .spec { font-size: 10; }
+    .row0 { background: #efefef; }
+    .row1 { background: #dadada; }
 """
 
         merchandise_list = f"""
