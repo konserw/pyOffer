@@ -50,7 +50,7 @@ class TermItem:
     def from_record(term_type: TermType, record: QSqlRecord) -> TermItem:
         t = TermItem(term_type)
         t.type = term_type
-        t.id = record.value("id")
+        t.id = record.value("term_id")
         t.short_desc = record.value("short_desc")
         t.long_desc = record.value("long_desc")
         return t
@@ -137,7 +137,7 @@ class TermsChooserDialog(QDialog):
 
     @classmethod
     def make(cls, term_type: TermType, parent: QObject = None) -> TermsChooserDialog:
-        table = get_terms_table(term_type.name)
+        table = get_terms_table(term_type.value)
         model = TermModel(parent)
         for i in range(table.rowCount()):
             model.add(TermItem.from_record(term_type, table.record(i)))

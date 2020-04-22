@@ -32,7 +32,7 @@ class TestTerms:
     def test_from_record(self):
         record = MagicMock(spec_set=QSqlRecord)
         record.value.side_effect = lambda key: {
-            "id": 0,
+            "term_id": 0,
             "short_desc": SHORT_DESCRIPTION,
             "long_desc": LONG_DESCRIPTION
         }[key]

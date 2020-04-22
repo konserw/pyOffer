@@ -86,9 +86,11 @@ def get_var(key: str) -> str:
     return record.value("value")
 
 
-def get_terms_table(term_type_name: str) -> QSqlTableModel:
+def get_terms_table(term_type: int) -> QSqlTableModel:
     model = QSqlTableModel()
-    model.setTable(F"terms_{term_type_name}")
+    model.setTable("terms")
+    model.setFilter(f"term_type = {term_type}")
+    model.removeColumn(1)  # remove term_type column as it no longer carries any value
     model.select()
     while model.canFetchMore():
         model.fetchMore()
