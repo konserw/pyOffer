@@ -36,6 +36,16 @@ if __name__ == '__main__':
     password = settings.value("password", "docker")
     settings.endGroup()
 
+    if False:
+        settings = QSettings()
+        settings.beginGroup("database")
+        settings.setValue("host_name", "127.0.0.1")
+        settings.setValue("database_name", "koferta_test")
+        settings.setValue("user_name", "postgres")
+        settings.setValue("password", "docker")
+        settings.endGroup()
+        settings.sync()
+
     try:
         database.connect(host_name, database_name, user_name, password)
     except RuntimeError as e:
