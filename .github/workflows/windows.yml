@@ -65,8 +65,15 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+    - name: Create exe
+      run: python setup.py build
+    - name: Upload build
+      uses: actions/upload-artifact@master
+      with:
+        name: pyOffer_build
+        path: build/exe.win-amd64-3.8
     - name: Create installer
-      run: python .\setup.py bdist_msi -d . --target-name pyOffer.msi
+      run: python setup.py bdist_msi -d . --target-name pyOffer.msi
     - name: Upload installer
       uses: actions/upload-artifact@master
       with:
