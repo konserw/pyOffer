@@ -14,5 +14,8 @@ CREATE TABLE vars
 -- Dumping data for table vars
 --
 
-INSERT INTO vars
+INSERT INTO public.vars
 VALUES (1, 'order email', 'biuro.pl@aliaxis.com');
+
+INSERT INTO public.vars
+VALUES (2, 'HQ', 'Nicoll Polska Sp. z o.o.<br />ul. Energetyczna 6, 56-400 Oleśnica');

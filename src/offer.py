@@ -15,7 +15,7 @@ from datetime import date
 from PySide2.QtCore import QObject
 
 from src.customer import Customer
-from src.database import get_company_address, get_var
+from src.database import get_var
 from src.merchandise import MerchandiseListModel
 from src.user import User
 
@@ -56,7 +56,7 @@ class Offer(QObject):
         offer.customer = Customer()
         offer.date = date.today()
         offer.new_symbol()
-        offer.company_address = "<br />\n".join(get_company_address())
+        offer.company_address = get_var("HQ")
         offer.order_email = get_var("order email")
         return offer
 

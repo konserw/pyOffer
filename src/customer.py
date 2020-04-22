@@ -19,11 +19,10 @@ from PySide2.QtWidgets import QWidget, QDialog, QHeaderView
 class Customer:
     def __init__(self):
         self.id = None
-        self.short_name = ""
-        self.full_name = ""
         self.title = ""
         self.first_name = ""
         self.last_name = ""
+        self.company_name = ""
         self.address = ""
 
     @property
@@ -44,20 +43,19 @@ class Customer:
 
     @property
     def description(self) -> str:
-        return "{}\n{}\n{}".format(self.concated_name, self.full_name, self.address)
+        return "{}\n{}\n{}".format(self.concated_name, self.company_name, self.address)
 
     def __str__(self) -> str:
-        return "Customer {}: {}; {}".format(self.id, self.concated_name, self.short_name)
+        return "<Customer {}: {}; {}>".format(self.id, self.concated_name, self.company_name)
 
     @staticmethod
     def from_record(record: QSqlRecord) -> Customer:
         c = Customer()
         c.id = record.value("customer_id")
-        c.short_name = record.value("short_name")
-        c.full_name = record.value("full_name")
         c.title = record.value("title")
         c.first_name = record.value("first_name")
         c.last_name = record.value("last_name")
+        c.company_name = record.value("company_name")
         c.address = record.value("address").replace("\\n", "\n")
         return c
 
@@ -65,12 +63,12 @@ class Customer:
 class CustomerSearchModel(QSqlTableModel):
     def __init__(self, parent: QObject = None):
         super().__init__(parent)
-        self.setTable("customers_view")
+        self.setTable("customers")
         self.select()
-        self.headers = (self.tr("Customer name"), self.tr("Company name"))
+        self.headers = (self.tr("Customer name"), self.tr("Company name"), self.tr("Address"))
 
     def columnCount(self, index: QModelIndex = QModelIndex) -> int:
-        return 2
+        return 3
 
     def data(self, index: QModelIndex, role: int = ...):
         row = index.row()
@@ -79,6 +77,10 @@ class CustomerSearchModel(QSqlTableModel):
             customer = Customer.from_record(self.record(row))
             if column == 0:
                 return customer.concated_name
+            elif column == 1:
+                return customer.company_name
+            elif column == 2:
+                return customer.address
         return super().data(index, role)
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int = ...):
@@ -90,7 +92,7 @@ class CustomerSearchModel(QSqlTableModel):
 
     @Slot(str)
     def search(self, pattern: str) -> None:
-        super().setFilter("first_name ilike '%{0}%' or full_name ilike '%{0}%' or last_name ilike '%{0}%'".format(pattern))
+        super().setFilter("first_name ilike '%{0}%' or company_name ilike '%{0}%' or last_name ilike '%{0}%'".format(pattern))
 
 
 class CustomerSearchWidget(QWidget):
@@ -121,7 +123,7 @@ class CustomerSelectionDialog(QDialog):
         self.customer_search = CustomerSearchWidget(model)
 
         self.setWindowTitle(self.tr("Select customer"))
-        self.resize(600, 900)
+        self.resize(1200, 900)
         self.verticalLayout = QtWidgets.QVBoxLayout(self)
         self.verticalLayout.addWidget(self.customer_search)
 

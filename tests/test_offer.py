@@ -39,9 +39,11 @@ class TestOffer:
         mock_date = mocker.patch("src.offer.date", autospec=True)
         mock_date.today.return_value = expected_date
 
-        expected_email = "order@company.com"
-        mocker.patch("src.offer.get_company_address", return_value=("lorem", "ipsum"))
-        mocker.patch("src.offer.get_var", return_value=expected_email)
+        vars = {
+            "order email": "order@company.com",
+            "HQ": "lorem<br />ipsum"
+        }
+        mocker.patch("src.offer.get_var", autospce=True, side_effect=lambda key: vars[key])
 
         offer = Offer.create_empty(user)
 
@@ -50,8 +52,8 @@ class TestOffer:
         assert_that(offer.date, is_(expected_date))
         assert_that(offer.author, is_(user))
         assert_that(offer.symbol, is_(expected_symbol))
-        assert_that(offer.company_address, is_("lorem<br />\nipsum"))
-        assert_that(offer.order_email, is_(expected_email))
+        assert_that(offer.company_address, is_(vars["HQ"]))
+        assert_that(offer.order_email, is_(vars["order email"]))
 
     @pytest.mark.parametrize("i_date, i_number, expected_text", [
         pytest.param(None, None, "W odpowiedzi na zapytanie, przedstawiamy ofertę na dostawę następujących produktów:"),
@@ -72,9 +74,12 @@ class TestOffer:
         mock_date = mocker.patch("src.offer.date", autospec=True)
         mock_date.today.return_value = expected_date
 
-        expected_email = "order@company.com"
-        mocker.patch("src.offer.get_company_address", return_value=("lorem", "ipsum"))
-        mocker.patch("src.offer.get_var", return_value=expected_email)
+
+        vars = {
+            "order email": "order@company.com",
+            "HQ": "lorem<br />ipsum"
+        }
+        mocker.patch("src.offer.get_var", autospce=True, side_effect=lambda key: vars[key])
 
         expected_symbol = "X2012N08"
         user = mocker.create_autospec(User, instance=True)
@@ -125,8 +130,7 @@ In some town<br />
         </td>
         <td width=372.5>
             <img src=:/logos height=60><br />
-            lorem<br />
-ipsum<br />
+            lorem<br />ipsum<br />
             <b>Author Name</b><br />
             author@company.com<br />
             Tel.: 123 456 789

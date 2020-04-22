@@ -36,7 +36,7 @@ def connect(host_name: str, database_name: str, user_name: str, password: str) -
 
 def get_customer_record(customer_id: int) -> QSqlRecord:
     model = QSqlTableModel()
-    model.setTable("customers_view")
+    model.setTable("customers")
     model.setFilter(F"customer_id = '{customer_id}'")
     model.select()
     return model.record(0)
@@ -63,17 +63,6 @@ def get_new_offer_number(user_id: int) -> int:
         logging.error(query.lastError().text())
         raise RuntimeError("Error accessing database")
     return query.record().value(0)
-
-
-def get_company_address() -> tuple:
-    text = f"SELECT full_name, address FROM public.companies WHERE company_id = 0"
-    query = QSqlQuery(text)
-    if not query.next():
-        logging.error(f"Query failed: {text}")
-        logging.error(query.lastError().text())
-        raise RuntimeError("Error accessing database")
-    record = query.record()
-    return record.value("full_name"), record.value("address")
 
 
 def get_var(key: str) -> str:

@@ -19,8 +19,7 @@ from hamcrest import assert_that, is_, not_none
 from src.customer import Customer, CustomerSearchModel, CustomerSelectionDialog, CustomerSearchWidget
 
 CUSTOMER_ID = 1
-SHORT_NAME = "short name"
-FULL_NAME = "Full business name that is quite long"
+COMPANY_NAME = "Full business name that is quite long"
 TITLE = "Mr."
 FIRST_NAME = "John"
 LAST_NAME = "Doe"
@@ -31,8 +30,7 @@ ADDRESS = "255 Some street\nIn some town"
 def sample_customer():
     c = Customer()
     c.id = CUSTOMER_ID
-    c.short_name = SHORT_NAME
-    c.full_name = FULL_NAME
+    c.company_name = COMPANY_NAME
     c.title = TITLE
     c.first_name = FIRST_NAME
     c.last_name = LAST_NAME
@@ -45,8 +43,7 @@ class TestCustomer:
         record = MagicMock(spec_set=QSqlRecord)
         record.value.side_effect = lambda key: {
             "customer_id": CUSTOMER_ID,
-            "short_name": SHORT_NAME,
-            "full_name": FULL_NAME,
+            "company_name": COMPANY_NAME,
             "title": TITLE,
             "first_name": FIRST_NAME,
             "last_name": LAST_NAME,
@@ -56,8 +53,7 @@ class TestCustomer:
         customer = Customer.from_record(record)
         assert_that(customer.is_valid, is_(True))
         assert_that(customer.id, is_(CUSTOMER_ID))
-        assert_that(customer.short_name, is_(SHORT_NAME))
-        assert_that(customer.full_name, is_(FULL_NAME))
+        assert_that(customer.company_name, is_(COMPANY_NAME))
         assert_that(customer.title, is_(TITLE))
         assert_that(customer.last_name, is_(LAST_NAME))
         assert_that(customer.address, is_(ADDRESS))
@@ -83,7 +79,7 @@ class TestCustomer:
         assert_that(sample_customer.description, is_("Mr. John Doe\nFull business name that is quite long\n255 Some street\nIn some town"))
 
     def test_str(self, sample_customer):
-        assert_that(str(sample_customer), is_("Customer 1: Mr. John Doe; short name"))
+        assert_that(str(sample_customer), is_("<Customer 1: Mr. John Doe; Full business name that is quite long>"))
 
     def test_customer_from_db_1(self, db):
         customer_id = 1
@@ -92,8 +88,7 @@ class TestCustomer:
 
         assert_that(customer.is_valid, is_(True))
         assert_that(customer.id, is_(customer_id))
-        assert_that(customer.short_name, is_("PolImpEx"))
-        assert_that(customer.full_name, is_("P.H.U. PolImpEx Sp. z o.o."))
+        assert_that(customer.company_name, is_("P.H.U. PolImpEx Sp. z o.o."))
         assert_that(customer.title, is_("Pan"))
         assert_that(customer.first_name, is_("Jan"))
         assert_that(customer.last_name, is_("Kowalski"))
@@ -107,7 +102,7 @@ class TestCustomer:
             "Polna 1a/2\n"
             "41-300 Dąbrowa Górnicza"
         ))
-        assert_that(str(customer), is_("Customer 1: Pan Jan Kowalski; PolImpEx"))
+        assert_that(str(customer), is_("<Customer 1: Pan Jan Kowalski; P.H.U. PolImpEx Sp. z o.o.>"))
 
     def test_customer_from_db_2(self, db):
         customer_id = 2
@@ -116,8 +111,7 @@ class TestCustomer:
 
         assert_that(customer.is_valid, is_(True))
         assert_that(customer.id, is_(customer_id))
-        assert_that(customer.short_name, is_("PolImpEx"))
-        assert_that(customer.full_name, is_("P.H.U. PolImpEx Sp. z o.o."))
+        assert_that(customer.company_name, is_("P.H.U. PolImpEx Sp. z o.o."))
         assert_that(customer.title, is_("Pani"))
         assert_that(customer.first_name, is_("Jane"))
         assert_that(customer.last_name, is_("Doe"))
@@ -131,7 +125,7 @@ class TestCustomer:
             "Polna 1a/2\n"
             "41-300 Dąbrowa Górnicza"
         ))
-        assert_that(str(customer), is_("Customer 2: Pani Jane Doe; PolImpEx"))
+        assert_that(str(customer), is_("<Customer 2: Pani Jane Doe; P.H.U. PolImpEx Sp. z o.o.>"))
 
 
 @pytest.mark.usefixtures("db")
@@ -140,10 +134,11 @@ class TestCustomerSearchModel:
         self.model = CustomerSearchModel()
 
     def test_column_headers(self):
-        assert_that(self.model.columnCount(), is_(2))
+        assert_that(self.model.columnCount(), is_(3))
         # todo: other localisations
         assert_that(self.model.headerData(0, Qt.Horizontal, Qt.DisplayRole), is_("Customer name"))
         assert_that(self.model.headerData(1, Qt.Horizontal, Qt.DisplayRole), is_("Company name"))
+        assert_that(self.model.headerData(2, Qt.Horizontal, Qt.DisplayRole), is_("Address"))
 
     def test_row_headers(self):
         assert_that(self.model.rowCount(), is_(2))
@@ -152,9 +147,11 @@ class TestCustomerSearchModel:
 
     def test_data(self):
         assert_that(self.model.data(self.model.index(0, 0), Qt.DisplayRole), is_("Pan Jan Kowalski"))
-        assert_that(self.model.data(self.model.index(0, 1), Qt.DisplayRole), is_("PolImpEx"))
+        assert_that(self.model.data(self.model.index(0, 1), Qt.DisplayRole), is_("P.H.U. PolImpEx Sp. z o.o."))
+        assert_that(self.model.data(self.model.index(0, 2), Qt.DisplayRole), is_("Polna 1a/2\n41-300 Dąbrowa Górnicza"))
         assert_that(self.model.data(self.model.index(1, 0), Qt.DisplayRole), is_("Pani Jane Doe"))
-        assert_that(self.model.data(self.model.index(1, 1), Qt.DisplayRole), is_("PolImpEx"))
+        assert_that(self.model.data(self.model.index(1, 1), Qt.DisplayRole), is_("P.H.U. PolImpEx Sp. z o.o."))
+        assert_that(self.model.data(self.model.index(1, 2), Qt.DisplayRole), is_("Polna 1a/2\n41-300 Dąbrowa Górnicza"))
 
     def _test_search_single(self, pattern):
         assert_that(self.model.rowCount(), is_(2))
@@ -213,7 +210,6 @@ class TestCustomerSearchWidget:
 
         assert_that(widget.chosen_customer, is_(not_none()))
         assert_that(widget.chosen_customer.concated_name, is_(expected))
-        assert_that(widget.chosen_customer.short_name, is_("PolImpEx"))
 
     def test_search(self, qtbot):
         model = CustomerSearchModel()
@@ -258,4 +254,3 @@ class TestCustomerSelectionDialog:
 
         assert_that(dialog.chosen_customer, is_(not_none()))
         assert_that(dialog.chosen_customer.concated_name, is_(expected))
-        assert_that(dialog.chosen_customer.short_name, is_("PolImpEx"))

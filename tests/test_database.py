@@ -180,11 +180,6 @@ class TestTerms:
         assert_that(rec.fieldName(1), is_("short_desc"))
         assert_that(rec.fieldName(2), is_("long_desc"))
 
-    def test_get_company_address(self, db):
-        name, address = db.get_company_address()
-        assert_that(name, is_("Nicoll Polska Sp. z o.o."))
-        assert_that(address, is_("ul. Energetyczna 6, 56-400 Oleśnica"))
-
     @pytest.mark.parametrize("key, expected_value", [
         pytest.param("order email", "biuro.pl@aliaxis.com")
     ])
