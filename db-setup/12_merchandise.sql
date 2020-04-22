@@ -6,7 +6,8 @@ CREATE TABLE merchandise
     merchandise_id SERIAL PRIMARY KEY,
     code           text NOT NULL DEFAULT '',
     description    text,
-    unit           unit_type     DEFAULT NULL
+    unit           unit_type     DEFAULT NULL,
+    discount_group text          DEFAULT NULL
 );
 
 DROP TABLE IF EXISTS price;
@@ -27,6 +28,7 @@ CREATE OR REPLACE FUNCTION merchandise_view(taget_date DATE)
                 code           TEXT,
                 description    TEXT,
                 unit           unit_type,
+                discount_group TEXT,
                 list_price     DECIMAL(8, 2)
             )
 AS
@@ -35,6 +37,7 @@ select merchandise.merchandise_id AS merchandise_id,
        merchandise.code           AS code,
        merchandise.description    AS description,
        merchandise.unit           AS unit,
+       merchandise.discount_group AS discount_group,
        price.value                AS list_price
 FROM merchandise
          natural join price

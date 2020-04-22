@@ -34,6 +34,7 @@ class Merchandise(QObject):
         self._discount = Decimal(0)
         self._count = Decimal(0)
         self.by_meter = False  # by default by piece
+        self.discount_group = None
 
     @property
     def list_price(self) -> Decimal:
@@ -82,6 +83,7 @@ class Merchandise(QObject):
         item.description = record.value("description")
         item.list_price = record.value("list_price")
         item.by_meter = record.value("unit") == "m"
+        item.discount_group = record.value("discount_group")
         return item
 
     def __eq__(self, other) -> bool:
@@ -444,6 +446,8 @@ class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):
                 return str(count)
             else:
                 return count
+        elif col == 4:
+            return self.sourceModel().data(index.sibling(index.row(), 5), role)
         else:
             return self.sourceModel().data(index, role)
 

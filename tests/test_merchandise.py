@@ -23,18 +23,19 @@ from src.merchandise import Merchandise, MerchandiseListModel, MerchandiseSelect
     MerchandiseListView, MerchandiseSelectionDelegate, MerchandiseSelectionDialog, DiscountDialog
 
 
-def create_merch(merchandise_id=1, list_price=9.99, count=1, discount=10):
+def create_merch(merchandise_id=1, list_price=9.99, count=1, discount=10) -> Merchandise:
     m = Merchandise(merchandise_id)
     m.code = "CODE"
     m.description = "DESCR"
     m.list_price = list_price
     m.count = count
     m.discount = discount
+    m.dicount_group = "sampleGroup"
     return m
 
 
 @pytest.fixture
-def sample_merch():
+def sample_merch() -> Merchandise:
     m = Merchandise(1)
     m.code = "CODE"
     m.description = "DESCR"
@@ -42,7 +43,7 @@ def sample_merch():
 
 
 class TestMerchandise:
-    def test_defaults(self, sample_merch):
+    def test_defaults(self, sample_merch: Merchandise):
         assert_that(sample_merch.list_price, is_(None))
         sample_merch.list_price = 0
         assert_that(sample_merch.discount, is_(0))
@@ -50,6 +51,7 @@ class TestMerchandise:
         assert_that(sample_merch.by_meter, is_(False))
         # todo other translations
         assert_that(sample_merch.unit, is_("pc."))
+        assert_that(sample_merch.discount_group, is_(none()))
         assert_that(sample_merch.price, is_(0))
         assert_that(sample_merch.total, is_(0))
 
@@ -466,6 +468,8 @@ class MockSourceModel(QAbstractItemModel):
         if col == 3:
             return item.unit
         if col == 4:
+            return item.discount_group
+        if col == 5:
             return item.list_price
 
     def data(self, index: QModelIndex, role: int):
@@ -478,7 +482,7 @@ class MockSourceModel(QAbstractItemModel):
         return 8
 
     def record(self, row):
-        names = ("merchandise_id", "code", "description", "unit", "list_price")
+        names = ("merchandise_id", "code", "description", "unit", "discount_group", "list_price")
         rec = QSqlRecord()
         for i, name in enumerate(names):
             f = QSqlField(name)
@@ -656,23 +660,24 @@ class TestMerchandiseSelectionModelWithDB:
         assert_that(selection_model_with_db.data(selection_model_with_db.index(1, 4, QModelIndex()), Qt.DisplayRole), is_(5.49))
 
     def test_row_count(self, selection_model_with_db):
-        assert_that(selection_model_with_db.rowCount(), is_(2))
+        assert_that(selection_model_with_db.rowCount(), is_(3))
 
     def test_column_count(self, selection_model_with_db):
         assert_that(selection_model_with_db.columnCount(), is_(5))
 
     @pytest.mark.parametrize("ex, expected", [
         pytest.param("some desc", 1),
-        pytest.param("other", 1),
+        pytest.param("other", 2),
         pytest.param("123", 1),
         pytest.param("456", 1),
-        pytest.param("", 2),
-        pytest.param("CODE", 2),
-        pytest.param("escr", 2),
+        pytest.param("789", 1),
+        pytest.param("", 3),
+        pytest.param("CODE", 3),
+        pytest.param("escr", 3),
         pytest.param("Not found", 0)
     ])
     def test_search(self, selection_model_with_db, ex, expected):
-        assert_that(selection_model_with_db.rowCount(), is_(2))
+        assert_that(selection_model_with_db.rowCount(), is_(3))
         selection_model_with_db.search(ex)
         assert_that(selection_model_with_db.rowCount(), is_(expected))
 

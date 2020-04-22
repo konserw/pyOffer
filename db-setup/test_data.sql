@@ -9,20 +9,26 @@ VALUES ('Pan', 'Jan', 'Kowalski', 1),
 
 -- merchandise
 
-INSERT INTO public.merchandise(code, description, unit)
-VALUES ('CODE123', 'some description', 'pc.');
+INSERT INTO public.merchandise(code, description, unit, discount_group)
+VALUES ('CODE123', 'some description', 'pc.', 'group1');
 
 INSERT INTO public.price(merchandise_id, value, valid_from, valid_to)
 VALUES (1, 19.99, '1000-01-01', '9999-12-31');
 
-INSERT INTO public.merchandise(code, description, unit)
-VALUES ('CODE456', 'some other description', 'm');
+INSERT INTO public.merchandise(code, description, unit, discount_group)
+VALUES ('CODE456', 'some other description', 'm', 'group2');
 
 INSERT INTO public.price(merchandise_id, value, valid_from, valid_to)
 VALUES (2, 4.49, '1000-01-01', '2015-12-31');
 
 INSERT INTO public.price(merchandise_id, value, valid_from, valid_to)
 VALUES (2, 5.49, '2016-01-01', '9999-12-31');
+
+INSERT INTO public.merchandise(code, description, unit, discount_group)
+VALUES ('CODE789', 'Yet another description', 'pc.', 'group1');
+
+INSERT INTO public.price(merchandise_id, value, valid_from, valid_to)
+VALUES (3, 120, '1000-01-01', '9999-12-31');
 
 -- users
 

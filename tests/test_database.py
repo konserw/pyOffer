@@ -25,7 +25,8 @@ class TestMerchandiseRecord:
         assert_that(rec.field(1).value(), is_("CODE123"))
         assert_that(rec.field(2).value(), is_("some description"))
         assert_that(rec.field(3).value(), is_("pc."))
-        assert_that(rec.field(4).value(), is_(19.99))
+        assert_that(rec.field(4).value(), is_("group1"))
+        assert_that(rec.field(5).value(), is_(19.99))
 
     def test_2(self):
         rec = get_merchandise_record(2)
@@ -33,10 +34,20 @@ class TestMerchandiseRecord:
         assert_that(rec.field(1).value(), is_("CODE456"))
         assert_that(rec.field(2).value(), is_("some other description"))
         assert_that(rec.field(3).value(), is_("m"))
-        assert_that(rec.field(4).value(), is_(5.49))
+        assert_that(rec.field(4).value(), is_("group2"))
+        assert_that(rec.field(5).value(), is_(5.49))
+
+    def test_3(self):
+        rec = get_merchandise_record(3)
+        assert_that(rec.field(0).value(), is_(3))
+        assert_that(rec.field(1).value(), is_("CODE789"))
+        assert_that(rec.field(2).value(), is_("Yet another description"))
+        assert_that(rec.field(3).value(), is_("pc."))
+        assert_that(rec.field(4).value(), is_("group1"))
+        assert_that(rec.field(5).value(), is_(120))
 
     def test_not_found(self):
-        assert_that(calling(get_merchandise_record).with_args(3), raises(RuntimeError))
+        assert_that(calling(get_merchandise_record).with_args(13), raises(RuntimeError))
 
 
 @pytest.fixture
@@ -51,33 +62,44 @@ class TestMerchandiseSqlModel:
         assert_that(merchandise_sql_model.data(merchandise_sql_model.index(0, 1, QModelIndex()), Qt.DisplayRole), is_("CODE123"))
         assert_that(merchandise_sql_model.data(merchandise_sql_model.index(0, 2, QModelIndex()), Qt.DisplayRole), is_("some description"))
         assert_that(merchandise_sql_model.data(merchandise_sql_model.index(0, 3, QModelIndex()), Qt.DisplayRole), is_("pc."))
-        assert_that(merchandise_sql_model.data(merchandise_sql_model.index(0, 4, QModelIndex()), Qt.DisplayRole), is_(19.99))
+        assert_that(merchandise_sql_model.data(merchandise_sql_model.index(0, 4, QModelIndex()), Qt.DisplayRole), is_("group1"))
+        assert_that(merchandise_sql_model.data(merchandise_sql_model.index(0, 5, QModelIndex()), Qt.DisplayRole), is_(19.99))
 
     def test_data_2(self, merchandise_sql_model):
         assert_that(merchandise_sql_model.data(merchandise_sql_model.index(1, 0, QModelIndex()), Qt.DisplayRole), is_(2))  # id
         assert_that(merchandise_sql_model.data(merchandise_sql_model.index(1, 1, QModelIndex()), Qt.DisplayRole), is_("CODE456"))
         assert_that(merchandise_sql_model.data(merchandise_sql_model.index(1, 2, QModelIndex()), Qt.DisplayRole), is_("some other description"))
         assert_that(merchandise_sql_model.data(merchandise_sql_model.index(1, 3, QModelIndex()), Qt.DisplayRole), is_("m"))
-        assert_that(merchandise_sql_model.data(merchandise_sql_model.index(1, 4, QModelIndex()), Qt.DisplayRole), is_(5.49))
+        assert_that(merchandise_sql_model.data(merchandise_sql_model.index(1, 4, QModelIndex()), Qt.DisplayRole), is_("group2"))
+        assert_that(merchandise_sql_model.data(merchandise_sql_model.index(1, 5, QModelIndex()), Qt.DisplayRole), is_(5.49))
+
+    def test_data_3(self, merchandise_sql_model):
+        assert_that(merchandise_sql_model.data(merchandise_sql_model.index(2, 0, QModelIndex()), Qt.DisplayRole), is_(3))  # id
+        assert_that(merchandise_sql_model.data(merchandise_sql_model.index(2, 1, QModelIndex()), Qt.DisplayRole), is_("CODE789"))
+        assert_that(merchandise_sql_model.data(merchandise_sql_model.index(2, 2, QModelIndex()), Qt.DisplayRole), is_("Yet another description"))
+        assert_that(merchandise_sql_model.data(merchandise_sql_model.index(2, 3, QModelIndex()), Qt.DisplayRole), is_("pc."))
+        assert_that(merchandise_sql_model.data(merchandise_sql_model.index(2, 4, QModelIndex()), Qt.DisplayRole), is_("group1"))
+        assert_that(merchandise_sql_model.data(merchandise_sql_model.index(2, 5, QModelIndex()), Qt.DisplayRole), is_(120))
 
     def test_row_count(self, merchandise_sql_model):
-        assert_that(merchandise_sql_model.rowCount(), is_(2))
+        assert_that(merchandise_sql_model.rowCount(), is_(3))
 
     def test_column_count(self, merchandise_sql_model):
-        assert_that(merchandise_sql_model.columnCount(), is_(5))
+        assert_that(merchandise_sql_model.columnCount(), is_(6))
 
     @pytest.mark.parametrize("ex, expected", [
         pytest.param("some desc", 1),
-        pytest.param("other", 1),
+        pytest.param("other", 2),
         pytest.param("123", 1),
         pytest.param("456", 1),
-        pytest.param("", 2),
-        pytest.param("CODE", 2),
-        pytest.param("escr", 2),
+        pytest.param("789", 1),
+        pytest.param("", 3),
+        pytest.param("CODE", 3),
+        pytest.param("escr", 3),
         pytest.param("Not found", 0)
     ])
     def test_search(self, merchandise_sql_model, ex, expected):
-        assert_that(merchandise_sql_model.rowCount(), is_(2))
+        assert_that(merchandise_sql_model.rowCount(), is_(3))
         merchandise_sql_model.update(ex)
         assert_that(merchandise_sql_model.rowCount(), is_(expected))
 
