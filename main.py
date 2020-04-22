@@ -13,7 +13,7 @@ import sys
 from datetime import datetime
 
 from PySide2.QtCore import QSettings
-from PySide2.QtWidgets import QApplication, QDialog
+from PySide2.QtWidgets import QApplication, QDialog, QMessageBox
 
 from src import database
 from src.main_window import MainWindow
@@ -36,7 +36,11 @@ if __name__ == '__main__':
     password = settings.value("password", "docker")
     settings.endGroup()
 
-    database.connect(host_name, database_name, user_name, password)
+    try:
+        database.connect(host_name, database_name, user_name, password)
+    except RuntimeError as e:
+        QMessageBox.critical(None, app.tr("Database connection failed"), app.tr(f"Driver error: {e.args[1]}\nDatabase error: {e.args[2]}"))
+        sys.exit(str(e))
 
     user_dialog = UserSelectionDialog.make()
     if user_dialog.exec_() == QDialog.Accepted:

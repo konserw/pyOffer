@@ -29,8 +29,9 @@ def connect(host_name: str, database_name: str, user_name: str, password: str) -
         logging.error("Failed to open database")
         logging.error(f"Plugins: {database.drivers()}")
         error = database.lastError()
-        logging.error(error.text())
-        raise RuntimeError(f"Failed to connect to db: {error}")
+        logging.error(error.driverText())
+        logging.error(error.databaseText())
+        raise RuntimeError("Failed to open database", error.driverText(), error.databaseText())
 
 
 def get_customer_record(customer_id: int) -> QSqlRecord:
