@@ -18,13 +18,14 @@ from datetime import date
 from PySide2.QtSql import QSqlDatabase, QSqlTableModel, QSqlQuery, QSqlQueryModel, QSqlRecord
 
 
-def connect(host_name: str, database_name: str, user_name: str, password: str) -> None:
+def connect(host_name: str, database_name: str, user_name: str, password: str, port: int = 5432) -> None:
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
     database = QSqlDatabase.addDatabase("QPSQL")
     database.setHostName(host_name)
     database.setDatabaseName(database_name)
     database.setUserName(user_name)
     database.setPassword(password)
+    database.setPort(port)
     if not database.open():
         logging.error("Failed to open database")
         logging.error(f"Plugins: {database.drivers()}")

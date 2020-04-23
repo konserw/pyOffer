@@ -34,20 +34,11 @@ if __name__ == '__main__':
     database_name = settings.value("database_name", "koferta_test")
     user_name = settings.value("user_name", "postgres")
     password = settings.value("password", "docker")
+    port = int(settings.value("port", "5432"))
     settings.endGroup()
 
-    if False:
-        settings = QSettings()
-        settings.beginGroup("database")
-        settings.setValue("host_name", "127.0.0.1")
-        settings.setValue("database_name", "koferta_test")
-        settings.setValue("user_name", "postgres")
-        settings.setValue("password", "docker")
-        settings.endGroup()
-        settings.sync()
-
     try:
-        database.connect(host_name, database_name, user_name, password)
+        database.connect(host_name, database_name, user_name, password, port)
     except RuntimeError as e:
         QMessageBox.critical(None, app.tr("Database connection failed"), app.tr(f"Driver error: {e.args[1]}\nDatabase error: {e.args[2]}"))
         sys.exit(str(e))
