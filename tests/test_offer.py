@@ -82,7 +82,7 @@ class TestOffer:
         mocker.patch("src.offer.get_var", autospce=True, side_effect=lambda key: vars[key])
 
         expected_symbol = "X2012N08"
-        user = mocker.create_autospec(User, instance=True)
+        user = mocker.create_autospec(User(), spec_set=True)
         user.new_offer_symbol.return_value = expected_symbol
         user.name = "Author Name"
         user.mail = "author@company.com"
@@ -91,10 +91,9 @@ class TestOffer:
 
         offer = Offer.create_empty(user)
 
-        customer = mocker.create_autospec(User, instance=True)
+        customer = mocker.create_autospec(Customer(), spec_set=True)
         customer.id = 1
-        customer.short_name = "short name"
-        customer.full_name = "Full business name"
+        customer.company_name = "Full business name"
         customer.concated_name = "Mr John Doe"
         customer.html_address = "255 Some street<br />\nIn some town"
         offer.customer = customer

@@ -21,6 +21,8 @@ from src.user import User
 
 
 class Offer(QObject):
+    customer: Customer
+
     def __init__(self, author: User, parent=None):
         super().__init__(parent)
         self.merchandise_list = None
@@ -147,7 +149,7 @@ class Offer(QObject):
             Oferta nr: <b>{self.symbol}</b><br />
             Z dnia: {self.date:%d.%m.%Y}<br />
             Dla:<br />
-            <b>{self.customer.full_name}</b><br />
+            <b>{self.customer.company_name}</b><br />
             {self.customer.html_address}<br />
             {self.customer.concated_name}
         </td>
