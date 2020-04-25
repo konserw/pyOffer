@@ -68,7 +68,7 @@ class Offer(QObject):
         left_col_width = 140
         col_width_price = 90
         col_width_narrow = 70
-        col_width_symbol = document_width - 40 - (col_width_price * 3) - (col_width_narrow * 2) - (4*7)
+        col_width_symbol = document_width - 40 - (col_width_price * 3) - (col_width_narrow * 2)
 
         phone = f"Tel.: {self.author.phone}" if self.author.phone else ""
         style = """
@@ -96,7 +96,7 @@ class Offer(QObject):
             <td>{i + 1}</td>
             <td>{item.code}</td>
             <td align=right>{item.list_price}</td>
-            <td align=right>{item.discount}</td>
+            <td align=right>{item.discount}%</td>
             <td align=right>{item.price}</td>
             <td align=right>{item.count}</td>
             <td align=right>{item.total}</td>
@@ -156,6 +156,7 @@ class Offer(QObject):
             <img src=:/logos height=120 valign=top>
         </td>
         <td width={document_width/3}>
+            <br />
             {self.company_address}<br />
             <b>{self.author.name}</b><br />
             {self.author.mail}<br />
