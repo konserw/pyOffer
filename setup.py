@@ -4,6 +4,7 @@ import sys
 import PySide2
 from cx_Freeze import setup, Executable
 
+VERSION = 0.2
 plugins_path = os.path.join(PySide2.__path__[0], "plugins")
 
 buildOptions = {
@@ -25,7 +26,7 @@ executables = [
 ]
 
 setup(name='pyOffer',
-      version='0.1',
+      version=str(VERSION),
       description='Program for creating business proposals for purchase of items',
       options=dict(build_exe=buildOptions),
       executables=executables)

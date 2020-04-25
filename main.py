@@ -15,11 +15,10 @@ from datetime import datetime
 from PySide2.QtCore import QSettings, QTranslator, QLocale
 from PySide2.QtWidgets import QApplication, QDialog, QMessageBox
 
+from setup import VERSION
 from src import database
 from src.main_window import MainWindow
 from src.user import User, UserSelectionDialog
-
-VERSION = 0.1
 
 if __name__ == '__main__':
     logging.info("pyOffer version {} started at {}", VERSION, datetime.now())
