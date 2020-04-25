@@ -4,7 +4,8 @@ import sys
 import PySide2
 from cx_Freeze import setup, Executable
 
-VERSION = 0.2
+from main import VERSION
+
 plugins_path = os.path.join(PySide2.__path__[0], "plugins")
 
 buildOptions = {
