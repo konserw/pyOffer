@@ -29,7 +29,7 @@ if __name__ == '__main__':
     app.setApplicationName("pyOffer")
 
     translator = QTranslator()
-    translation_file = f"translations/{QLocale.system().name()[0 - 2]}"
+    translation_file = f"translations/{QLocale.system().name()[0:2]}"
     if translator.load(translation_file):
         app.installTranslator(translator)
     else:
