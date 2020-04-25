@@ -29,6 +29,7 @@ class MainWindow(QMainWindow):
     def __init__(self, user: User):
         super().__init__()
         self.ui = Ui_MainWindow(self)
+        self.retranslate_ui()
         self.set_offer_ui_enabled(False)
 
         self.offer = None
@@ -66,6 +67,45 @@ class MainWindow(QMainWindow):
 
         # must be connected at the end or will break tests
         self.calendar.clicked.connect(self.inquiry_date_changed)
+
+    def retranslate_ui(self) -> None:
+        self.ui.menu_offer.setTitle(self.tr("Offer"))
+        self.ui.menu_export.setTitle(self.tr("Export"))
+        self.ui.menu_help.setTitle(self.tr("Help"))
+        self.ui.action_new.setText(self.tr("New"))
+        self.ui.action_open.setText(self.tr("Open"))
+        self.ui.action_save.setText(self.tr("Save"))
+        self.ui.action_exit.setText(self.tr("Exit"))
+        self.ui.action_PDF.setText(self.tr("PDF"))
+        self.ui.action_print.setText(self.tr("Print preview"))
+        self.ui.action_about.setText(self.tr("About"))
+        self.ui.action_about_Qt.setText(self.tr("About Qt"))
+        self.ui.action_new_number.setText(self.tr("Set new offer symbol"))
+        self.ui.push_button_add_merchandise.setText(self.tr("Add merchandise"))
+        self.ui.push_button_discount.setText(self.tr("Set Discount"))
+        self.ui.push_button_remove_row.setText(self.tr("Remove row"))
+        self.ui.tabWidget.setTabText(self.ui.tabWidget.indexOf(self.ui.tab), self.tr("Offer table"))
+        self.ui.tabWidget.setTabText(self.ui.tabWidget.indexOf(self.ui.tab_2), self.tr("Other information"))
+        self.ui.command_link_button_customer.setText(self.tr("Choose customer"))
+        self.ui.grup_box_query.setTitle(self.tr("Inquiry"))
+        self.ui.check_box_query_date.setText(self.tr("Inquiry date:"))
+        self.ui.push_button_query_date.setText("")
+        self.ui.check_box_query_number.setText(self.tr("Inquiry number:"))
+        self.ui.groupBox.setTitle(self.tr("Other information"))
+        self.ui.command_link_button_delivery.setText(self.tr("Shipment terms"))
+        self.ui.command_link_button_delivery_date.setText(self.tr("Delivery date"))
+        self.ui.command_link_button_billing.setText(self.tr("Billing terms"))
+        self.ui.command_link_button_offer.setText(self.tr("Offer terms"))
+        self.ui.command_link_button_remarks.setText(self.tr("Remarks"))
+#        self.ui.kolumny.setTitle(self.tr("Uk\u0142ad wydruku:"))
+#        self.ui.check_box_no_column.setText(self.tr("LP"))
+#        self.ui.check_box_merchandise_column.setText(self.tr("Towar"))
+#        self.ui.check_box_details_column.setText(self.tr("Specyfikacja"))
+#        self.ui.check_box_list_price_column.setText(self.tr("Cena katalogowa"))
+#        self.ui.check_box_discount_column.setText(self.tr("Rabat"))
+#        self.ui.check_box_price_column.setText(self.tr("Cena"))
+#        self.ui.check_box_quantity_column.setText(self.tr("Ilo\u015b\u0107"))
+#        self.ui.check_box_total_column.setText(self.tr("Warto\u015b\u0107"))
 
     def set_offer_ui_enabled(self, enable: bool) -> None:
         # menus
