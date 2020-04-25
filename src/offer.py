@@ -74,8 +74,8 @@ class Offer(QObject):
         style = """
     body { font-family: Arial, Helvetica, sans-serif; font-size:12; } 
     .spec { font-size: 10; }
-    .row0 { background: #efefef; }
-    .row1 { background: #dadada; }
+    .row0 { background: #88CFFF; }
+    .row1 { background: #A6DAFF; }
 """
 
         merchandise_list = f"""
