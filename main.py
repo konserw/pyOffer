@@ -12,7 +12,7 @@ import logging
 import sys
 from datetime import datetime
 
-from PySide2.QtCore import QSettings
+from PySide2.QtCore import QSettings, QTranslator, QLocale
 from PySide2.QtWidgets import QApplication, QDialog, QMessageBox
 
 from src import database
@@ -27,6 +27,13 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setOrganizationName("KonserwSoft")
     app.setApplicationName("pyOffer")
+
+    translator = QTranslator()
+    translation_file = f"translations/{QLocale.system().name()[0 - 2]}"
+    if translator.load(translation_file):
+        app.installTranslator(translator)
+    else:
+        logging.warning(f"Failed to load translation: {translation_file}")
 
     settings = QSettings()
     settings.beginGroup("database")
