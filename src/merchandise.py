@@ -434,11 +434,17 @@ class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):
         return 5
 
     def data(self, index: QModelIndex, role: int):
-        if not index.isValid() or role not in (Qt.DisplayRole, Qt.EditRole):
+        if not index.isValid() or role not in (Qt.DisplayRole, Qt.EditRole, Qt.TextAlignmentRole):
             return
 
         col = index.column()
         row = index.row()
+
+        if role == Qt.TextAlignmentRole:
+            if col > 2:
+                return Qt.AlignRight
+            return Qt.AlignLeft
+
         if col == 0:
             item_id = self.get_item_id(row)
             count = self.selected[item_id].count if item_id in self.selected else 0
@@ -447,7 +453,7 @@ class MerchandiseSelectionModel(QtCore.QSortFilterProxyModel):
             else:
                 return count
         elif col == 4:
-            return self.sourceModel().data(index.sibling(index.row(), 5), role)
+            return f"{self.sourceModel().data(index.sibling(index.row(), 5), role):.2f}"
         else:
             return self.sourceModel().data(index, role)
 
