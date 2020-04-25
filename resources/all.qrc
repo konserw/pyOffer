@@ -5,6 +5,6 @@
         <file alias="calendar">schedule.png</file>
         <file alias="discount">discount.png</file>
         <file alias="user">user.png</file>
-        <file alias="logos">logos.png</file>
+        <file alias="logos">aliaxis.jpg</file>
     </qresource>
 </RCC>
