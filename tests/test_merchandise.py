@@ -515,7 +515,7 @@ class TestMerchandiseSelectionModel:
         assert_that(selection_model.data(selection_model.index(0, 1, QModelIndex()), Qt.DisplayRole), is_("CODE"))
         assert_that(selection_model.data(selection_model.index(0, 2, QModelIndex()), Qt.DisplayRole), is_("DESCR"))
         assert_that(selection_model.data(selection_model.index(0, 3, QModelIndex()), Qt.DisplayRole), is_("pc."))
-        assert_that(selection_model.data(selection_model.index(0, 4, QModelIndex()), Qt.DisplayRole), is_(Decimal("9.99")))
+        assert_that(selection_model.data(selection_model.index(0, 4, QModelIndex()), Qt.DisplayRole), is_("9.99"))
 
     def test_row_count(self, selection_model):
         assert_that(selection_model.rowCount(), is_(2))
@@ -650,14 +650,14 @@ class TestMerchandiseSelectionModelWithDB:
         assert_that(selection_model_with_db.data(selection_model_with_db.index(0, 1, QModelIndex()), Qt.DisplayRole), is_("CODE123"))
         assert_that(selection_model_with_db.data(selection_model_with_db.index(0, 2, QModelIndex()), Qt.DisplayRole), is_("some description"))
         assert_that(selection_model_with_db.data(selection_model_with_db.index(0, 3, QModelIndex()), Qt.DisplayRole), is_("pc."))
-        assert_that(selection_model_with_db.data(selection_model_with_db.index(0, 4, QModelIndex()), Qt.DisplayRole), is_(19.99))
+        assert_that(selection_model_with_db.data(selection_model_with_db.index(0, 4, QModelIndex()), Qt.DisplayRole), is_("19.99"))
 
     def test_data_2(self, selection_model_with_db):
         assert_that(selection_model_with_db.data(selection_model_with_db.index(1, 0, QModelIndex()), Qt.DisplayRole), is_("0"))  # count
         assert_that(selection_model_with_db.data(selection_model_with_db.index(1, 1, QModelIndex()), Qt.DisplayRole), is_("CODE456"))
         assert_that(selection_model_with_db.data(selection_model_with_db.index(1, 2, QModelIndex()), Qt.DisplayRole), is_("some other description"))
         assert_that(selection_model_with_db.data(selection_model_with_db.index(1, 3, QModelIndex()), Qt.DisplayRole), is_("m"))
-        assert_that(selection_model_with_db.data(selection_model_with_db.index(1, 4, QModelIndex()), Qt.DisplayRole), is_(5.49))
+        assert_that(selection_model_with_db.data(selection_model_with_db.index(1, 4, QModelIndex()), Qt.DisplayRole), is_("5.49"))
 
     def test_row_count(self, selection_model_with_db):
         assert_that(selection_model_with_db.rowCount(), is_(3))

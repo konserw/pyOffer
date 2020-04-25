@@ -106,10 +106,9 @@ class TestOffer:
 <title>Oferta</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head>
 <style>
-    body { font-family: Arial, Helvetica, sans-serif; font-size:12; } 
-    .spec { font-size: 10; }
-    .row0 { background: #efefef; }
-    .row1 { background: #dadada; }
+    .spec { font-size: 6pt; }
+    .row0 { background: #88CFFF; }
+    .row1 { background: #A6DAFF; }
 </style>
 </head>
 <body>
@@ -118,7 +117,7 @@ class TestOffer:
 <tr><td>
     <table>
     <tr>
-        <td valign=top width=372.5>
+        <td valign=top width=248.33333333333334>
             Oferta nr: <b>X2012N08</b><br />
             Z dnia: 15.12.2020<br />
             Dla:<br />
@@ -127,8 +126,11 @@ class TestOffer:
 In some town<br />
             Mr John Doe
         </td>
-        <td width=372.5>
-            <img src=:/logos height=60><br />
+        <td width=248.33333333333334 align=right>
+            <img src=:/logos height=120 valign=top>
+        </td>
+        <td width=248.33333333333334>
+            <br />
             lorem<br />ipsum<br />
             <b>Author Name</b><br />
             author@company.com<br />
@@ -136,7 +138,7 @@ In some town<br />
         </td>
     </tr>
     <tr>
-        <td colspan=2>
+        <td colspan=3>
             <hr width=100%>
         </td>
     </tr>
@@ -152,7 +154,7 @@ In some town<br />
     <table cellspacing=0>
         <thead><tr class="header">
             <td width=40><b>Lp.</b></td>
-            <td width=267><b>Towar</b></td>
+            <td width=295><b>Towar</b></td>
             <td width=90 align=right><b>Cena kat.</b></td>
             <td width=70 align=right><b>Rabat</b></td>
             <td width=90 align=right><b>Cena</b></td>
@@ -164,7 +166,7 @@ In some town<br />
             <td>1</td>
             <td>CODE</td>
             <td align=right>9.99</td>
-            <td align=right>10.0</td>
+            <td align=right>10.0%</td>
             <td align=right>8.99</td>
             <td align=right>1</td>
             <td align=right>8.99</td>
