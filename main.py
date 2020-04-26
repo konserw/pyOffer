@@ -22,7 +22,19 @@ from src.user import User, UserSelectionDialog
 VERSION = 0.3
 
 if __name__ == '__main__':
-    logging.info("pyOffer version {} started at {}", VERSION, datetime.now())
+    if getattr(sys, "frozen", False):
+        logging.basicConfig(
+            level=logging.INFO,
+            filename="pyoffer.log",
+            format='[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s: %(message)s',
+            datefmt='%H:%M:%S'
+        )
+    else:
+        logging.basicConfig(
+            level=logging.DEBUG,
+        )
+
+    logging.info("pyOffer version %s started at %s", VERSION, datetime.now())
 
     app = QApplication(sys.argv)
     app.setOrganizationName("KonserwSoft")
