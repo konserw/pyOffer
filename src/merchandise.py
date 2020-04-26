@@ -10,6 +10,7 @@
 
 from __future__ import annotations
 
+import logging
 import typing
 from decimal import Decimal
 
@@ -553,6 +554,7 @@ class MerchandiseSelectionDialog(QtWidgets.QDialog):
 
     @classmethod
     def make(cls, parent: QObject = None) -> MerchandiseSelectionDialog:
+        logging.debug("Creating %s", cls.__name__)
         sql_model = get_merchandise_sql_model()
         selection_model = MerchandiseSelectionModel(parent)
         selection_model.setSourceModel(sql_model)

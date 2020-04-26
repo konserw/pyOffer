@@ -28,11 +28,12 @@ def connect(host_name: str, database_name: str, user_name: str, password: str, p
     database.setPort(port)
     if not database.open():
         logging.error("Failed to open database")
-        logging.error(f"Plugins: {database.drivers()}")
+        logging.error("Plugins: %s", database.drivers())
         error = database.lastError()
         logging.error(error.driverText())
         logging.error(error.databaseText())
         raise RuntimeError("Failed to open database", error.driverText(), error.databaseText())
+    logging.info("Database opened successfully")
 
 
 def get_customer_record(customer_id: int) -> QSqlRecord:

@@ -10,6 +10,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from PySide2 import QtWidgets
 from PySide2.QtCore import QModelIndex, Qt, Slot, QObject
 from PySide2.QtSql import QSqlTableModel, QSqlRecord
@@ -142,5 +144,6 @@ class CustomerSelectionDialog(QDialog):
 
     @classmethod
     def make(cls, parent: QObject = None) -> CustomerSelectionDialog:
+        logging.debug("Creating %s", cls.__name__)
         model = CustomerSearchModel(parent)
         return cls(model, parent)

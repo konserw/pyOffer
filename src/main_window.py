@@ -29,6 +29,7 @@ from src.user import User
 class MainWindow(QMainWindow):
     def __init__(self, user: User):
         super().__init__()
+        logging.debug("MainWindow creation")
         self.ui = Ui_MainWindow(self)
         self.retranslate_ui()
         self.set_offer_ui_enabled(False)
@@ -39,7 +40,6 @@ class MainWindow(QMainWindow):
         self.font_database.addApplicationFont(":/font-bold")
         self.offer_font = self.font_database.font("Frank Ruhl Libre", "Regular", 7)
         logging.info(f"Loaded font for offer print: {self.offer_font.family()} {self.offer_font.styleName()}")
-#        self.offer_font.setLetterSpacing(QFont.PercentageSpacing, 105)
 
         self.offer = None
         self.user = user

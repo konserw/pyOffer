@@ -10,6 +10,7 @@
 
 from __future__ import annotations
 
+import logging
 import typing
 from enum import Enum, unique
 
@@ -137,6 +138,7 @@ class TermsChooserDialog(QDialog):
 
     @classmethod
     def make(cls, term_type: TermType, parent: QObject = None) -> TermsChooserDialog:
+        logging.debug("Creating %s", cls.__name__)
         table = get_terms_table(term_type.value)
         model = TermModel(parent)
         for i in range(table.rowCount()):

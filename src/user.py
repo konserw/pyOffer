@@ -7,9 +7,9 @@
 # See the GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
-
 from __future__ import annotations
 
+import logging
 from datetime import date
 
 from PySide2 import QtWidgets
@@ -31,6 +31,9 @@ class User:
         self.male = True
         self.char_for_offer_symbol = None
         self.business_symbol = None
+
+    def __str__(self) -> str:
+        return f"<User {self.id}: {self.name}>"
 
     @property
     def gender_suffix(self) -> str:
@@ -120,7 +123,8 @@ class UserSelectionDialog(QtWidgets.QDialog):
         self.settings.setValue("default_user", row)
         self.accept()
 
-    @staticmethod
-    def make() -> UserSelectionDialog:
+    @classmethod
+    def make(cls) -> UserSelectionDialog:
+        logging.debug("Creating %s", cls.__name__)
         user_model = get_users_table()
-        return UserSelectionDialog(user_model)
+        return cls(user_model)
