@@ -19,7 +19,7 @@ from src import database
 from src.main_window import MainWindow
 from src.user import User, UserSelectionDialog
 
-VERSION = 0.3
+VERSION = 0.4
 
 if __name__ == '__main__':
     if getattr(sys, "frozen", False):
