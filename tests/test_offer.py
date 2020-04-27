@@ -107,8 +107,8 @@ class TestOffer:
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head>
 <style>
     .spec { font-size: 6pt; }
-    .row0 { background: #88CFFF; }
-    .row1 { background: #A6DAFF; }
+    .row0 { background: #efefef; }
+    .row1 { background: #dadada; }
 </style>
 </head>
 <body>
@@ -126,15 +126,15 @@ class TestOffer:
 In some town<br />
             Mr John Doe
         </td>
-        <td width=248.33333333333334 align=right>
-            <img src=:/logos height=120 valign=top>
-        </td>
         <td width=248.33333333333334>
             <br />
             lorem<br />ipsum<br />
             <b>Author Name</b><br />
             author@company.com<br />
             Tel.: 123 456 789
+        </td>
+        <td width=248.33333333333334 align=right>
+            <img src=:/logos height=120 valign=top>
         </td>
     </tr>
     <tr>
@@ -165,11 +165,11 @@ In some town<br />
         <tr class="row1">
             <td>1</td>
             <td>CODE</td>
-            <td align=right>9.99</td>
+            <td align=right>9.99 zł</td>
             <td align=right>10.0%</td>
-            <td align=right>8.99</td>
-            <td align=right>1</td>
-            <td align=right>8.99</td>
+            <td align=right>8.99 zł</td>
+            <td align=right>1 szt.</td>
+            <td align=right>8.99 zł</td>
         </tr>
         <tr class="row1 spec">
             <td></td>

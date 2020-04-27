@@ -49,8 +49,7 @@ class TestMerchandise:
         assert_that(sample_merch.discount, is_(0))
         assert_that(sample_merch.count, is_(0))
         assert_that(sample_merch.by_meter, is_(False))
-        # todo other translations
-        assert_that(sample_merch.unit, is_("pc."))
+        assert_that(sample_merch.unit, is_("szt."))
         assert_that(sample_merch.discount_group, is_(none()))
         assert_that(sample_merch.price, is_(0))
         assert_that(sample_merch.total, is_(0))
@@ -115,11 +114,10 @@ class TestMerchandise:
         assert_that(sample_merch == other, is_(False))
 
     def test_unit(self, sample_merch):
-        # todo: other trans
         item = create_merch()
-        assert_that(item.unit, is_("pc."))
+        assert_that(item.unit, is_("szt."))
         item.by_meter = True
-        assert_that(item.unit, is_("m"))
+        assert_that(item.unit, is_("m.b."))
 
 
 @pytest.fixture
@@ -171,7 +169,7 @@ class TestMerchandiseListModel:
         assert_that(sample_model.list[0][col], is_(value))
 
     def test_data_display_role(self, sample_model):
-        for key, val in enumerate(("CODE", "DESCR", "9.99", "0.0", "9.99", "1", "pc.", "9.99")):
+        for key, val in enumerate(("CODE", "DESCR", "9.99", "0.0", "9.99", "1", "szt.", "9.99")):
             assert_that(sample_model.data(sample_model.index(0, key), Qt.DisplayRole), is_(val))
 
     def test_data_edit_role(self, sample_model):
@@ -514,7 +512,7 @@ class TestMerchandiseSelectionModel:
         assert_that(selection_model.data(selection_model.index(0, 0, QModelIndex()), Qt.DisplayRole), is_("0"))
         assert_that(selection_model.data(selection_model.index(0, 1, QModelIndex()), Qt.DisplayRole), is_("CODE"))
         assert_that(selection_model.data(selection_model.index(0, 2, QModelIndex()), Qt.DisplayRole), is_("DESCR"))
-        assert_that(selection_model.data(selection_model.index(0, 3, QModelIndex()), Qt.DisplayRole), is_("pc."))
+        assert_that(selection_model.data(selection_model.index(0, 3, QModelIndex()), Qt.DisplayRole), is_("szt."))
         assert_that(selection_model.data(selection_model.index(0, 4, QModelIndex()), Qt.DisplayRole), is_("9.99"))
 
     def test_row_count(self, selection_model):
