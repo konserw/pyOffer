@@ -37,6 +37,7 @@ def main() -> None:
                     unit = "m" if row[4] == "mb." else "pc."  # by piece by default
                     merchandise_sql.write(f"({i}, '{row[0]}', '{desc}', '{unit}', '{row[1]}')")
                     price = row[3] if row[3] else 0
+                    price *= 4.45  # EUR -> PLN
                     price_sql.write(f"({i}, '{price}')")
 
             price_sql.write(";\n")
