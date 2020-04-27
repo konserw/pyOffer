@@ -6,8 +6,8 @@
         <file alias="discount">discount.png</file>
         <file alias="user">user.png</file>
         <file alias="logos">aliaxis.png</file>
-        <file alias="font">FrankRuhlLibre-Regular.ttf</file>
-        <file alias="font-light">FrankRuhlLibre-Light.ttf</file>
-        <file alias="font-bold">FrankRuhlLibre-Bold.ttf</file>
+        <file alias="font-regular">Montserrat-Regular.ttf</file>
+        <file alias="font-medium">Montserrat-Medium.ttf</file>
+        <file alias="font-bold">Montserrat-Bold.ttf</file>
     </qresource>
 </RCC>

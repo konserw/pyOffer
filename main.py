@@ -22,10 +22,10 @@ from src.user import User, UserSelectionDialog
 VERSION = 0.5
 
 if __name__ == '__main__':
-    if getattr(sys, "frozen", False):
+    if getattr(sys, 'frozen', False):
         logging.basicConfig(
             level=logging.INFO,
-            filename="pyoffer.log",
+            filename='pyoffer.log',
             format='[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s: %(message)s',
             datefmt='%H:%M:%S'
         )

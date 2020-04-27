@@ -35,10 +35,10 @@ class MainWindow(QMainWindow):
         self.set_offer_ui_enabled(False)
 
         self.font_database = QFontDatabase()
-        self.font_database.addApplicationFont(":/font")
-        self.font_database.addApplicationFont(":/font-light")
-        self.font_database.addApplicationFont(":/font-bold")
-        self.offer_font = self.font_database.font("Frank Ruhl Libre", "Regular", 7)
+        self.font_database.addApplicationFont(':/font-regular')
+        self.font_database.addApplicationFont(':/font-medium')
+        self.font_database.addApplicationFont(':/font-bold')
+        self.offer_font = self.font_database.font('Montserrat', 'Regular', 7)
         logging.info(f"Loaded font for offer print: {self.offer_font.family()} {self.offer_font.styleName()}")
 
         self.offer = None
