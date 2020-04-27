@@ -73,8 +73,8 @@ class Offer(QObject):
         phone = f"Tel.: {self.author.phone}" if self.author.phone else ""
         style = """
     .spec { font-size: 6pt; }
-    .row0 { background: #88CFFF; }
-    .row1 { background: #A6DAFF; }
+    .row0 { background: #efefef; }
+    .row1 { background: #dadada; }
 """
 
         merchandise_list = f"""
