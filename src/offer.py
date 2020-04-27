@@ -152,15 +152,15 @@ class Offer(QObject):
             {self.customer.html_address}<br />
             {self.customer.concated_name}
         </td>
-        <td width={document_width/3} align=right>
-            <img src=:/logos height=120 valign=top>
-        </td>
         <td width={document_width/3}>
             <br />
             {self.company_address}<br />
             <b>{self.author.name}</b><br />
             {self.author.mail}<br />
             {phone}
+        </td>
+        <td width={document_width/3} align=right>
+            <img src=:/logos height=120 valign=top>
         </td>
     </tr>
     <tr>
