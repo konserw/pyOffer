@@ -64,9 +64,9 @@ class Merchandise(QObject):
     @property
     def unit(self) -> str:
         if self.by_meter:
-            return self.tr("m")
+            return "m.b."
         else:
-            return self.tr("pc.")
+            return "szt."
 
     @property
     def price(self) -> Decimal:

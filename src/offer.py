@@ -95,11 +95,11 @@ class Offer(QObject):
         <tr class="{row_style}">
             <td>{i + 1}</td>
             <td>{item.code}</td>
-            <td align=right>{item.list_price}</td>
+            <td align=right>{item.list_price} zł</td>
             <td align=right>{item.discount}%</td>
-            <td align=right>{item.price}</td>
-            <td align=right>{item.count}</td>
-            <td align=right>{item.total}</td>
+            <td align=right>{item.price} zł</td>
+            <td align=right>{item.count} {item.unit}</td>
+            <td align=right>{item.total} zł</td>
         </tr>
         <tr class="{row_style} spec">
             <td></td>
