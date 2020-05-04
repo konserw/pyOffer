@@ -15,6 +15,15 @@ from hamcrest import assert_that, is_, calling, raises
 from src.terms import TermType
 
 
+class TestDiscountGroups:
+    def test_get_discount_groups_model(self, db):
+        model = db.get_discount_groups_model()
+
+        assert_that(model.rowCount(), is_(2))
+        groups_in_model = {model.data(model.index(0, 0), Qt.DisplayRole), model.data(model.index(1, 0), Qt.DisplayRole)}
+        assert_that(groups_in_model, is_({"group1", "group2"}))
+
+
 class TestMerchandiseRecord:
     def test_1(self, db):
         rec = db.get_merchandise_record(1)

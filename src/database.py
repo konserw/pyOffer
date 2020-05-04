@@ -15,6 +15,7 @@ import os
 import sys
 from datetime import date
 
+from PySide2.QtCore import QObject
 from PySide2.QtSql import QSqlDatabase, QSqlTableModel, QSqlQuery, QSqlQueryModel, QSqlRecord
 
 
@@ -116,3 +117,11 @@ class MerchandiseSqlModel(QSqlQueryModel):
 
 def get_merchandise_sql_model(for_date: date = date.today()) -> MerchandiseSqlModel:
     return MerchandiseSqlModel(for_date)
+
+
+def get_discount_groups_model(parent: QObject = None) -> QSqlQueryModel:
+    model = QSqlQueryModel(parent)
+    model.setQuery("SELECT distinct discount_group FROM public.merchandise;")
+    if model.lastError().isValid():
+        raise RuntimeError(model.lastError().text())
+    return model
