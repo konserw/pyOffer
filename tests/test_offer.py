@@ -178,7 +178,7 @@ In some town<br />
 
         <tr style="font-weight:bold;">
             <td align=right colspan=6>Razem:</td>
-            <td align=right>8.99</td>
+            <td align=right>8.99 zł</td>
         </tr>
     </table>
 

@@ -109,7 +109,7 @@ class Offer(QObject):
         merchandise_list += f"""
         <tr style="font-weight:bold;">
             <td align=right colspan=6>Razem:</td>
-            <td align=right>{self.merchandise_list.grand_total}</td>
+            <td align=right>{self.merchandise_list.grand_total} zł</td>
         </tr>
     </table>
 """
