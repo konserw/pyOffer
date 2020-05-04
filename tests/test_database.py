@@ -12,15 +12,12 @@ import pytest
 from PySide2.QtCore import Qt, QModelIndex
 from hamcrest import assert_that, is_, calling, raises
 
-from src.database import get_merchandise_sql_model, get_merchandise_record, get_user_record, \
-    get_new_offer_number, get_terms_table, connect
 from src.terms import TermType
 
 
-@pytest.mark.usefixtures("db")
 class TestMerchandiseRecord:
-    def test_1(self):
-        rec = get_merchandise_record(1)
+    def test_1(self, db):
+        rec = db.get_merchandise_record(1)
         assert_that(rec.field(0).value(), is_(1))
         assert_that(rec.field(1).value(), is_("CODE123"))
         assert_that(rec.field(2).value(), is_("some description"))
@@ -28,8 +25,8 @@ class TestMerchandiseRecord:
         assert_that(rec.field(4).value(), is_("group1"))
         assert_that(rec.field(5).value(), is_(19.99))
 
-    def test_2(self):
-        rec = get_merchandise_record(2)
+    def test_2(self, db):
+        rec = db.get_merchandise_record(2)
         assert_that(rec.field(0).value(), is_(2))
         assert_that(rec.field(1).value(), is_("CODE456"))
         assert_that(rec.field(2).value(), is_("some other description"))
@@ -37,8 +34,8 @@ class TestMerchandiseRecord:
         assert_that(rec.field(4).value(), is_("group2"))
         assert_that(rec.field(5).value(), is_(5.49))
 
-    def test_3(self):
-        rec = get_merchandise_record(3)
+    def test_3(self, db):
+        rec = db.get_merchandise_record(3)
         assert_that(rec.field(0).value(), is_(3))
         assert_that(rec.field(1).value(), is_("CODE789"))
         assert_that(rec.field(2).value(), is_("Yet another description"))
@@ -46,16 +43,15 @@ class TestMerchandiseRecord:
         assert_that(rec.field(4).value(), is_("group1"))
         assert_that(rec.field(5).value(), is_(120))
 
-    def test_not_found(self):
-        assert_that(calling(get_merchandise_record).with_args(13), raises(RuntimeError))
+    def test_not_found(self, db):
+        assert_that(calling(db.get_merchandise_record).with_args(13), raises(RuntimeError))
 
 
 @pytest.fixture
-def merchandise_sql_model():
-    return get_merchandise_sql_model()
+def merchandise_sql_model(db):
+    return db.get_merchandise_sql_model()
 
 
-@pytest.mark.usefixtures("db")
 class TestMerchandiseSqlModel:
     def test_data_1(self, merchandise_sql_model):
         assert_that(merchandise_sql_model.data(merchandise_sql_model.index(0, 0, QModelIndex()), Qt.DisplayRole), is_(1))  # id
@@ -104,7 +100,6 @@ class TestMerchandiseSqlModel:
         assert_that(merchandise_sql_model.rowCount(), is_(expected))
 
 
-@pytest.mark.usefixtures("db")
 class TestUsers:
     @pytest.mark.parametrize("user_id, expected_number", [
         pytest.param(3, 0),  # user 3 does not exist
@@ -113,12 +108,12 @@ class TestUsers:
         pytest.param(2, 2323),
         pytest.param(2, 2324),
     ])
-    def test_new_offer_number(self, user_id, expected_number):
+    def test_new_offer_number(self, db, user_id, expected_number):
         """ This test alters database, so it will work only once on clean db"""
-        assert_that(get_new_offer_number(user_id), is_(expected_number))
+        assert_that(db.get_new_offer_number(user_id), is_(expected_number))
 
-    def test_user_record_1(self):
-        rec = get_user_record(1)
+    def test_user_record_1(self, db):
+        rec = db.get_user_record(1)
         assert_that(rec.value("user_id"), is_(1))
         assert_that(rec.value("name"), is_("Mark Salesman"))
         assert_that(rec.value("mail"), is_("mark@salesman.com"))
@@ -127,8 +122,8 @@ class TestUsers:
         assert_that(rec.value("char_for_offer_symbol"), is_("M"))
         assert_that(rec.value("business_symbol"), is_("I"))
 
-    def test_user_record_2(self):
-        rec = get_user_record(2)
+    def test_user_record_2(self, db):
+        rec = db.get_user_record(2)
         assert_that(rec.value("user_id"), is_(2))
         assert_that(rec.value("name"), is_("Agatha Salesman"))
         assert_that(rec.value("mail"), is_("agatha@salesman.com"))
@@ -138,10 +133,9 @@ class TestUsers:
         assert_that(rec.value("business_symbol"), is_("X"))
 
 
-@pytest.mark.usefixtures("db")
 class TestTerms:
-    def test_billing_terms_table(self):
-        model = get_terms_table(TermType.billing.value)
+    def test_billing_terms_table(self, db):
+        model = db.get_terms_table(TermType.billing.value)
         assert_that(model.tableName(), is_("terms"))
         assert_that(model.rowCount(), is_(15))
         assert_that(model.columnCount(), is_(3))
@@ -150,8 +144,8 @@ class TestTerms:
         assert_that(rec.fieldName(1), is_("short_desc"))
         assert_that(rec.fieldName(2), is_("long_desc"))
 
-    def test_delivery_terms_table(self):
-        model = get_terms_table(TermType.delivery.value)
+    def test_delivery_terms_table(self, db):
+        model = db.get_terms_table(TermType.delivery.value)
         assert_that(model.tableName(), is_("terms"))
         assert_that(model.rowCount(), is_(14))
         assert_that(model.columnCount(), is_(3))
@@ -160,8 +154,8 @@ class TestTerms:
         assert_that(rec.fieldName(1), is_("short_desc"))
         assert_that(rec.fieldName(2), is_("long_desc"))
 
-    def test_delivery_date_terms_table(self):
-        model = get_terms_table(TermType.delivery_date.value)
+    def test_delivery_date_terms_table(self, db):
+        model = db.get_terms_table(TermType.delivery_date.value)
         assert_that(model.tableName(), is_("terms"))
         assert_that(model.rowCount(), is_(27))
         assert_that(model.columnCount(), is_(3))
@@ -170,8 +164,8 @@ class TestTerms:
         assert_that(rec.fieldName(1), is_("short_desc"))
         assert_that(rec.fieldName(2), is_("long_desc"))
 
-    def test_offer_terms_table(self):
-        model = get_terms_table(TermType.offer.value)
+    def test_offer_terms_table(self, db):
+        model = db.get_terms_table(TermType.offer.value)
         assert_that(model.tableName(), is_("terms"))
         assert_that(model.rowCount(), is_(4))
         assert_that(model.columnCount(), is_(3))
@@ -190,5 +184,5 @@ class TestTerms:
 
 class TestNoConnection:
     @pytest.mark.skip("this test breaks other tests using db")
-    def test_connect_failed(self):
-        assert_that(calling(connect).with_args("127.0.0.1", "name", "name", "pass"), raises(RuntimeError, "Failed to connect to db"))
+    def test_connect_failed(self, db):
+        assert_that(calling(db.connect).with_args("127.0.0.1", "name", "name", "pass"), raises(RuntimeError, "Failed to connect to db"))
