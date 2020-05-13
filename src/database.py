@@ -15,7 +15,7 @@ import os
 import sys
 from datetime import date
 
-from PySide2.QtCore import QObject
+from PySide2.QtCore import QObject, Qt
 from PySide2.QtSql import QSqlDatabase, QSqlTableModel, QSqlQuery, QSqlQueryModel, QSqlRecord
 
 
@@ -48,6 +48,7 @@ def get_customer_record(customer_id: int) -> QSqlRecord:
 def get_users_table() -> QSqlTableModel:
     model = QSqlTableModel()
     model.setTable("users")
+    model.setSort(0, Qt.AscendingOrder)
     model.select()
     return model
 
