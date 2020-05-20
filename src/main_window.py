@@ -9,18 +9,18 @@
 # If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import annotations
-import logging
 
+import logging
 from datetime import date
 
 from PySide2.QtCore import Slot, Qt, QDate
-from PySide2.QtGui import QTextDocument, QFontDatabase, QFont
+from PySide2.QtGui import QTextDocument, QFontDatabase
 from PySide2.QtPrintSupport import QPrinter, QPrintPreviewDialog
 from PySide2.QtWidgets import QMainWindow, QDialog, QApplication, QCalendarWidget, QFileDialog
 
 from forms.ui_mainwindow import Ui_MainWindow
 from src.customer import CustomerSelectionDialog
-from src.merchandise import MerchandiseSelectionDialog, DiscountDialog
+from src.merchandise import MerchandiseSelectionDialog, DiscountDialog, DiscountGroupDialog
 from src.offer import Offer
 from src.terms import TermsChooserDialog, TermType
 from src.user import User
@@ -60,6 +60,7 @@ class MainWindow(QMainWindow):
         self.ui.push_button_add_merchandise.clicked.connect(self.select_merchandise)
         self.ui.push_button_remove_row.clicked.connect(self.remove_row)
         self.ui.push_button_discount.clicked.connect(self.set_discount)
+        self.ui.push_button_discount_group.clicked.connect(self.set_discount_group)
 
         self.ui.command_link_button_customer.clicked.connect(self.select_customer)
         self.ui.check_box_query_date.stateChanged.connect(self.inquiry_date_toggled)
@@ -92,6 +93,7 @@ class MainWindow(QMainWindow):
         self.ui.action_new_number.setText(self.tr("Set new offer symbol"))
         self.ui.push_button_add_merchandise.setText(self.tr("Add merchandise"))
         self.ui.push_button_discount.setText(self.tr("Set Discount"))
+        self.ui.push_button_discount_group.setText(self.tr("Set Discount for group"))
         self.ui.push_button_remove_row.setText(self.tr("Remove row"))
         self.ui.tabWidget.setTabText(self.ui.tabWidget.indexOf(self.ui.tab), self.tr("Offer table"))
         self.ui.tabWidget.setTabText(self.ui.tabWidget.indexOf(self.ui.tab_2), self.tr("Other information"))
@@ -200,11 +202,21 @@ class MainWindow(QMainWindow):
     @Slot()
     def set_discount(self) -> None:
         dialog = DiscountDialog(self)
-        dialog.line_edit_expression.textChanged.connect(self.offer.merchandise_list.highlight_rows)
-        self.offer.merchandise_list.highlight_rows("")
+        dialog.line_edit_expression.textChanged.connect(self.offer.merchandise_list.select_items)
+        self.offer.merchandise_list.select_items("")
         if dialog.exec_() == QDialog.Accepted:
-            self.offer.merchandise_list.set_discount(dialog.filter_expression, dialog.discount_value)
-        self.offer.merchandise_list.highlight_rows(None)
+            self.offer.merchandise_list.apply_discount(dialog.discount_value)
+        else:
+            self.offer.merchandise_list.select_items(None)
+
+    @Slot()
+    def set_discount_group(self) -> None:
+        dialog = DiscountGroupDialog(self.offer.merchandise_list.get_discount_groups(), self)
+        dialog.selectionChanged.connect(self.offer.merchandise_list.select_items)
+        if dialog.exec_() == QDialog.Accepted:
+            self.offer.merchandise_list.apply_discount(dialog.discount_value)
+        else:
+            self.offer.merchandise_list.select_items(None)
 
     @Slot()
     def inquiry_date_button_clicked(self) -> None:

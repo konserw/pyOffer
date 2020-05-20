@@ -9,6 +9,7 @@
 # If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import date
+
 import pytest
 from PySide2.QtCore import Qt, QDate, QSizeF
 from PySide2.QtGui import QTextDocument
@@ -137,6 +138,7 @@ class TestMainWindow:
         pytest.param("push_button_add_merchandise", "select_merchandise"),
         pytest.param("push_button_remove_row", "remove_row"),
         pytest.param("push_button_discount", "set_discount"),
+        pytest.param("push_button_discount_group", "set_discount_group"),
         pytest.param("push_button_query_date", "inquiry_date_button_clicked"),
     ])
     def test_slot_for_clicked(self, mocker, qtbot, active_window, widget_name, slot_name):
@@ -302,20 +304,60 @@ class TestMainWindow:
         else:
             remove_row.assert_not_called()
 
-    def test_set_discount(self, mocker, active_window):
-        expression = "ex"
+    def test_set_discount_accepted(self, mocker, active_window):
         discount = 50
         dialog_class = mocker.patch("src.main_window.DiscountDialog")
         dialog = dialog_class.return_value
         dialog.exec_.return_value = QDialog.Accepted
-        dialog.filter_expression = expression
         dialog.discount_value = discount
 
         active_window.set_discount()
 
         dialog_class.assert_called_once_with(active_window)
         dialog.exec_.assert_called_once()
-        active_window.offer.merchandise_list.set_discount.assert_called_once_with(expression, discount)
+        active_window.offer.merchandise_list.select_items.assert_called_once_with("")
+        active_window.offer.merchandise_list.apply_discount.assert_called_once_with(discount)
+
+    def test_set_discount_rejected(self, mocker, active_window):
+        dialog_class = mocker.patch("src.main_window.DiscountDialog")
+        dialog = dialog_class.return_value
+        dialog.exec_.return_value = QDialog.Rejected
+
+        active_window.set_discount()
+
+        dialog_class.assert_called_once_with(active_window)
+        dialog.exec_.assert_called_once()
+        active_window.offer.merchandise_list.apply_discount.assert_not_called()
+        active_window.offer.merchandise_list.select_items.assert_has_calls([mocker.call(''), mocker.call(None)])
+
+    def test_set_discount_group_accepted(self, mocker, active_window):
+        discount = 50
+        groups = {"group"}
+        active_window.offer.merchandise_list.get_discount_groups.return_value = groups
+        dialog_class = mocker.patch("src.main_window.DiscountGroupDialog")
+        dialog = dialog_class.return_value
+        dialog.exec_.return_value = QDialog.Accepted
+        dialog.discount_value = discount
+
+        active_window.set_discount_group()
+
+        dialog_class.assert_called_once_with(groups, active_window)
+        dialog.exec_.assert_called_once()
+        active_window.offer.merchandise_list.apply_discount.assert_called_once_with(discount)
+
+    def test_set_discount_group_rejected(self, mocker, active_window):
+        groups = {"group"}
+        active_window.offer.merchandise_list.get_discount_groups.return_value = groups
+        dialog_class = mocker.patch("src.main_window.DiscountGroupDialog")
+        dialog = dialog_class.return_value
+        dialog.exec_.return_value = QDialog.Rejected
+
+        active_window.set_discount_group()
+
+        dialog_class.assert_called_once_with(groups, active_window)
+        dialog.exec_.assert_called_once()
+        active_window.offer.merchandise_list.apply_discount.assert_not_called()
+        active_window.offer.merchandise_list.select_items.assert_called_once_with(None)
 
     def test_inquiry_date_button_clicked(self, mocker, active_window):
         show_calendar = mocker.patch.object(active_window.calendar, 'show', autospec=True)
