@@ -127,7 +127,6 @@ In some town<br />
             Mr John Doe
         </td>
         <td width=248.33333333333334>
-            <br />
             lorem<br />ipsum<br />
             <b>Author Name</b><br />
             author@company.com<br />
