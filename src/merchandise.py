@@ -404,7 +404,7 @@ class MerchandiseListView(QTableView):
 
     def dropEvent(self, a0: QtGui.QDropEvent) -> None:
         drag_end_index = self.indexAt(a0.pos())
-        self.model().moveRow(QModelIndex(), self.drag_start_index.row(), QModelIndex, drag_end_index.row())
+        self.model().moveRow(QModelIndex(), self.drag_start_index.row(), QModelIndex(), drag_end_index.row())
         a0.acceptProposedAction()
 
 
