@@ -66,9 +66,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addWidget(self.push_button_add_merchandise)
 
         self.push_button_discount = QPushButton(self.tab)
-        self.push_button_discount.setObjectName(u"push_button_discount")
-
         self.horizontalLayout_2.addWidget(self.push_button_discount)
+        self.push_button_discount_group = QPushButton(self.tab)
+        self.horizontalLayout_2.addWidget(self.push_button_discount_group)
 
         self.push_button_remove_row = QPushButton(self.tab)
         self.push_button_remove_row.setObjectName(u"push_button_remove_row")
@@ -78,7 +78,6 @@ class Ui_MainWindow(object):
         self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer_2)
-
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
 

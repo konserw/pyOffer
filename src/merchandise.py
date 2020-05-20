@@ -15,7 +15,7 @@ import typing
 from decimal import Decimal
 
 from PySide2 import QtGui, QtCore, QtWidgets
-from PySide2.QtCore import QObject, QAbstractTableModel, QModelIndex, Qt, Slot
+from PySide2.QtCore import QObject, QAbstractTableModel, QModelIndex, Qt, Slot, Signal
 from PySide2.QtGui import QIcon, QPixmap, QColor
 from PySide2.QtSql import QSqlRecord
 from PySide2.QtWidgets import QWidget, QTableView, QItemDelegate, QStyleOptionViewItem
@@ -175,8 +175,8 @@ class MerchandiseListModel(QAbstractTableModel):
                 return Qt.AlignRight
             return Qt.AlignLeft
 
-        if role == Qt.BackgroundRole:
-            if self.ex is not None and row < len(self.list) and self.ex.casefold() in self.list[row].code.casefold():
+        if role == Qt.BackgroundRole and self.ex is not None and row < len(self.list):
+            if self.ex.casefold() in self.list[row].code.casefold() or (self.ex and self.ex == self.list[row].discount_group):
                 return QColor(0xFC, 0xF7, 0xBB)
 
         if role == Qt.EditRole and row < len(self.list) and col in (3, 5):
@@ -276,20 +276,21 @@ class MerchandiseListModel(QAbstractTableModel):
         self.list.append(item)
         self.endInsertRows()
 
-    def set_discount(self, ex: str, value: float) -> None:
+    def apply_discount(self, value: float) -> None:
         self.beginResetModel()
-        for item in filter(lambda item: ex.casefold() in item.code.casefold(), self.list):
+        for item in filter(lambda item: self.ex.casefold() in item.code.casefold() or (self.ex and self.ex == item.discount_group), self.list):
             item.discount = value
+        self.ex = None
         self.endResetModel()
 
     @Slot(str)
-    def highlight_rows(self, ex: str) -> None:
+    def select_items(self, ex: str) -> None:
         self.beginResetModel()
         self.ex = ex
         self.endResetModel()
 
-    def print(self) -> str:
-        raise NotImplementedError()
+    def get_discount_groups(self) -> typing.Set[str]:
+        return set([item.discount_group for item in self.list if item.discount_group is not None])
 
 
 class DiscountDialog(QtWidgets.QDialog):
@@ -345,6 +346,66 @@ class DiscountDialog(QtWidgets.QDialog):
     @property
     def filter_expression(self) -> str:
         return self.line_edit_expression.text()
+
+
+class DiscountGroupDialog(QtWidgets.QDialog):
+    selectionChanged = Signal(str)
+
+    def __init__(self, groups_list, parent: QObject = None):
+        super().__init__(parent)
+        self.model = QtCore.QStringListModel(groups_list)
+
+        self.setWindowTitle(self.tr("Set discount value for group"))
+        icon = QIcon()
+        icon.addFile(u":/discount")
+        self.setWindowIcon(icon)
+
+        top_level_layout = QtWidgets.QHBoxLayout(self)
+        icon_label = QtWidgets.QLabel(self)
+        pixmap = QPixmap(":/discount").scaled(128, 128, Qt.KeepAspectRatio)
+        icon_label.setPixmap(pixmap)
+        top_level_layout.addWidget(icon_label)
+
+        vertical_layout = QtWidgets.QVBoxLayout(self)
+        self.label = QtWidgets.QLabel(self)
+        self.label.setText(self.tr("Please choose discount group and discount value"))
+        vertical_layout.addWidget(self.label)
+
+        self.list_view = QtWidgets.QListView()
+        self.list_view.setModel(self.model)
+        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.list_view.clicked.connect(self._list_item_clicked)
+        vertical_layout.addWidget(self.list_view)
+
+        spin_layout = QtWidgets.QHBoxLayout(self)
+        spin_layout.addStretch()
+        spin_layout.addWidget(QtWidgets.QLabel(self.tr("Discount:"), self))
+        self.spinbox_discount = QtWidgets.QDoubleSpinBox(self)
+        self.spinbox_discount.setDecimals(1)
+        self.spinbox_discount.setMinimum(0)
+        self.spinbox_discount.setSingleStep(5)
+        self.spinbox_discount.setMaximum(100)
+        spin_layout.addWidget(self.spinbox_discount)
+        vertical_layout.addLayout(spin_layout)
+
+        self.buttons = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+        self.buttons.accepted.connect(self.accept)
+        self.buttons.rejected.connect(self.reject)
+        vertical_layout.addWidget(self.buttons)
+
+        top_level_layout.addLayout(vertical_layout)
+
+    @property
+    def discount_value(self) -> float:
+        self.spinbox_discount.interpretText()
+        return self.spinbox_discount.value()
+
+    @Slot(QModelIndex)
+    def _list_item_clicked(self, index: QModelIndex):
+        group = None
+        if index.isValid():
+            group = self.model.data(index, Qt.DisplayRole)
+        self.selectionChanged.emit(group)
 
 
 class MerchandiseListDelegate(QItemDelegate):

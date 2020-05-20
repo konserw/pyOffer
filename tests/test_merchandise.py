@@ -20,7 +20,7 @@ from qtmatchers import has_item_flags
 
 from src.database import get_merchandise_sql_model
 from src.merchandise import Merchandise, MerchandiseListModel, MerchandiseSelectionModel, MerchandiseListDelegate, \
-    MerchandiseListView, MerchandiseSelectionDelegate, MerchandiseSelectionDialog, DiscountDialog
+    MerchandiseListView, MerchandiseSelectionDelegate, MerchandiseSelectionDialog, DiscountDialog, DiscountGroupDialog
 
 
 def create_merch(merchandise_id=1, list_price=9.99, count=1, discount=10) -> Merchandise:
@@ -319,17 +319,22 @@ class TestMerchandiseListModel:
         pytest.param("Other", "second"),
         pytest.param("otheR", "second"),
         pytest.param("the", "second"),
+        pytest.param("group", "none"),
+        pytest.param("group22", "none"),
+        pytest.param("group2", "second"),
     ])
     def test_set_discount(self, sample_model, ex, which):
         other = create_merch(2, discount=0)
         other.code = "Other"
         other.description = "otheR one"
+        other.discount_group = "group2"
         sample_model.add_item(other)
         assert_that(sample_model.list[0].discount, is_(0))
         assert_that(sample_model.list[1].discount, is_(0))
 
         discount = 50
-        sample_model.set_discount(ex, discount)
+        sample_model.select_items(ex)
+        sample_model.apply_discount(discount)
 
         if which in ("both", "first"):
             assert_that(sample_model.list[0].discount, is_(50))
@@ -353,11 +358,15 @@ class TestMerchandiseListModel:
         pytest.param("Other", "second"),
         pytest.param("otheR", "second"),
         pytest.param("the", "second"),
+        pytest.param("group", "none"),
+        pytest.param("group22", "none"),
+        pytest.param("group2", "second"),
     ])
     def test_highlight_rows(self, sample_model, ex, which):
         other = create_merch(2, discount=0)
         other.code = "Other"
         other.description = "otheR one"
+        other.discount_group = "group2"
         sample_model.add_item(other)
         indexes = [
             sample_model.index(0, 0),
@@ -366,7 +375,7 @@ class TestMerchandiseListModel:
         assert_that(sample_model.data(indexes[0], Qt.BackgroundRole), is_(none()))
         assert_that(sample_model.data(indexes[1], Qt.BackgroundRole), is_(none()))
 
-        sample_model.highlight_rows(ex)
+        sample_model.select_items(ex)
 
         if which in ("both", "first"):
             assert_that(sample_model.data(indexes[0], Qt.BackgroundRole), is_(QColor(0xFC, 0xF7, 0xBB)))
@@ -376,6 +385,34 @@ class TestMerchandiseListModel:
             assert_that(sample_model.data(indexes[1], Qt.BackgroundRole), is_(QColor(0xFC, 0xF7, 0xBB)))
         else:
             assert_that(sample_model.data(indexes[1], Qt.BackgroundRole), is_(none()))
+
+    def test_discount_groups_is_empty(self, sample_model):
+        assert_that(sample_model.get_discount_groups(), is_(empty()))
+
+    def test_discount_groups_one_group(self, sample_model):
+        other = create_merch(2)
+        other.discount_group = "group2"
+        sample_model.add_item(other)
+
+        assert_that(sample_model.get_discount_groups(), is_({"group2"}))
+
+    def test_discount_groups_one_group_double(self, sample_model):
+        other = create_merch(2)
+        other.discount_group = "group2"
+        sample_model.add_item(other)
+        sample_model.add_item(other)
+
+        assert_that(sample_model.get_discount_groups(), is_({"group2"}))
+
+    def test_discount_groups_two_groups(self, sample_model):
+        other = create_merch(2)
+        other.discount_group = "group1"
+        sample_model.add_item(other)
+        other = create_merch(3)
+        other.discount_group = "group2"
+        sample_model.add_item(other)
+
+        assert_that(sample_model.get_discount_groups(), is_({"group1", "group2"}))
 
     def test_with_modeltester(self, qtmodeltester, sample_model):
         qtmodeltester.check(sample_model)
@@ -672,7 +709,7 @@ class TestMerchandiseSelectionModelWithDB:
         pytest.param("", 3),
         pytest.param("CODE", 3),
         pytest.param("escr", 3),
-        pytest.param("Not found", 0)
+        pytest.param("Not found", 0),
     ])
     def test_search(self, selection_model_with_db, ex, expected):
         assert_that(selection_model_with_db.rowCount(), is_(3))
@@ -720,3 +757,47 @@ class TestDiscountDialog:
         if ex:
             qtbot.keyClicks(discount_dialog.line_edit_expression, ex)
         assert_that(discount_dialog.filter_expression, is_(ex))
+
+
+@pytest.fixture
+def sample_groups():
+    return {"group1", "group2"}
+
+
+@pytest.fixture
+def discount_group_dialog(qtbot, sample_groups):
+    dialog = DiscountGroupDialog(sample_groups)
+    qtbot.addWidget(dialog)
+    return dialog
+
+
+class TestDiscountGroupDialog:
+    def test_initial_state(self, discount_group_dialog, sample_groups):
+        # todo: other translations
+        assert_that(discount_group_dialog.windowTitle(), is_("Set discount value for group"))
+        assert_that(set(discount_group_dialog.list_view.model().stringList()), is_(sample_groups))
+        assert_that(discount_group_dialog.label.text(), is_("Please choose discount group and discount value"))
+        assert_that(discount_group_dialog.spinbox_discount.minimum(), is_(0))
+        assert_that(discount_group_dialog.spinbox_discount.singleStep(), is_(5))
+        assert_that(discount_group_dialog.spinbox_discount.maximum(), is_(100))
+
+    @pytest.mark.parametrize("value", [
+        pytest.param(0),
+        pytest.param(11),
+        pytest.param(50),
+        pytest.param(100),
+    ])
+    def test_discount_value(self, discount_group_dialog, value):
+        discount_group_dialog.spinbox_discount.setValue(value)
+        assert_that(discount_group_dialog.discount_value, is_(value))
+
+    @pytest.mark.parametrize("row", [
+        pytest.param(0),
+        pytest.param(1),
+    ])
+    def test_selection_changed_emited(self, qtbot, discount_group_dialog, row):
+        index = discount_group_dialog.model.index(row)
+        pos = discount_group_dialog.list_view.visualRect(index).center()
+        expected_value = index.data(Qt.DisplayRole)
+        with qtbot.wait_signal(discount_group_dialog.selectionChanged, check_params_cb=lambda value: expected_value == value):
+            qtbot.mouseClick(discount_group_dialog.list_view.viewport(), Qt.LeftButton, Qt.NoModifier, pos)
