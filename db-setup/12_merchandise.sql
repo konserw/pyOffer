@@ -21,18 +21,19 @@ CREATE TABLE price
 );
 
 
-CREATE OR REPLACE FUNCTION merchandise_view(taget_date DATE)
-    returns table
-            (
-                merchandise_id INT,
-                code           TEXT,
-                description    TEXT,
-                unit           unit_type,
-                discount_group TEXT,
-                list_price     DECIMAL(8, 2)
-            )
-AS
-$body$
+-- FUNCTION: public.merchandise_view(date)
+-- DROP FUNCTION public.merchandise_view(date);
+
+CREATE OR REPLACE FUNCTION public.merchandise_view(
+	taget_date date DEFAULT current_date
+	)
+    RETURNS TABLE(merchandise_id integer, code text, description text, unit unit_type, discount_group text, list_price numeric)
+    LANGUAGE 'sql'
+
+    COST 100
+    VOLATILE
+
+AS $BODY$
 select merchandise.merchandise_id AS merchandise_id,
        merchandise.code           AS code,
        merchandise.description    AS description,
@@ -42,4 +43,7 @@ select merchandise.merchandise_id AS merchandise_id,
 FROM merchandise
          natural join price
 WHERE $1 BETWEEN price.valid_from AND price.valid_to
-$body$ language sql;
+$BODY$;
+
+ALTER FUNCTION public.merchandise_view(date)
+    OWNER TO postgres;
