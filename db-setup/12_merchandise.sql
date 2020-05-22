@@ -47,3 +47,42 @@ $BODY$;
 
 ALTER FUNCTION public.merchandise_view(date)
     OWNER TO postgres;
+
+-- FUNCTION: public.create_merchandise(text, text, unit_type, text, numeric(8,2))
+-- DROP FUNCTION public.create_merchandise(text, text, unit_type, text, numeric(8,2))
+
+CREATE OR REPLACE FUNCTION public.create_merchandise(
+    in_code text,
+    in_description text,
+    in_unit unit_type DEFAULT 'pc.',
+    in_discount_group text DEFAULT '',
+	in_price numeric(8,2) DEFAULT 0
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE
+
+AS $BODY$
+declare
+  l_id integer;
+begin
+  l_id := nextval('merchandise_merchandise_id_seq');
+  INSERT INTO public.merchandise(
+	merchandise_id, code, description, unit, discount_group)
+	VALUES (l_id, in_code, in_description, in_unit, in_discount_group);
+
+  INSERT INTO public.price(
+	merchandise_id, value, valid_from, valid_to)
+	VALUES (l_id, in_price, DEFAULt, DEFAULT);
+
+  if exists(select merchandise_id from public.merchandise where merchandise_id = l_id) and exists(select merchandise_id from public.price where merchandise_id = l_id) then
+  	return l_id;
+  else
+    return -1;
+  end if;
+end;$BODY$;
+
+ALTER FUNCTION public.create_merchandise(text, text, unit_type, text, numeric(8,2))
+    OWNER TO postgres;
