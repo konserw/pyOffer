@@ -160,13 +160,20 @@ class TestUsers:
     @pytest.mark.parametrize("user_id, expected_number", [
         pytest.param(3, 0),  # user 3 does not exist
         pytest.param(1, 1),
-        pytest.param(1, 2),
         pytest.param(2, 2323),
-        pytest.param(2, 2324),
     ])
     def test_new_offer_number(self, db, user_id, expected_number):
-        """ This test alters database, so it will work only once on clean db"""
-        assert_that(db.get_new_offer_number(user_id), is_(expected_number))
+        with rollback():
+            assert_that(db.get_new_offer_number(user_id), is_(expected_number))
+
+    @pytest.mark.parametrize("user_id, expected_number", [
+        pytest.param(1, 1),
+        pytest.param(2, 2323),
+    ])
+    def test_new_offer_number_double(self, db, user_id, expected_number):
+        with rollback():
+            assert_that(db.get_new_offer_number(user_id), is_(expected_number))
+            assert_that(db.get_new_offer_number(user_id), is_(expected_number+1))
 
     def test_user_record_1(self, db):
         rec = db.get_user_record(1)
