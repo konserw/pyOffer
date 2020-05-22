@@ -8,11 +8,58 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 
+from contextlib import contextmanager
+from decimal import Decimal
+
 import pytest
 from PySide2.QtCore import Qt, QModelIndex
+from PySide2.QtSql import QSqlDatabase
 from hamcrest import assert_that, is_, calling, raises
 
 from src.terms import TermType
+
+
+@contextmanager
+def rollback():
+    database = QSqlDatabase.database()
+    database.transaction()
+    try:
+        yield database
+    finally:
+        database.rollback()
+
+
+class TestCreateMerchandise:
+    @pytest.mark.parametrize("code, desc, unit, group, price", [
+        pytest.param("test_code", "test_desc", "m", "some_group", 9.99),
+        pytest.param("test_code", "test_desc", "pc.", "some_group", 9.99),
+        pytest.param("", "", "pc.", "", 0),
+        pytest.param("test_code", "test_desc", "m", "some_group", 100000.0),
+    ])
+    def test_can_create_merchandise(self, db, code, desc, unit, group, price):
+        with rollback():
+            by_metre = unit == "m"
+            merchandise_id = db.create_merchandise(code, desc, by_metre, group, Decimal(price))
+
+            rec = db.get_merchandise_record(merchandise_id)
+            assert_that(rec.field(0).value(), is_(merchandise_id))
+            assert_that(rec.field(1).value(), is_(code))
+            assert_that(rec.field(2).value(), is_(desc))
+            assert_that(rec.field(3).value(), is_(unit))
+            assert_that(rec.field(4).value(), is_(group))
+            assert_that(rec.field(5).value(), is_(price))
+
+    @pytest.mark.parametrize("price", [
+        pytest.param(None),
+        pytest.param("x"),
+        pytest.param(1000000.0),
+    ])
+    def test_create_merchandise_throws(self, db, price):
+        with rollback():
+            assert_that(
+                calling(db.create_merchandise).with_args("test_code", "test_desc", "m", "", price),
+                raises(RuntimeError, "Query .* failed")
+            )
 
 
 class TestDiscountGroups:

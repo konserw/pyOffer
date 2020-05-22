@@ -14,6 +14,7 @@ import logging
 import os
 import sys
 from datetime import date
+from decimal import Decimal
 
 from PySide2.QtCore import QObject, Qt
 from PySide2.QtSql import QSqlDatabase, QSqlTableModel, QSqlQuery, QSqlQueryModel, QSqlRecord
@@ -126,3 +127,15 @@ def get_discount_groups_model(parent: QObject = None) -> QSqlQueryModel:
     if model.lastError().isValid():
         raise RuntimeError(model.lastError().text())
     return model
+
+
+def create_merchandise(code: str, description: str, by_metre: bool, discount_group: str, price: Decimal) -> int:
+    unit = 'm' if by_metre else 'pc.'
+    query_text = f"SELECT public.create_merchandise('{code}', '{description}', '{unit}', '{discount_group}', '{price}')"
+    query = QSqlQuery(query_text)
+    if not query.next():
+        raise RuntimeError(f"Query {query_text} failed with:\n{query.lastError().text()}")
+    merchandise_id = query.value(0)
+    if merchandise_id < 0:
+        raise RuntimeError(f"Query {query_text} failed on server side")
+    return merchandise_id
