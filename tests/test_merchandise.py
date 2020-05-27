@@ -15,7 +15,7 @@ from PySide2 import QtWidgets
 from PySide2.QtCore import Qt, QModelIndex, QAbstractItemModel, QPoint, QSize, QStringListModel
 from PySide2.QtGui import QColor
 from PySide2.QtSql import QSqlField, QSqlRecord
-from hamcrest import assert_that, is_, greater_than, instance_of, none, empty
+from hamcrest import assert_that, is_, greater_than, instance_of, none, empty, matches_regexp
 from qtmatchers import has_item_flags, checked, unchecked
 
 from src.database import get_merchandise_sql_model
@@ -163,7 +163,8 @@ class TestMerchandise:
             assert_that(sample_merch.formatted_field(4), is_("8,99"))
             assert_that(sample_merch.formatted_field(5), is_("1000"))
             assert_that(sample_merch.formatted_field(6), is_(sample_merch.unit))
-            assert_that(sample_merch.formatted_field(7), is_("8\xa0990,00"))
+            # short or long unbreakable space as thousands separator
+            assert_that(sample_merch.formatted_field(7), matches_regexp("8[\xa0\u202f]990,00"))
 
 
 @pytest.fixture
