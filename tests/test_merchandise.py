@@ -7,7 +7,7 @@
 # See the GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
-
+import locale
 from decimal import Decimal
 
 import pytest
@@ -22,6 +22,16 @@ from src.database import get_merchandise_sql_model
 from src.merchandise import Merchandise, MerchandiseListModel, MerchandiseSelectionModel, MerchandiseListDelegate, \
     MerchandiseListView, MerchandiseSelectionDelegate, MerchandiseSelectionDialog, DiscountDialog, DiscountGroupDialog, \
     CreateMerchandiseDialog
+from contextlib import contextmanager
+
+
+@contextmanager
+def temp_locale(locale_string):
+    locale.setlocale(locale.LC_ALL, locale_string)
+    try:
+        yield
+    finally:
+        locale.setlocale(locale.LC_ALL, "C")
 
 
 def create_merch(merchandise_id=1, list_price=9.99, count=1, discount=10) -> Merchandise:
@@ -120,6 +130,41 @@ class TestMerchandise:
         item.by_meter = True
         assert_that(item.unit, is_("m.b."))
 
+    def test_formatted_field_no_locale(self):
+        sample_merch = create_merch(count=1000)
+        assert_that(sample_merch.formatted_field(0), is_(sample_merch.code))
+        assert_that(sample_merch.formatted_field(1), is_(sample_merch.description))
+        assert_that(sample_merch.formatted_field(2), is_("9.99"))
+        assert_that(sample_merch.formatted_field(3), is_("10.0%"))
+        assert_that(sample_merch.formatted_field(4), is_("8.99"))
+        assert_that(sample_merch.formatted_field(5), is_("1000"))
+        assert_that(sample_merch.formatted_field(6), is_(sample_merch.unit))
+        assert_that(sample_merch.formatted_field(7), is_("8990.00"))
+
+    def test_formatted_field_en_gb_locale(self):
+        with temp_locale("en_GB.UTF-8"):
+            sample_merch = create_merch(count=1000)
+            assert_that(sample_merch.formatted_field(0), is_(sample_merch.code))
+            assert_that(sample_merch.formatted_field(1), is_(sample_merch.description))
+            assert_that(sample_merch.formatted_field(2), is_("9.99"))
+            assert_that(sample_merch.formatted_field(3), is_("10.0%"))
+            assert_that(sample_merch.formatted_field(4), is_("8.99"))
+            assert_that(sample_merch.formatted_field(5), is_("1000"))
+            assert_that(sample_merch.formatted_field(6), is_(sample_merch.unit))
+            assert_that(sample_merch.formatted_field(7), is_("8,990.00"))
+
+    def test_formatted_field_pl_pl_locale(self):
+        with temp_locale("pl_PL.UTF-8"):
+            sample_merch = create_merch(count=1000)
+            assert_that(sample_merch.formatted_field(0), is_(sample_merch.code))
+            assert_that(sample_merch.formatted_field(1), is_(sample_merch.description))
+            assert_that(sample_merch.formatted_field(2), is_("9,99"))
+            assert_that(sample_merch.formatted_field(3), is_("10,0%"))
+            assert_that(sample_merch.formatted_field(4), is_("8,99"))
+            assert_that(sample_merch.formatted_field(5), is_("1000"))
+            assert_that(sample_merch.formatted_field(6), is_(sample_merch.unit))
+            assert_that(sample_merch.formatted_field(7), is_("8\xa0990,00"))
+
 
 @pytest.fixture
 def sample_model():
@@ -170,7 +215,7 @@ class TestMerchandiseListModel:
         assert_that(sample_model.list[0][col], is_(value))
 
     def test_data_display_role(self, sample_model):
-        for key, val in enumerate(("CODE", "DESCR", "9.99", "0.0", "9.99", "1", "szt.", "9.99")):
+        for key, val in enumerate(("CODE", "DESCR", "9.99", "0.0%", "9.99", "1", "szt.", "9.99")):
             assert_that(sample_model.data(sample_model.index(0, key), Qt.DisplayRole), is_(val))
 
     def test_data_edit_role(self, sample_model):
@@ -460,7 +505,7 @@ class TestMerchandiseListDelegate:
 
         editor.setValue(50)
         delegate.setModelData(editor, sample_model, index)
-        assert_that(sample_model.data(index, Qt.DisplayRole), is_("50.0" if col == 3 else "50"))
+        assert_that(sample_model.data(index, Qt.DisplayRole), is_("50.0%" if col == 3 else "50"))
 
 
 @pytest.mark.xfail  # Events are not processed correctly in QTest

@@ -8,6 +8,7 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 
+import locale
 import logging
 import sys
 from datetime import datetime
@@ -35,6 +36,9 @@ if __name__ == '__main__':
         )
 
     logging.info("pyOffer version %s started at %s", VERSION, datetime.now())
+
+    locale_set = locale.setlocale(locale.LC_ALL, '')
+    logging.info("System locale: %s", locale_set)
 
     app = QApplication(sys.argv)
     app.setOrganizationName("KonserwSoft")

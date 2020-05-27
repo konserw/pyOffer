@@ -116,6 +116,24 @@ class Merchandise(QObject):
         else:
             raise RuntimeError("unexpected assignment")
 
+    def formatted_field(self, col) -> str:
+        if col == 0:
+            return self.code
+        elif col == 1:
+            return self.description
+        elif col == 2:
+            return f"{self.list_price:.20n}"
+        elif col == 3:
+            return f"{self.discount:.5n}%"
+        elif col == 4:
+            return f"{self.price:.20n}"
+        elif col == 5:
+            return f"{self.count}"
+        elif col == 6:
+            return self.unit
+        elif col == 7:
+            return f"{self.total:.20n}"
+
 
 class MerchandiseListModel(QAbstractTableModel):
     def __init__(self, parent: QObject = None):
@@ -187,9 +205,9 @@ class MerchandiseListModel(QAbstractTableModel):
                 if col == 6:
                     return self.tr("Total:")
                 elif col == 7:
-                    return str(self.grand_total)
+                    return f"{self.grand_total:.20n}"
             elif row < len(self.list):
-                return str(self.list[row][col])
+                return self.list[row].formatted_field(col)
 
     @property
     def grand_total(self) -> Decimal:
