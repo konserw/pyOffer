@@ -144,7 +144,7 @@ class Offer(QObject):
 <tr><td>
     <table>
     <tr>
-        <td valign=top width={document_width/3}>
+        <td valign=top width=315>
             Oferta nr: <b>{self.symbol}</b><br />
             Z dnia: {self.date:%d.%m.%Y}<br />
             Dla:<br />
@@ -152,14 +152,14 @@ class Offer(QObject):
             {self.customer.html_address}<br />
             {self.customer.concated_name}
         </td>
-        <td width={document_width/3}>
+        <td width=315>
             {self.company_address}<br />
             <b>{self.author.name}</b><br />
             {self.author.mail}<br />
             {phone}
         </td>
-        <td width={document_width/3} align=right>
-            <img src=:/logos height=120 valign=top>
+        <td width=115 align=right>
+            <img src=:/logos width=114 valign=top>
         </td>
     </tr>
     <tr>

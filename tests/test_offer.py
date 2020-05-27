@@ -117,7 +117,7 @@ class TestOffer:
 <tr><td>
     <table>
     <tr>
-        <td valign=top width=248.33333333333334>
+        <td valign=top width=315>
             Oferta nr: <b>X2012N08</b><br />
             Z dnia: 15.12.2020<br />
             Dla:<br />
@@ -126,14 +126,14 @@ class TestOffer:
 In some town<br />
             Mr John Doe
         </td>
-        <td width=248.33333333333334>
+        <td width=315>
             lorem<br />ipsum<br />
             <b>Author Name</b><br />
             author@company.com<br />
             Tel.: 123 456 789
         </td>
-        <td width=248.33333333333334 align=right>
-            <img src=:/logos height=120 valign=top>
+        <td width=115 align=right>
+            <img src=:/logos width=114 valign=top>
         </td>
     </tr>
     <tr>
