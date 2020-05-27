@@ -101,8 +101,10 @@ class TestMainWindow:
         assert_that(main_window.offer, is_(none()))
         assert_that(main_window.user, is_(not_none()))
 
+        assert_that(main_window.ui.menu_offer, is_(enabled()))
         assert_that(main_window.ui.action_new, is_(enabled()))
         assert_that(main_window.ui.action_exit, is_(enabled()))
+        assert_that(main_window.ui.menu_database, is_(enabled()))
         assert_that(main_window.ui.menu_help, is_(enabled()))
 
         self._check_offer_ui(main_window, disabled())
@@ -115,6 +117,7 @@ class TestMainWindow:
         pytest.param("menu_offer", "action_exit", "exit"),
         pytest.param("menu_export", "action_print", "print_preview"),
         pytest.param("menu_export", "action_PDF", "print_pdf"),
+        pytest.param("menu_database", "action_create_merchandise", "create_merchandise"),
         pytest.param("menu_help", "action_about", "about"),
         pytest.param("menu_help", "action_about_Qt", "about_qt"),
     ])
@@ -207,6 +210,15 @@ class TestMainWindow:
         active_window.new_offer_symbol()
         active_window.offer.new_symbol.assert_called_once_with()
         assert_that(active_window.windowTitle(), is_(f"pyOffer - {expected_next_symbol}"))
+
+    def test_create_merchandise(self, mocker, main_window):
+        dialog = mocker.patch("src.main_window.CreateMerchandiseDialog", autospec=True)
+        dialog.make.return_value = dialog
+
+        main_window.create_merchandise()
+
+        dialog.make.assert_called_once_with(main_window)
+        dialog.show.assert_called_once()
 
     def test_select_customer(self, mocker, active_window, sample_customer):
         dialog = mocker.patch("src.main_window.CustomerSelectionDialog", autospec=True)

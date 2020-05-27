@@ -20,7 +20,7 @@ from PySide2.QtWidgets import QMainWindow, QDialog, QApplication, QCalendarWidge
 
 from forms.ui_mainwindow import Ui_MainWindow
 from src.customer import CustomerSelectionDialog
-from src.merchandise import MerchandiseSelectionDialog, DiscountDialog, DiscountGroupDialog
+from src.merchandise import MerchandiseSelectionDialog, DiscountDialog, DiscountGroupDialog, CreateMerchandiseDialog
 from src.offer import Offer
 from src.terms import TermsChooserDialog, TermType
 from src.user import User
@@ -54,6 +54,7 @@ class MainWindow(QMainWindow):
         self.ui.action_print.triggered.connect(self.print_preview)
         self.ui.action_PDF.triggered.connect(self.print_pdf)
 
+        self.ui.action_create_merchandise.triggered.connect(self.create_merchandise)
         self.ui.action_about.triggered.connect(self.about)
         self.ui.action_about_Qt.triggered.connect(self.about_qt)
 
@@ -81,6 +82,7 @@ class MainWindow(QMainWindow):
     def retranslate_ui(self) -> None:
         self.ui.menu_offer.setTitle(self.tr("Offer"))
         self.ui.menu_export.setTitle(self.tr("Export"))
+        self.ui.menu_database.setTitle(self.tr("Database"))
         self.ui.menu_help.setTitle(self.tr("Help"))
         self.ui.action_new.setText(self.tr("New"))
         self.ui.action_open.setText(self.tr("Open"))
@@ -88,6 +90,7 @@ class MainWindow(QMainWindow):
         self.ui.action_exit.setText(self.tr("Exit"))
         self.ui.action_PDF.setText(self.tr("PDF"))
         self.ui.action_print.setText(self.tr("Print preview"))
+        self.ui.action_create_merchandise.setText(self.tr("Create merchandise"))
         self.ui.action_about.setText(self.tr("About"))
         self.ui.action_about_Qt.setText(self.tr("About Qt"))
         self.ui.action_new_number.setText(self.tr("Set new offer symbol"))
@@ -302,6 +305,11 @@ class MainWindow(QMainWindow):
         printer.setOutputFormat(QPrinter.PdfFormat)
         printer.setOutputFileName(file_name)
         self.print(printer)
+
+    @Slot()
+    def create_merchandise(self) -> None:
+        dialog = CreateMerchandiseDialog.make(self)
+        dialog.show()
 
     @Slot()
     def about(self) -> None:

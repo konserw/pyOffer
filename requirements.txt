@@ -2,7 +2,7 @@ pytest
 pytest-qt
 pytest-mock
 PyHamcrest
-pyhamcrest-qt
+pyhamcrest-qt>=0.4
 pyside2==5.14.1
 mock
 cx-freeze

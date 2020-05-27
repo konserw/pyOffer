@@ -12,15 +12,16 @@ from decimal import Decimal
 
 import pytest
 from PySide2 import QtWidgets
-from PySide2.QtCore import Qt, QModelIndex, QAbstractItemModel, QPoint, QSize
+from PySide2.QtCore import Qt, QModelIndex, QAbstractItemModel, QPoint, QSize, QStringListModel
 from PySide2.QtGui import QColor
 from PySide2.QtSql import QSqlField, QSqlRecord
 from hamcrest import assert_that, is_, greater_than, instance_of, none, empty
-from qtmatchers import has_item_flags
+from qtmatchers import has_item_flags, checked, unchecked
 
 from src.database import get_merchandise_sql_model
 from src.merchandise import Merchandise, MerchandiseListModel, MerchandiseSelectionModel, MerchandiseListDelegate, \
-    MerchandiseListView, MerchandiseSelectionDelegate, MerchandiseSelectionDialog, DiscountDialog, DiscountGroupDialog
+    MerchandiseListView, MerchandiseSelectionDelegate, MerchandiseSelectionDialog, DiscountDialog, DiscountGroupDialog, \
+    CreateMerchandiseDialog
 
 
 def create_merch(merchandise_id=1, list_price=9.99, count=1, discount=10) -> Merchandise:
@@ -761,7 +762,7 @@ class TestDiscountDialog:
 
 @pytest.fixture
 def sample_groups():
-    return {"group1", "group2"}
+    return ["group1", "group2"]
 
 
 @pytest.fixture
@@ -775,7 +776,7 @@ class TestDiscountGroupDialog:
     def test_initial_state(self, discount_group_dialog, sample_groups):
         # todo: other translations
         assert_that(discount_group_dialog.windowTitle(), is_("Set discount value for group"))
-        assert_that(set(discount_group_dialog.list_view.model().stringList()), is_(sample_groups))
+        assert_that(discount_group_dialog.list_view.model().stringList(), is_(sample_groups))
         assert_that(discount_group_dialog.label.text(), is_("Please choose discount group and discount value"))
         assert_that(discount_group_dialog.spinbox_discount.minimum(), is_(0))
         assert_that(discount_group_dialog.spinbox_discount.singleStep(), is_(5))
@@ -801,3 +802,101 @@ class TestDiscountGroupDialog:
         expected_value = index.data(Qt.DisplayRole)
         with qtbot.wait_signal(discount_group_dialog.selectionChanged, check_params_cb=lambda value: expected_value == value):
             qtbot.mouseClick(discount_group_dialog.list_view.viewport(), Qt.LeftButton, Qt.NoModifier, pos)
+
+
+@pytest.fixture
+def create_merchandise_dialog(qtbot, sample_groups):
+    dialog = CreateMerchandiseDialog(QStringListModel(sample_groups))
+    qtbot.addWidget(dialog)
+    return dialog
+
+
+class TestCreateMerchandiseDialog:
+    def test_initial_state(self, create_merchandise_dialog, sample_groups):
+        # todo: other translations
+        assert_that(create_merchandise_dialog.windowTitle(), is_("Create merchandise"))
+
+        model = create_merchandise_dialog.line_edit_discount_group.completer().completionModel()
+        assert_that(model.match(model.index(0, 0), Qt.DisplayRole, sample_groups[0]))
+        assert_that(model.match(model.index(1, 0), Qt.DisplayRole, sample_groups[1]))
+
+        assert_that(create_merchandise_dialog.line_edit_code.text(), is_(empty()))
+        assert_that(create_merchandise_dialog.line_edit_description.text(), is_(empty()))
+        assert_that(create_merchandise_dialog.radio_button_metre, is_(unchecked()))
+        assert_that(create_merchandise_dialog.radio_button_piece, is_(checked()))
+        assert_that(create_merchandise_dialog.line_edit_discount_group.text(), is_(empty()))
+        assert_that(create_merchandise_dialog.spin_box_price.decimals(), is_(2))
+        assert_that(create_merchandise_dialog.spin_box_price.minimum(), is_(0.0))
+        assert_that(create_merchandise_dialog.spin_box_price.singleStep(), is_(1.0))
+        assert_that(create_merchandise_dialog.spin_box_price.maximum(), is_(100000.0))
+        assert_that(create_merchandise_dialog.spin_box_price.value(), is_(0.0))
+
+    @pytest.mark.parametrize("prefix, expected_completions", [
+        pytest.param("group", ["group1", "group2"]),
+        pytest.param("group1", ["group1"]),
+        pytest.param("group2", ["group2"]),
+        pytest.param("x", []),
+    ])
+    def test_completion(self, create_merchandise_dialog, prefix, expected_completions):
+        create_merchandise_dialog.line_edit_discount_group.insert(prefix)
+        completer = create_merchandise_dialog.line_edit_discount_group.completer()
+
+        assert_that(completer.completionPrefix(), is_(prefix))
+        completions = []
+        for i in range(completer.completionCount()):
+            completer.setCurrentRow(i)
+            completions.append(completer.currentCompletion())
+        assert_that(completions, is_(expected_completions))
+
+    @pytest.mark.parametrize("button_id, slot_name", [
+        pytest.param(QtWidgets.QDialogButtonBox.Save, "save"),
+        pytest.param(QtWidgets.QDialogButtonBox.Close, "reject"),
+        pytest.param(QtWidgets.QDialogButtonBox.Reset, "reset")
+    ])
+    def test_slot_triggered(self, mocker, qtbot, create_merchandise_dialog, button_id, slot_name):
+        slot = mocker.patch.object(create_merchandise_dialog, slot_name, autospec=True)
+        button = create_merchandise_dialog.button_box.button(button_id)
+
+        with qtbot.wait_signal(button.clicked):
+            qtbot.mouseClick(button, Qt.LeftButton)
+        slot.assert_called_once_with()
+
+    @pytest.mark.parametrize("by_metre", [
+        pytest.param(True),
+        pytest.param(False),
+    ])
+    def test_save(self, mocker, create_merchandise_dialog, by_metre):
+        code = "sample code"
+        description = "sample description"
+        group = "sample discount group"
+        price = 9.99
+        merch_id = 123
+        create_merchandise_dialog.line_edit_code.insert(code)
+        create_merchandise_dialog.line_edit_description.insert(description)
+        create_merchandise_dialog.radio_button_metre.setChecked(by_metre)
+        create_merchandise_dialog.line_edit_discount_group.insert(group)
+        create_merchandise_dialog.spin_box_price.setValue(price)
+
+        message = mocker.patch("src.merchandise.QtWidgets.QMessageBox.information", autospec=True)
+        create_method = mocker.patch("src.merchandise.create_merchandise", autospec=True)
+        create_method.return_value = merch_id
+        create_merchandise_dialog.save()
+
+        create_method.assert_called_once_with(code, description, by_metre, group, price)
+        message.assert_called_once_with(create_merchandise_dialog, "Success", f"Created new merchandise, id: {merch_id}")
+
+    def test_reset(self, create_merchandise_dialog):
+        create_merchandise_dialog.line_edit_code.insert("sample code")
+        create_merchandise_dialog.line_edit_description.insert("sample description")
+        create_merchandise_dialog.radio_button_metre.setChecked(True)
+        create_merchandise_dialog.line_edit_discount_group.insert("sample discount group")
+        create_merchandise_dialog.spin_box_price.setValue(9.99)
+
+        create_merchandise_dialog.reset()
+
+        assert_that(create_merchandise_dialog.line_edit_code.text(), is_(empty()))
+        assert_that(create_merchandise_dialog.line_edit_description.text(), is_(empty()))
+        assert_that(create_merchandise_dialog.radio_button_metre, is_(unchecked()))
+        assert_that(create_merchandise_dialog.radio_button_piece, is_(checked()))
+        assert_that(create_merchandise_dialog.line_edit_discount_group.text(), is_(empty()))
+        assert_that(create_merchandise_dialog.spin_box_price.value(), is_(0.0))

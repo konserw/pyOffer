@@ -22,7 +22,7 @@ from PySide2.QtWidgets import QWidget, QTableView, QItemDelegate, QStyleOptionVi
 
 # noinspection PyUnresolvedReferences
 import resources.all  # noqa: F401
-from src.database import get_merchandise_sql_model
+from src.database import get_merchandise_sql_model, create_merchandise, get_discount_groups_model
 
 
 class Merchandise(QObject):
@@ -620,3 +620,97 @@ class MerchandiseSelectionDialog(QtWidgets.QDialog):
         selection_model = MerchandiseSelectionModel(parent)
         selection_model.setSourceModel(sql_model)
         return cls(selection_model, parent)
+
+
+class CreateMerchandiseDialog(QtWidgets.QDialog):
+    def __init__(self, discount_group_model, parent: QObject = None):
+        super().__init__(parent)
+        self.discount_group_model = discount_group_model
+
+        self.setWindowTitle(self.tr("Create merchandise"))
+        self.resize(620, 480)
+
+        self.grid_layout = QtWidgets.QGridLayout(self)
+        self.grid_layout.setSpacing(6)
+        self.grid_layout.setContentsMargins(11, 11, 11, 11)
+        self.grid_layout.setObjectName(u"gridLayout")
+
+        label = QtWidgets.QLabel(self)
+        label.setText(self.tr("Code:"))
+        self.grid_layout.addWidget(label, 0, 0, 1, 1)
+        self.line_edit_code = QtWidgets.QLineEdit(self)
+        self.grid_layout.addWidget(self.line_edit_code, 0, 1, 1, 1)
+
+        label = QtWidgets.QLabel(self)
+        label.setText(self.tr("Description:"))
+        self.grid_layout.addWidget(label, 1, 0, 1, 1)
+        self.line_edit_description = QtWidgets.QLineEdit(self)
+        self.grid_layout.addWidget(self.line_edit_description, 1, 1, 1, 1)
+
+        label = QtWidgets.QLabel(self)
+        label.setText(self.tr("Unit:"))
+        self.grid_layout.addWidget(label, 2, 0, 1, 1)
+        self.radio_button_metre = QtWidgets.QRadioButton(self.tr("metre"))
+        self.radio_button_piece = QtWidgets.QRadioButton(self.tr("piece"))
+        self.radio_button_piece.setChecked(True)
+        hbox = QtWidgets.QHBoxLayout()
+        hbox.addWidget(self.radio_button_metre)
+        hbox.addWidget(self.radio_button_piece)
+        self.grid_layout.addLayout(hbox, 2, 1, 1, 1)
+
+        label = QtWidgets.QLabel(self)
+        label.setText(self.tr("Discount group:"))
+        self.grid_layout.addWidget(label, 3, 0, 1, 1)
+        self.line_edit_discount_group = QtWidgets.QLineEdit(self)
+        completer = QtWidgets.QCompleter(self)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+        completer.setModel(self.discount_group_model)
+        self.line_edit_discount_group.setCompleter(completer)
+        self.grid_layout.addWidget(self.line_edit_discount_group, 3, 1, 1, 1)
+
+        label = QtWidgets.QLabel(self)
+        label.setText(self.tr("Price:"))
+        self.grid_layout.addWidget(label, 4, 0, 1, 1)
+        self.spin_box_price = QtWidgets.QDoubleSpinBox(self)
+        self.spin_box_price.setDecimals(2)
+        self.spin_box_price.setMinimum(0.0)
+        self.spin_box_price.setSingleStep(1.0)
+        self.spin_box_price.setMaximum(100000.0)
+        self.grid_layout.addWidget(self.spin_box_price, 4, 1, 1, 1)
+
+        self.button_box = QtWidgets.QDialogButtonBox(self)
+        self.button_box.setOrientation(Qt.Horizontal)
+        self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Save | QtWidgets.QDialogButtonBox.Close | QtWidgets.QDialogButtonBox.Reset)
+        self.button_box.accepted.connect(self.save)
+        self.button_box.rejected.connect(self.reject)
+        self.button_box.button(QtWidgets.QDialogButtonBox.Reset).clicked.connect(self.reset)
+        self.grid_layout.addWidget(self.button_box, 5, 0, 1, 2)
+
+    @classmethod
+    def make(cls, parent: QObject = None) -> MerchandiseSelectionDialog:
+        logging.debug("Creating %s", cls.__name__)
+        model = get_discount_groups_model()
+        return cls(model, parent)
+
+    @Slot()
+    def save(self) -> None:
+        try:
+            merch_id = create_merchandise(
+                self.line_edit_code.text(),
+                self.line_edit_description.text(),
+                self.radio_button_metre.isChecked(),
+                self.line_edit_discount_group.text(),
+                self.spin_box_price.value()
+            )
+        except RuntimeError as e:
+            QtWidgets.QMessageBox.warning(self, self.tr("Database operation failed"), str(e))
+        else:
+            QtWidgets.QMessageBox.information(self, self.tr("Success"), self.tr(f"Created new merchandise, id: {merch_id}"))
+
+    @Slot()
+    def reset(self) -> None:
+        self.line_edit_code.clear()
+        self.line_edit_description.clear()
+        self.radio_button_piece.setChecked(True)
+        self.line_edit_discount_group.clear()
+        self.spin_box_price.setValue(0.0)

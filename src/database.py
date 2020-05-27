@@ -129,9 +129,9 @@ def get_discount_groups_model(parent: QObject = None) -> QSqlQueryModel:
     return model
 
 
-def create_merchandise(code: str, description: str, by_metre: bool, discount_group: str, price: Decimal) -> int:
+def create_merchandise(code: str, description: str, by_metre: bool, discount_group: str, price: float) -> int:
     unit = 'm' if by_metre else 'pc.'
-    query_text = f"SELECT public.create_merchandise('{code}', '{description}', '{unit}', '{discount_group}', '{price}')"
+    query_text = f"SELECT public.create_merchandise('{code}', '{description}', '{unit}', '{discount_group}', {price})"
     query = QSqlQuery(query_text)
     if not query.next():
         raise RuntimeError(f"Query {query_text} failed with:\n{query.lastError().text()}")
