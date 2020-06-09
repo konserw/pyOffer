@@ -13,7 +13,7 @@ from decimal import Decimal
 
 import pytest
 from PySide2.QtCore import Qt, QModelIndex
-from PySide2.QtSql import QSqlDatabase
+from PySide2.QtSql import QSqlDatabase, QSqlQuery
 from hamcrest import assert_that, is_, calling, raises
 
 from src.terms import TermType
@@ -27,6 +27,30 @@ def rollback():
         yield database
     finally:
         database.rollback()
+
+
+class TestCustomer:
+    @pytest.mark.parametrize("title, first_name, last_name, company_name, address", [
+        pytest.param("", "", "", "", ""),
+        pytest.param("mr", "John", "Smith", "some company", "some street 2\nSome Town"),
+        pytest.param("ms", "Jane", "Doe", "some other company", "Some other ave. 116/4\nAnother Town"),
+    ])
+    def test_can_create_customer(self, db, title, first_name, last_name, company_name, address):
+        with rollback():
+            db.create_customer(title, first_name, last_name, company_name, address)
+
+            query = QSqlQuery("SELECT currval('customers_customer_id_seq');")
+            if not query.next():
+                raise AssertionError(f"Couldn't retrieve customer_id: {query.lastError().text()}")
+            customer_id = query.value(0)
+
+            rec = db.get_customer_record(customer_id)
+            assert_that(rec.field(0).value(), is_(customer_id))
+            assert_that(rec.field(1).value(), is_(title))
+            assert_that(rec.field(2).value(), is_(first_name))
+            assert_that(rec.field(3).value(), is_(last_name))
+            assert_that(rec.field(4).value(), is_(company_name))
+            assert_that(rec.field(5).value(), is_(address))
 
 
 class TestCreateMerchandise:

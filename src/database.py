@@ -14,7 +14,6 @@ import logging
 import os
 import sys
 from datetime import date
-from decimal import Decimal
 
 from PySide2.QtCore import QObject, Qt
 from PySide2.QtSql import QSqlDatabase, QSqlTableModel, QSqlQuery, QSqlQueryModel, QSqlRecord
@@ -139,3 +138,13 @@ def create_merchandise(code: str, description: str, by_metre: bool, discount_gro
     if merchandise_id < 0:
         raise RuntimeError(f"Query {query_text} failed on server side")
     return merchandise_id
+
+
+def create_customer(title: str, first_name: str, last_name: str, company_name: str, address: str) -> None:
+    query_text = f"""
+INSERT INTO public.customers(title, first_name, last_name, company_name, address)
+    VALUES ('{title}', '{first_name}', '{last_name}', '{company_name}', '{address}')
+;"""
+    query = QSqlQuery()
+    if not query.exec_(query_text):
+        raise RuntimeError(f"Query {query_text} failed with:\n{query.lastError().text()}")
