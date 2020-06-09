@@ -148,3 +148,19 @@ INSERT INTO public.customers(title, first_name, last_name, company_name, address
     query = QSqlQuery()
     if not query.exec_(query_text):
         raise RuntimeError(f"Query {query_text} failed with:\n{query.lastError().text()}")
+
+
+def get_company_names_model(parent: QObject = None) -> QSqlQueryModel:
+    model = QSqlQueryModel(parent)
+    model.setQuery("SELECT distinct company_name FROM public.customers;")
+    if model.lastError().isValid():
+        raise RuntimeError(model.lastError().text())
+    return model
+
+
+def get_addresses_model(parent: QObject = None) -> QSqlQueryModel:
+    model = QSqlQueryModel(parent)
+    model.setQuery("SELECT distinct address FROM public.customers;")
+    if model.lastError().isValid():
+        raise RuntimeError(model.lastError().text())
+    return model

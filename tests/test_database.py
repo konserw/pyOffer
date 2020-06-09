@@ -52,6 +52,18 @@ class TestCustomer:
             assert_that(rec.field(4).value(), is_(company_name))
             assert_that(rec.field(5).value(), is_(address))
 
+    def test_company_names_model(self, db):
+        model = db.get_company_names_model()
+
+        assert_that(model.rowCount(), is_(1))
+        assert_that(model.data(model.index(0, 0), Qt.DisplayRole), is_("P.H.U. PolImpEx Sp. z o.o."))
+
+    def test_company_addresses_model(self, db):
+        model = db.get_addresses_model()
+
+        assert_that(model.rowCount(), is_(1))
+        assert_that(model.data(model.index(0, 0), Qt.DisplayRole), is_("Polna 1a/2\\n41-300 Dąbrowa Górnicza"))
+
 
 class TestMerchandise:
     @pytest.mark.parametrize("code, desc, unit, group, price", [
@@ -85,7 +97,7 @@ class TestMerchandise:
                 raises(RuntimeError, "Query .* failed")
             )
 
-    def test_get_discount_groups_model(self, db):
+    def test_discount_groups_model(self, db):
         model = db.get_discount_groups_model()
 
         assert_that(model.rowCount(), is_(2))
