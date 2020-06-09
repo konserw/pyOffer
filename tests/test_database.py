@@ -53,7 +53,7 @@ class TestCustomer:
             assert_that(rec.field(5).value(), is_(address))
 
 
-class TestCreateMerchandise:
+class TestMerchandise:
     @pytest.mark.parametrize("code, desc, unit, group, price", [
         pytest.param("test_code", "test_desc", "m", "some_group", 9.99),
         pytest.param("test_code", "test_desc", "pc.", "some_group", 9.99),
@@ -85,8 +85,6 @@ class TestCreateMerchandise:
                 raises(RuntimeError, "Query .* failed")
             )
 
-
-class TestDiscountGroups:
     def test_get_discount_groups_model(self, db):
         model = db.get_discount_groups_model()
 
@@ -94,9 +92,7 @@ class TestDiscountGroups:
         groups_in_model = {model.data(model.index(0, 0), Qt.DisplayRole), model.data(model.index(1, 0), Qt.DisplayRole)}
         assert_that(groups_in_model, is_({"group1", "group2"}))
 
-
-class TestMerchandiseRecord:
-    def test_1(self, db):
+    def test_record_1(self, db):
         rec = db.get_merchandise_record(1)
         assert_that(rec.field(0).value(), is_(1))
         assert_that(rec.field(1).value(), is_("CODE123"))
@@ -105,7 +101,7 @@ class TestMerchandiseRecord:
         assert_that(rec.field(4).value(), is_("group1"))
         assert_that(rec.field(5).value(), is_(19.99))
 
-    def test_2(self, db):
+    def test_record_2(self, db):
         rec = db.get_merchandise_record(2)
         assert_that(rec.field(0).value(), is_(2))
         assert_that(rec.field(1).value(), is_("CODE456"))
@@ -114,7 +110,7 @@ class TestMerchandiseRecord:
         assert_that(rec.field(4).value(), is_("group2"))
         assert_that(rec.field(5).value(), is_(5.49))
 
-    def test_3(self, db):
+    def test_record_3(self, db):
         rec = db.get_merchandise_record(3)
         assert_that(rec.field(0).value(), is_(3))
         assert_that(rec.field(1).value(), is_("CODE789"))
@@ -123,7 +119,7 @@ class TestMerchandiseRecord:
         assert_that(rec.field(4).value(), is_("group1"))
         assert_that(rec.field(5).value(), is_(120))
 
-    def test_not_found(self, db):
+    def test_record_not_found(self, db):
         assert_that(calling(db.get_merchandise_record).with_args(13), raises(RuntimeError))
 
 
