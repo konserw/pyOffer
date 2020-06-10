@@ -16,6 +16,7 @@ from PySide2 import QtWidgets
 from PySide2.QtCore import QModelIndex, Qt, Slot, QObject
 from PySide2.QtSql import QSqlTableModel, QSqlRecord
 from PySide2.QtWidgets import QWidget, QDialog, QHeaderView
+from src.database import get_company_names_model, get_addresses_model, create_customer
 
 
 class Customer:
@@ -147,3 +148,94 @@ class CustomerSelectionDialog(QDialog):
         logging.debug("Creating %s", cls.__name__)
         model = CustomerSearchModel(parent)
         return cls(model, parent)
+
+
+class CreateCustomerDialog(QtWidgets.QDialog):
+    def __init__(self, company_names_model, addresses_model, parent: QObject = None):
+        super().__init__(parent)
+        self.company_names_model = company_names_model
+        self.addresses_model = addresses_model
+
+        self.setWindowTitle(self.tr("Create customer"))
+        self.resize(620, 480)
+
+        self.grid_layout = QtWidgets.QGridLayout(self)
+        self.grid_layout.setSpacing(6)
+        self.grid_layout.setContentsMargins(11, 11, 11, 11)
+        self.grid_layout.setObjectName(u"gridLayout")
+
+        label = QtWidgets.QLabel(self)
+        label.setText(self.tr("Title:"))
+        self.grid_layout.addWidget(label, 0, 0, 1, 1)
+        self.line_edit_title = QtWidgets.QLineEdit(self)
+        self.grid_layout.addWidget(self.line_edit_title, 0, 1, 1, 1)
+
+        label = QtWidgets.QLabel(self)
+        label.setText(self.tr("First name:"))
+        self.grid_layout.addWidget(label, 1, 0, 1, 1)
+        self.line_edit_first_name = QtWidgets.QLineEdit(self)
+        self.grid_layout.addWidget(self.line_edit_first_name, 1, 1, 1, 1)
+
+        label = QtWidgets.QLabel(self)
+        label.setText(self.tr("Last name:"))
+        self.grid_layout.addWidget(label, 2, 0, 1, 1)
+        self.line_edit_last_name = QtWidgets.QLineEdit(self)
+        self.grid_layout.addWidget(self.line_edit_last_name, 2, 1, 1, 1)
+
+        label = QtWidgets.QLabel(self)
+        label.setText(self.tr("Company name:"))
+        self.grid_layout.addWidget(label, 3, 0, 1, 1)
+        self.line_edit_company_name = QtWidgets.QLineEdit(self)
+        completer = QtWidgets.QCompleter(self)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+        completer.setModel(self.company_names_model)
+        self.line_edit_company_name.setCompleter(completer)
+        self.grid_layout.addWidget(self.line_edit_company_name, 3, 1, 1, 1)
+
+        label = QtWidgets.QLabel(self)
+        label.setText(self.tr("Address:"))
+        self.grid_layout.addWidget(label, 4, 0, 1, 1)
+        self.line_edit_address = QtWidgets.QLineEdit(self)
+        completer = QtWidgets.QCompleter(self)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+        completer.setModel(self.addresses_model)
+        self.line_edit_address.setCompleter(completer)
+        self.grid_layout.addWidget(self.line_edit_address, 4, 1, 1, 1)
+
+        self.button_box = QtWidgets.QDialogButtonBox(self)
+        self.button_box.setOrientation(Qt.Horizontal)
+        self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Save | QtWidgets.QDialogButtonBox.Close | QtWidgets.QDialogButtonBox.Reset)
+        self.button_box.accepted.connect(self.save)
+        self.button_box.rejected.connect(self.reject)
+        self.button_box.button(QtWidgets.QDialogButtonBox.Reset).clicked.connect(self.reset)
+        self.grid_layout.addWidget(self.button_box, 5, 0, 1, 2)
+
+    @classmethod
+    def make(cls, parent: QObject = None) -> CreateCustomerDialog:
+        logging.debug("Creating %s", cls.__name__)
+        names_model = get_company_names_model()
+        addresses_model = get_addresses_model()
+        return cls(names_model, addresses_model, parent)
+
+    @Slot()
+    def save(self) -> None:
+        try:
+            create_customer(
+                self.line_edit_title.text(),
+                self.line_edit_first_name.text(),
+                self.line_edit_last_name.text(),
+                self.line_edit_company_name.text(),
+                self.line_edit_address.text()
+            )
+        except RuntimeError as e:
+            QtWidgets.QMessageBox.warning(self, self.tr("Database operation failed"), str(e))
+        else:
+            QtWidgets.QMessageBox.information(self, self.tr("Success"), self.tr(f"Created new customer."))
+
+    @Slot()
+    def reset(self) -> None:
+        self.line_edit_title.clear()
+        self.line_edit_first_name.clear()
+        self.line_edit_last_name.clear()
+        self.line_edit_company_name.clear()
+        self.line_edit_address.clear()

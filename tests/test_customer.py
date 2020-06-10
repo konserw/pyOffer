@@ -11,12 +11,12 @@
 from unittest.mock import MagicMock
 
 import pytest
-from PySide2.QtCore import Qt, QPoint
+from PySide2.QtCore import Qt, QPoint, QStringListModel
 from PySide2.QtSql import QSqlRecord
-from PySide2.QtWidgets import QDialog
-from hamcrest import assert_that, is_, not_none
+from PySide2.QtWidgets import QDialog, QDialogButtonBox
+from hamcrest import assert_that, is_, not_none, empty
 
-from src.customer import Customer, CustomerSearchModel, CustomerSelectionDialog, CustomerSearchWidget
+from src.customer import Customer, CustomerSearchModel, CustomerSelectionDialog, CustomerSearchWidget, CreateCustomerDialog
 
 CUSTOMER_ID = 1
 COMPANY_NAME = "Full business name that is quite long"
@@ -254,3 +254,93 @@ class TestCustomerSelectionDialog:
 
         assert_that(dialog.chosen_customer, is_(not_none()))
         assert_that(dialog.chosen_customer.concated_name, is_(expected))
+
+
+@pytest.fixture
+def create_customer_dialog(qtbot):
+    dialog = CreateCustomerDialog(QStringListModel(["company"]), QStringListModel(["address"]))
+    qtbot.addWidget(dialog)
+    return dialog
+
+
+class TestCreateMerchandiseDialog:
+    def test_initial_state(self, create_customer_dialog):
+        # todo: other translations
+        assert_that(create_customer_dialog.windowTitle(), is_("Create customer"))
+
+        model = create_customer_dialog.line_edit_company_name.completer().completionModel()
+        assert_that(model.data(model.index(0, 0), Qt.DisplayRole), is_("company"))
+        model = create_customer_dialog.line_edit_address.completer().completionModel()
+        assert_that(model.data(model.index(0, 0), Qt.DisplayRole), is_("address"))
+
+        assert_that(create_customer_dialog.line_edit_title.text(), is_(empty()))
+        assert_that(create_customer_dialog.line_edit_first_name.text(), is_(empty()))
+        assert_that(create_customer_dialog.line_edit_last_name.text(), is_(empty()))
+        assert_that(create_customer_dialog.line_edit_company_name.text(), is_(empty()))
+        assert_that(create_customer_dialog.line_edit_address.text(), is_(empty()))
+
+    @pytest.mark.parametrize("prefix, expected_completion_count", [
+        pytest.param("a", 1),
+        pytest.param("add", 1),
+        pytest.param("addres", 1),
+        pytest.param("address", 1),
+        pytest.param("x", 0),
+        pytest.param("res", 0),
+    ])
+    def test_completion_address(self, create_customer_dialog, prefix, expected_completion_count):
+        create_customer_dialog.line_edit_address.insert(prefix)
+        completer = create_customer_dialog.line_edit_address.completer()
+
+        assert_that(completer.completionPrefix(), is_(prefix))
+        assert_that(completer.completionCount(), is_(expected_completion_count))
+        if expected_completion_count == 1:
+            completer.setCurrentRow(1)
+            assert_that(completer.currentCompletion(), is_("address"))
+
+    @pytest.mark.parametrize("button_id, slot_name", [
+        pytest.param(QDialogButtonBox.Save, "save"),
+        pytest.param(QDialogButtonBox.Close, "reject"),
+        pytest.param(QDialogButtonBox.Reset, "reset")
+    ])
+    def test_slot_triggered(self, mocker, qtbot, create_customer_dialog, button_id, slot_name):
+        slot = mocker.patch.object(create_customer_dialog, slot_name, autospec=True)
+        button = create_customer_dialog.button_box.button(button_id)
+
+        with qtbot.wait_signal(button.clicked):
+            qtbot.mouseClick(button, Qt.LeftButton)
+        slot.assert_called_once_with()
+
+    def test_save(self, mocker, create_customer_dialog):
+        title = "sample title"
+        first_name = "sample first name"
+        last_name = "sample last name"
+        company_name = "sample company name"
+        address = "sample address"
+
+        create_customer_dialog.line_edit_title.insert(title)
+        create_customer_dialog.line_edit_first_name.insert(first_name)
+        create_customer_dialog.line_edit_last_name.insert(last_name)
+        create_customer_dialog.line_edit_company_name.insert(company_name)
+        create_customer_dialog.line_edit_address.insert(address)
+
+        message = mocker.patch("src.customer.QtWidgets.QMessageBox.information", autospec=True)
+        create_method = mocker.patch("src.customer.create_customer", autospec=True)
+        create_customer_dialog.save()
+
+        create_method.assert_called_once_with(title, first_name, last_name, company_name, address)
+        message.assert_called_once_with(create_customer_dialog, "Success", f"Created new customer.")
+
+    def test_reset(self, create_customer_dialog):
+        create_customer_dialog.line_edit_title.insert("sample title")
+        create_customer_dialog.line_edit_first_name.insert("sample first name")
+        create_customer_dialog.line_edit_last_name.insert("sample last name")
+        create_customer_dialog.line_edit_company_name.insert("sample company name")
+        create_customer_dialog.line_edit_address.insert("sample address")
+
+        create_customer_dialog.reset()
+
+        assert_that(create_customer_dialog.line_edit_title.text(), is_(empty()))
+        assert_that(create_customer_dialog.line_edit_first_name.text(), is_(empty()))
+        assert_that(create_customer_dialog.line_edit_last_name.text(), is_(empty()))
+        assert_that(create_customer_dialog.line_edit_company_name.text(), is_(empty()))
+        assert_that(create_customer_dialog.line_edit_address.text(), is_(empty()))
