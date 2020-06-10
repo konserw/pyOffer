@@ -118,6 +118,7 @@ class TestMainWindow:
         pytest.param("menu_export", "action_print", "print_preview"),
         pytest.param("menu_export", "action_PDF", "print_pdf"),
         pytest.param("menu_database", "action_create_merchandise", "create_merchandise"),
+        pytest.param("menu_database", "action_create_customer", "create_customer"),
         pytest.param("menu_help", "action_about", "about"),
         pytest.param("menu_help", "action_about_Qt", "about_qt"),
     ])
@@ -216,6 +217,15 @@ class TestMainWindow:
         dialog.make.return_value = dialog
 
         main_window.create_merchandise()
+
+        dialog.make.assert_called_once_with(main_window)
+        dialog.show.assert_called_once()
+
+    def test_create_customer(self, mocker, main_window):
+        dialog = mocker.patch("src.main_window.CreateCustomerDialog", autospec=True)
+        dialog.make.return_value = dialog
+
+        main_window.create_customer()
 
         dialog.make.assert_called_once_with(main_window)
         dialog.show.assert_called_once()

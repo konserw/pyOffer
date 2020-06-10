@@ -19,7 +19,7 @@ from PySide2.QtPrintSupport import QPrinter, QPrintPreviewDialog
 from PySide2.QtWidgets import QMainWindow, QDialog, QApplication, QCalendarWidget, QFileDialog
 
 from forms.ui_mainwindow import Ui_MainWindow
-from src.customer import CustomerSelectionDialog
+from src.customer import CustomerSelectionDialog, CreateCustomerDialog
 from src.merchandise import MerchandiseSelectionDialog, DiscountDialog, DiscountGroupDialog, CreateMerchandiseDialog
 from src.offer import Offer
 from src.terms import TermsChooserDialog, TermType
@@ -55,6 +55,8 @@ class MainWindow(QMainWindow):
         self.ui.action_PDF.triggered.connect(self.print_pdf)
 
         self.ui.action_create_merchandise.triggered.connect(self.create_merchandise)
+        self.ui.action_create_customer.triggered.connect(self.create_customer)
+
         self.ui.action_about.triggered.connect(self.about)
         self.ui.action_about_Qt.triggered.connect(self.about_qt)
 
@@ -91,6 +93,7 @@ class MainWindow(QMainWindow):
         self.ui.action_PDF.setText(self.tr("PDF"))
         self.ui.action_print.setText(self.tr("Print preview"))
         self.ui.action_create_merchandise.setText(self.tr("Create merchandise"))
+        self.ui.action_create_customer.setText(self.tr("Create customer"))
         self.ui.action_about.setText(self.tr("About"))
         self.ui.action_about_Qt.setText(self.tr("About Qt"))
         self.ui.action_new_number.setText(self.tr("Set new offer symbol"))
@@ -309,6 +312,11 @@ class MainWindow(QMainWindow):
     @Slot()
     def create_merchandise(self) -> None:
         dialog = CreateMerchandiseDialog.make(self)
+        dialog.show()
+
+    @Slot()
+    def create_customer(self) -> None:
+        dialog = CreateCustomerDialog.make(self)
         dialog.show()
 
     @Slot()

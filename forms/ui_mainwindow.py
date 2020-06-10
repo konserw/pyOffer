@@ -37,6 +37,7 @@ class Ui_MainWindow(object):
         self.action_print = QAction(MainWindow)
         self.action_print.setObjectName(u"action_print")
         self.action_create_merchandise = QAction(MainWindow)
+        self.action_create_customer = QAction(MainWindow)
         self.action_about = QAction(MainWindow)
         self.action_about.setObjectName(u"action_about")
         self.action_about_Qt = QAction(MainWindow)
@@ -403,6 +404,7 @@ class Ui_MainWindow(object):
         self.menu_export.addAction(self.action_PDF)
         self.menu_export.addAction(self.action_print)
         self.menu_database.addAction(self.action_create_merchandise)
+        self.menu_database.addAction(self.action_create_customer)
         self.menu_help.addAction(self.action_about)
         self.menu_help.addAction(self.action_about_Qt)
 
