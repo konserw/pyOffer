@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import logging
 
-from PySide2 import QtWidgets
+from PySide2 import QtWidgets, QtCore
 from PySide2.QtCore import QModelIndex, Qt, Slot, QObject
 from PySide2.QtSql import QSqlTableModel, QSqlRecord
 from PySide2.QtWidgets import QWidget, QDialog, QHeaderView
@@ -85,6 +85,11 @@ class CustomerSearchModel(QSqlTableModel):
             elif column == 2:
                 return customer.address
         return super().data(index, role)
+
+    def flags(self, index: QModelIndex) -> Qt.ItemFlags:
+        if index.isValid():
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        return Qt.NoItemFlags
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int = ...):
         if role == Qt.DisplayRole:

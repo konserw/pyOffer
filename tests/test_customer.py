@@ -15,6 +15,7 @@ from PySide2.QtCore import Qt, QPoint, QStringListModel
 from PySide2.QtSql import QSqlRecord
 from PySide2.QtWidgets import QDialog, QDialogButtonBox
 from hamcrest import assert_that, is_, not_none, empty
+from qtmatchers import has_item_flags
 
 from src.customer import Customer, CustomerSearchModel, CustomerSelectionDialog, CustomerSearchWidget, CreateCustomerDialog
 
@@ -152,6 +153,15 @@ class TestCustomerSearchModel:
         assert_that(self.model.data(self.model.index(1, 0), Qt.DisplayRole), is_("Pani Jane Doe"))
         assert_that(self.model.data(self.model.index(1, 1), Qt.DisplayRole), is_("P.H.U. PolImpEx Sp. z o.o."))
         assert_that(self.model.data(self.model.index(1, 2), Qt.DisplayRole), is_("Polna 1a/2\n41-300 Dąbrowa Górnicza"))
+
+    @pytest.mark.parametrize("col", [
+        pytest.param(0),
+        pytest.param(1),
+        pytest.param(2),
+    ])
+    def test_normal_flags(self, col: int):
+        expected = Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        assert_that(self.model.flags(self.model.index(0, col)), has_item_flags(expected))
 
     def _test_search_single(self, pattern):
         assert_that(self.model.rowCount(), is_(2))
