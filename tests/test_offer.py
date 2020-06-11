@@ -181,6 +181,73 @@ class TestOffer:
 """
         assert_that(terms_table, contains_string(expected_remarks_text))
 
+    def test_empty_merchandise_table(self):
+        offer = Offer()
+        offer.merchandise_list = MerchandiseListModel(offer)
+
+        merchandise_table = offer.merchanidse_table()
+
+        expected_merchandise_table = """
+    <table cellspacing=0>
+        <thead><tr class="header">
+            <td width=40><b>Lp.</b></td>
+            <td width=295><b>Towar</b></td>
+            <td width=90 align=right><b>Cena kat.</b></td>
+            <td width=70 align=right><b>Rabat</b></td>
+            <td width=90 align=right><b>Cena</b></td>
+            <td width=70 align=right><b>Ilość</b></td>
+            <td width=90 align=right><b>Wartość</b></td>
+        </tr></thead>
+
+        <tr style="font-weight:bold;">
+            <td align=right colspan=6>Razem:</td>
+            <td align=right>0.00 zł</td>
+        </tr>
+    </table>
+"""
+        assert_that(merchandise_table, is_(equal_to_ignoring_whitespace(expected_merchandise_table)))
+
+    def test_merchandise_table_with_one_row(self):
+        offer = Offer()
+        offer.merchandise_list = MerchandiseListModel(offer)
+        offer.merchandise_list.add_item(create_merch())
+
+        merchandise_table = offer.merchanidse_table()
+
+        expected_merchandise_table = """
+    <table cellspacing=0>
+        <thead><tr class="header">
+            <td width=40><b>Lp.</b></td>
+            <td width=295><b>Towar</b></td>
+            <td width=90 align=right><b>Cena kat.</b></td>
+            <td width=70 align=right><b>Rabat</b></td>
+            <td width=90 align=right><b>Cena</b></td>
+            <td width=70 align=right><b>Ilość</b></td>
+            <td width=90 align=right><b>Wartość</b></td>
+        </tr></thead>
+
+        <tr class="row1">
+            <td>1</td>
+            <td>CODE</td>
+            <td align=right>9.99 zł</td>
+            <td align=right>10.0%</td>
+            <td align=right>8.99 zł</td>
+            <td align=right>1 szt.</td>
+            <td align=right>8.99 zł</td>
+        </tr>
+        <tr class="row1 spec">
+            <td></td>
+            <td colspan=6>DESCR</td>
+        </tr>
+
+        <tr style="font-weight:bold;">
+            <td align=right colspan=6>Razem:</td>
+            <td align=right>8.99 zł</td>
+        </tr>
+    </table>
+"""
+        assert_that(merchandise_table, is_(equal_to_ignoring_whitespace(expected_merchandise_table)))
+
     def test_whole_printout(self, mocker):
         expected_date = date(2020, 12, 15)
         mock_date = mocker.patch("src.offer.date", autospec=True)
