@@ -211,5 +211,5 @@ In some town<br />
 </html>
 """
 
-        document = offer.document
+        document = offer.printout()
         assert_that(document, is_(equal_to_ignoring_whitespace(expected_document)))

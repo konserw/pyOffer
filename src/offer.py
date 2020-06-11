@@ -65,8 +65,7 @@ class Offer(QObject):
         offer.order_email = get_var("order email")
         return offer
 
-    @property
-    def document(self) -> str:
+    def printout(self) -> str:
         style = """
     .spec { font-size: 6pt; }
     .row0 { background: #efefef; }
@@ -108,7 +107,7 @@ class Offer(QObject):
 </html>
 """
 
-    def terms_table(self):
+    def terms_table(self) -> str:
         remarks = self.remarks.replace("\n", "<br />\n")
         term_table = "<table cellspacing=3>"
         for term in self.terms.values():
@@ -128,7 +127,7 @@ class Offer(QObject):
 """
         return term_table
 
-    def merchanidse_table(self):
+    def merchanidse_table(self) -> str:
         col_width_symbol = self.document_width - 40 - (self.col_width_price * 3) - (self.col_width_narrow * 2)
         merchandise_list = f"""
     <table cellspacing=0>
@@ -168,7 +167,7 @@ class Offer(QObject):
 """
         return merchandise_list
 
-    def header_table(self):
+    def header_table(self) -> str:
         phone = f"Tel.: {self.author.phone}" if self.author.phone else ""
         return f"""
     <table>
@@ -199,7 +198,7 @@ class Offer(QObject):
     </table>
 """
 
-    def footer(self):
+    def footer(self) -> str:
         return f"""
     <p>
     <b>Zamówienia prosimy kierować na adres:</b> {self.order_email} z kopią do autora oferty.<br />

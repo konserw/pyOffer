@@ -283,7 +283,7 @@ class MainWindow(QMainWindow):
         doc = QTextDocument()
         doc.setUseDesignMetrics(True)
         doc.setDefaultFont(self.offer_font)
-        doc.setHtml(self.offer.document)
+        doc.setHtml(self.offer.printout())
         doc.setPageSize(printer.pageRect().size())
         doc.print_(printer)
 

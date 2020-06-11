@@ -68,7 +68,7 @@ def mock_new_offer(mocker, expected_symbol, expected_next_symbol, expected_inqui
         instance.inquiry_number = None
         instance.inquiry_date = None
         instance.customer = None
-        instance.document = "Lorem ipsum"
+        instance.printout.return_value = "Lorem ipsum"
 
         def update_symbol():
             instance.symbol = expected_next_symbol
