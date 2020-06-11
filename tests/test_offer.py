@@ -10,7 +10,7 @@
 import pytest
 from datetime import date
 
-from hamcrest import assert_that, is_, instance_of, none
+from hamcrest import assert_that, is_, instance_of, none, equal_to_ignoring_whitespace
 
 from src.customer import Customer
 from src.merchandise import MerchandiseListModel
@@ -212,4 +212,4 @@ In some town<br />
 """
 
         document = offer.document
-        assert_that(document, is_(expected_document))
+        assert_that(document, is_(equal_to_ignoring_whitespace(expected_document)))

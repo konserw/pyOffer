@@ -21,7 +21,10 @@ from src.user import User
 
 
 class Offer(QObject):
-    customer: Customer
+    document_width = 745
+    left_col_width = 140
+    col_width_price = 90
+    col_width_narrow = 70
 
     def __init__(self, author: User, parent=None):
         super().__init__(parent)
@@ -64,29 +67,79 @@ class Offer(QObject):
 
     @property
     def document(self) -> str:
-        document_width = 745
-        left_col_width = 140
-        col_width_price = 90
-        col_width_narrow = 70
-        col_width_symbol = document_width - 40 - (col_width_price * 3) - (col_width_narrow * 2)
-
-        phone = f"Tel.: {self.author.phone}" if self.author.phone else ""
         style = """
     .spec { font-size: 6pt; }
     .row0 { background: #efefef; }
     .row1 { background: #dadada; }
 """
 
+        return f"""<html>
+<head>
+<title>Oferta</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head>
+<style>{style}</style>
+</head>
+<body>
+<table>
+<thead>
+<tr><td>
+{self.header_table()}
+</td></tr>
+</thead>
+<tbody>
+<tr><td>
+    {self.inquiry_text}
+</td></tr>
+<tr><td>
+{self.merchanidse_table()}
+</td></tr>
+<tr><td>
+    Podane ceny nie zawierają podatku VAT<br />
+</td></tr>
+<tr><td>
+{self.terms_table()}
+</td></tr>
+<tr><td>
+{self.footer()}
+</td></tr>
+</tbody>
+</table>
+</body>
+</html>
+"""
+
+    def terms_table(self):
+        remarks = self.remarks.replace("\n", "<br />\n")
+        term_table = "<table cellspacing=3>"
+        for term in self.terms.values():
+            term_table += f"""
+    <tr>
+        <td width={self.left_col_width}>{term.type_description}:</td>
+        <td width={self.document_width - self.left_col_width - 3}>{term.long_desc}</td>
+    </tr>
+"""
+        if self.remarks:
+            term_table += f"""
+    <tr>
+        <td width={self.left_col_width}>Uwagi:</td>
+        <td width={self.document_width - self.left_col_width - 3}>{remarks}</td>
+    </tr>
+</table>
+"""
+        return term_table
+
+    def merchanidse_table(self):
+        col_width_symbol = self.document_width - 40 - (self.col_width_price * 3) - (self.col_width_narrow * 2)
         merchandise_list = f"""
     <table cellspacing=0>
         <thead><tr class="header">
             <td width=40><b>Lp.</b></td>
             <td width={col_width_symbol}><b>Towar</b></td>
-            <td width={col_width_price} align=right><b>Cena kat.</b></td>
-            <td width={col_width_narrow} align=right><b>Rabat</b></td>
-            <td width={col_width_price} align=right><b>Cena</b></td>
-            <td width={col_width_narrow} align=right><b>Ilość</b></td>
-            <td width={col_width_price} align=right><b>Wartość</b></td>
+            <td width={self.col_width_price} align=right><b>Cena kat.</b></td>
+            <td width={self.col_width_narrow} align=right><b>Rabat</b></td>
+            <td width={self.col_width_price} align=right><b>Cena</b></td>
+            <td width={self.col_width_narrow} align=right><b>Ilość</b></td>
+            <td width={self.col_width_price} align=right><b>Wartość</b></td>
         </tr></thead>
 """
         for i, item in enumerate(self.merchandise_list.list):
@@ -113,35 +166,11 @@ class Offer(QObject):
         </tr>
     </table>
 """
+        return merchandise_list
 
-        remarks = self.remarks.replace("\n", "<br />\n")
-        term_table = "<table cellspacing=3>"
-        for term in self.terms.values():
-            term_table += f"""
-    <tr>
-        <td width={left_col_width}>{term.type_description}:</td>
-        <td width={document_width-left_col_width-3}>{term.long_desc}</td>
-    </tr>
-"""
-        if self.remarks:
-            term_table += f"""
-    <tr>
-        <td width={left_col_width}>Uwagi:</td>
-        <td width={document_width - left_col_width - 3}>{remarks}</td>
-    </tr>
-</table>
-"""
-
-        doc = f"""<html>
-<head>
-<title>Oferta</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head>
-<style>{style}</style>
-</head>
-<body>
-<table>
-<thead>
-<tr><td>
+    def header_table(self):
+        phone = f"Tel.: {self.author.phone}" if self.author.phone else ""
+        return f"""
     <table>
     <tr>
         <td valign=top width=315>
@@ -168,22 +197,10 @@ class Offer(QObject):
         </td>
     </tr>
     </table>
-</td></tr>
-</thead>
-<tbody>
-<tr><td>
-    {self.inquiry_text}
-</td></tr>
-<tr><td>
-    {merchandise_list}
-</td></tr>
-<tr><td>
-    Podane ceny nie zawierają podatku VAT<br />
-</td></tr>
-<tr><td>
-{term_table}
-</td></tr>
-<tr><td>
+"""
+
+    def footer(self):
+        return f"""
     <p>
     <b>Zamówienia prosimy kierować na adres:</b> {self.order_email} z kopią do autora oferty.<br />
     <br />
@@ -193,10 +210,5 @@ class Offer(QObject):
         Ofertę przygotował{self.author.gender_suffix}<br /><br /><br />
         {self.author.name}
     </p>
-</td></tr>
-</tbody>
-</table>
-</body>
-</html>
 """
-        return doc
+
