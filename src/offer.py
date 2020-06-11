@@ -29,13 +29,13 @@ class Offer(QObject):
     def __init__(self, author: User = None, parent=None):
         super().__init__(parent)
         self.merchandise_list = None
-        self.customer = None
+        self.customer = Customer()
         self.terms = {}
         self.date = None
         self.inquiry_date = None
         self.inquiry_number = None
         self.id = None
-        self.symbol = None
+        self.symbol = ""
         self.author = author
         self.remarks = ""
         self.company_address = ""
@@ -58,7 +58,6 @@ class Offer(QObject):
     def create_empty(cls, author: User, parent: QObject = None) -> Offer:
         offer = cls(author, parent)
         offer.merchandise_list = MerchandiseListModel(offer)
-        offer.customer = Customer()
         offer.date = date.today()
         offer.new_symbol()
         offer.company_address = get_var("HQ")

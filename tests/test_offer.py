@@ -7,17 +7,17 @@
 # See the GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
-import pytest
 from datetime import date
 
-from hamcrest import assert_that, is_, instance_of, none, equal_to_ignoring_whitespace, contains_string
+import pytest
+from hamcrest import assert_that, is_, instance_of, equal_to_ignoring_whitespace, contains_string, not_
 
 from src.customer import Customer
 from src.merchandise import MerchandiseListModel
 from src.offer import Offer
+from src.terms import TermItem, TermType
 from src.user import User
 from tests.test_merchandise import create_merch
-from src.terms import TermItem, TermType
 
 remarks_test_set = [
     pytest.param("one liner", "one liner"),
@@ -39,7 +39,7 @@ class TestOffer:
         user.new_offer_symbol.return_value = expected_symbol
 
         offer = Offer(user)
-        assert_that(offer.symbol, is_(none()))
+        assert_that(offer.symbol, is_(""))
         offer.new_symbol()
         assert_that(offer.symbol, is_(expected_symbol))
 
@@ -247,6 +247,191 @@ class TestOffer:
     </table>
 """
         assert_that(merchandise_table, is_(equal_to_ignoring_whitespace(expected_merchandise_table)))
+
+    @pytest.mark.parametrize("symbol", [
+        pytest.param("X2012N08"),
+        pytest.param("A2011B01"),
+    ])
+    def test_header_table_symbol(self, mocker, symbol):
+        user = mocker.create_autospec(User(), spec_set=True)
+        user.name = ""
+        user.mail = ""
+        user.gender_suffix = ""
+        user.phone = ""
+
+        offer = Offer(user)
+        offer.date = date(2020, 12, 15)
+        offer.symbol = symbol
+        header_table = offer.header_table()
+
+        expected = f"Oferta nr: <b>{symbol}</b><br />"
+        assert_that(header_table, contains_string(expected))
+
+    @pytest.mark.parametrize("offer_date, expected_date", [
+        pytest.param(date(2020, 12, 15), "15.12.2020"),
+        pytest.param(date(1999, 12, 15), "15.12.1999"),
+        pytest.param(date(2020, 1, 15), "15.01.2020"),
+        pytest.param(date(2020, 12, 1), "01.12.2020"),
+        pytest.param(date(2020, 1, 1), "01.01.2020"),
+    ])
+    def test_header_table_date(self, mocker, offer_date, expected_date):
+        user = mocker.create_autospec(User(), spec_set=True)
+        user.name = ""
+        user.mail = ""
+        user.gender_suffix = ""
+        user.phone = ""
+
+        offer = Offer(user)
+        offer.date = offer_date
+        header_table = offer.header_table()
+
+        expected = f"Z dnia: {expected_date}<br />"
+        assert_that(header_table, contains_string(expected))
+
+    @pytest.mark.parametrize("company_name, html_address, concated_name", [
+        pytest.param("Some Company", "255 Some street\n<br />In some town", "Mr. John Smith"),
+        pytest.param("Some Company", "255 Some street\n<br />In some town\n<br />State or something", "Mr. John Smith"),
+        pytest.param("Full business name that is quite long", "255 Some street\n<br />In some town", "Mr. John Smith"),
+        pytest.param("Full business name that is quite long", "255 Some street\n<br />In some town", "Ms. Jane Doe"),
+    ])
+    def test_header_table_customer(self, mocker, company_name, html_address, concated_name):
+        user = mocker.create_autospec(User(), spec_set=True)
+        user.name = ""
+        user.mail = ""
+        user.gender_suffix = ""
+        user.phone = ""
+        customer = mocker.create_autospec(Customer(), spec_set=True)
+        customer.id = 1
+        customer.company_name = company_name
+        customer.concated_name = concated_name
+        customer.html_address = html_address
+
+        offer = Offer(user)
+        offer.date = date(2020, 12, 15)
+        offer.customer = customer
+        header_table = offer.header_table()
+
+        expected = f"""
+            Dla:<br />
+            <b>{company_name}</b><br />
+            {html_address}<br />
+            {concated_name}
+"""
+        assert_that(header_table, contains_string(expected))
+
+    @pytest.mark.parametrize("name, mail, phone", [
+        pytest.param("Mr. John Smith", "john.smith@company.com", "123 456 789"),
+        pytest.param("Ms. Jane Doe", "jane.doe@company.com", "7895464312"),
+    ])
+    @pytest.mark.parametrize("company", [
+        pytest.param("Some company"),
+        pytest.param("Full business name that is quite long"),
+        pytest.param("Full business name that is quite long<br />With address<br />And town"),
+    ])
+    def test_header_table_author(self, mocker, company, name, mail, phone):
+        user = mocker.create_autospec(User(), spec_set=True)
+        user.name = name
+        user.mail = mail
+        user.phone = phone
+
+        offer = Offer(user)
+        offer.company_address = company
+        offer.date = date(2020, 12, 15)
+        header_table = offer.header_table()
+
+        expected = f"""
+        <td width=315>
+            {company}<br />
+            <b>{name}</b><br />
+            {mail}<br />
+            Tel.: {phone}
+        </td>
+"""
+        assert_that(header_table, contains_string(expected))
+
+    @pytest.mark.parametrize("company, name, mail", [
+        pytest.param("Some company", "Mr. John Smith", "john.smith@company.com"),
+        pytest.param("Some company", "Ms. Jane Doe", "jane.doe@company.com"),
+    ])
+    def test_header_table_author_no_phone(self, mocker, company, name, mail):
+        user = mocker.create_autospec(User(), spec_set=True)
+        user.name = name
+        user.mail = mail
+        user.phone = None
+
+        offer = Offer(user)
+        offer.company_address = company
+        offer.date = date(2020, 12, 15)
+        header_table = offer.header_table()
+
+        expected = f"""
+        <td width=315>
+            {company}<br />
+            <b>{name}</b><br />
+            {mail}<br />
+"""
+        assert_that(header_table, contains_string(expected))
+        assert_that(header_table, not_(contains_string("Tel")))
+
+    def test_full_header_table(self, mocker):
+        expected_date = date(2020, 12, 15)
+        mock_date = mocker.patch("src.offer.date", autospec=True)
+        mock_date.today.return_value = expected_date
+
+        vars = {
+            "order email": "order@company.com",
+            "HQ": "lorem<br />ipsum"
+        }
+        mocker.patch("src.offer.get_var", autospce=True, side_effect=lambda key: vars[key])
+
+        expected_symbol = "X2012N08"
+        user = mocker.create_autospec(User(), spec_set=True)
+        user.new_offer_symbol.return_value = expected_symbol
+        user.name = "Author Name"
+        user.mail = "author@company.com"
+        user.gender_suffix = "a"
+        user.phone = "123 456 789"
+
+        offer = Offer.create_empty(user)
+
+        customer = mocker.create_autospec(Customer(), spec_set=True)
+        customer.id = 1
+        customer.company_name = "Full business name"
+        customer.concated_name = "Mr John Doe"
+        customer.html_address = "255 Some street<br />\nIn some town"
+        offer.customer = customer
+
+        header_table = offer.header_table()
+        expected_header_table = """
+    <table>
+    <tr>
+        <td valign=top width=315>
+            Oferta nr: <b>X2012N08</b><br />
+            Z dnia: 15.12.2020<br />
+            Dla:<br />
+            <b>Full business name</b><br />
+            255 Some street<br />
+In some town<br />
+            Mr John Doe
+        </td>
+        <td width=315>
+            lorem<br />ipsum<br />
+            <b>Author Name</b><br />
+            author@company.com<br />
+            Tel.: 123 456 789
+        </td>
+        <td width=115 align=right>
+            <img src=:/logos width=114 valign=top>
+        </td>
+    </tr>
+    <tr>
+        <td colspan=3>
+            <hr width=100%>
+        </td>
+    </tr>
+    </table>
+"""
+        assert_that(header_table, is_(equal_to_ignoring_whitespace(expected_header_table)))
 
     def test_whole_printout(self, mocker):
         expected_date = date(2020, 12, 15)
