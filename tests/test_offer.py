@@ -433,6 +433,33 @@ In some town<br />
 """
         assert_that(header_table, is_(equal_to_ignoring_whitespace(expected_header_table)))
 
+    @pytest.mark.parametrize("suffix, name, order_mail", [
+        pytest.param("", "Mr. John Smith", "office@company.com"),
+        pytest.param("a", "Ms. Jane Doe", "billing@company.com"),
+    ])
+    def test_footer(self, mocker, suffix, name, order_mail):
+        user = mocker.create_autospec(User(), spec_set=True)
+        user.name = name
+        user.gender_suffix = suffix
+
+        offer = Offer(user)
+        offer.order_email = order_mail
+        offer.date = date(2020, 12, 15)
+        header_table = offer.footer()
+
+        expected = f"""
+    <p>
+    <b>Zamówienia prosimy kierować na adres:</b> {order_mail} z kopią do autora oferty.<br />
+    <br />
+    Łączymy pozdrowienia.
+    </p>
+    <p align=center style="margin-left: 500">
+        Ofertę przygotował{suffix}<br /><br /><br />
+        {name}
+    </p>
+"""
+        assert_that(header_table, contains_string(expected))
+
     def test_whole_printout(self, mocker):
         expected_date = date(2020, 12, 15)
         mock_date = mocker.patch("src.offer.date", autospec=True)
