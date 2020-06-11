@@ -35,16 +35,16 @@ class TermItem:
     pl_type_descs = {
         TermType.delivery: "Warunki dostawy",
         TermType.offer: "Warunki oferty",
-        TermType.billing: "Warunki plałatności",
+        TermType.billing: "Warunki płatności",
         TermType.delivery_date: "Termin dostawy",
         TermType.remarks: "Uwagi"
     }
 
-    def __init__(self, term_type: TermType):
+    def __init__(self, term_type: TermType, long_desc=None):
         self.type = term_type
         self.id = None
         self.short_desc = None
-        self.long_desc = None
+        self.long_desc = long_desc
         self.type_description = self.pl_type_descs[term_type]
 
     @staticmethod

@@ -26,7 +26,7 @@ class Offer(QObject):
     col_width_price = 90
     col_width_narrow = 70
 
-    def __init__(self, author: User, parent=None):
+    def __init__(self, author: User = None, parent=None):
         super().__init__(parent)
         self.merchandise_list = None
         self.customer = None
@@ -123,8 +123,9 @@ class Offer(QObject):
         <td width={self.left_col_width}>Uwagi:</td>
         <td width={self.document_width - self.left_col_width - 3}>{remarks}</td>
     </tr>
-</table>
 """
+
+        term_table += "</table>"
         return term_table
 
     def merchanidse_table(self) -> str:

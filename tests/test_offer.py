@@ -10,13 +10,26 @@
 import pytest
 from datetime import date
 
-from hamcrest import assert_that, is_, instance_of, none, equal_to_ignoring_whitespace
+from hamcrest import assert_that, is_, instance_of, none, equal_to_ignoring_whitespace, contains_string
 
 from src.customer import Customer
 from src.merchandise import MerchandiseListModel
 from src.offer import Offer
 from src.user import User
 from tests.test_merchandise import create_merch
+from src.terms import TermItem, TermType
+
+remarks_test_set = [
+    pytest.param("one liner", "one liner"),
+    pytest.param("two\nlines", "two<br />\nlines"),
+    pytest.param("or\nthree\nlines", "or<br />\nthree<br />\nlines"),
+]
+terms_test_set = [
+    pytest.param(TermType.delivery, "Warunki dostawy"),
+    pytest.param(TermType.offer, "Warunki oferty"),
+    pytest.param(TermType.billing, "Warunki płatności"),
+    pytest.param(TermType.delivery_date, "Termin dostawy"),
+]
 
 
 class TestOffer:
@@ -61,19 +74,117 @@ class TestOffer:
         pytest.param(None, "123", "W odpowiedzi na zapytanie numer 123, przedstawiamy ofertę na dostawę następujących produktów:"),
         pytest.param("30.12.2020", "123", "W odpowiedzi na zapytanie numer 123 z dnia 30.12.2020, przedstawiamy ofertę na dostawę następujących produktów:"),
     ])
-    def test_inquiry_text(self, mocker, i_date, i_number, expected_text):
-        user = mocker.create_autospec(User, instance=True)
-        offer = Offer(user)
+    def test_inquiry_text(self, i_date, i_number, expected_text):
+        offer = Offer()
         offer.inquiry_date = i_date
         offer.inquiry_number = i_number
 
         assert_that(offer.inquiry_text, is_(expected_text))
 
-    def test_document(self, mocker):
+    def test_empty_terms_table(self):
+        offer = Offer()
+
+        terms_table = offer.terms_table()
+
+        expected_terms_table = "<table cellspacing=3></table>"
+        assert_that(terms_table, is_(equal_to_ignoring_whitespace(expected_terms_table)))
+
+    @pytest.mark.parametrize("term_type, term_type_desc", terms_test_set)
+    def test_terms_table(self, term_type, term_type_desc):
+        text = "Some terms text"
+        offer = Offer()
+        offer.terms = {term_type: (TermItem(term_type, text))}
+
+        terms_table = offer.terms_table()
+
+        expected_terms_table = f"""
+<table cellspacing=3>
+    <tr>
+        <td width=140>{term_type_desc}:</td>
+        <td width=602>{text}</td>
+    </tr>
+</table>
+"""
+        assert_that(terms_table, is_(equal_to_ignoring_whitespace(expected_terms_table)))
+
+    @pytest.mark.parametrize("remarks, expected_remarks", remarks_test_set)
+    def test_terms_table_remarks(self, remarks, expected_remarks):
+        offer = Offer()
+        offer.remarks = remarks
+
+        terms_table = offer.terms_table()
+
+        expected_terms_table = f"""
+<table cellspacing=3>
+    <tr>
+        <td width=140>Uwagi:</td>
+        <td width=602>{expected_remarks}</td>
+    </tr>
+</table>
+"""
+        assert_that(terms_table, is_(equal_to_ignoring_whitespace(expected_terms_table)))
+
+    @pytest.mark.parametrize("term_type, term_type_desc", terms_test_set)
+    @pytest.mark.parametrize("remarks, expected_remarks", remarks_test_set)
+    def test_terms_table_with_remarks(self, term_type, term_type_desc, remarks, expected_remarks):
+        text = "Some terms text"
+        offer = Offer()
+        offer.remarks = remarks
+        offer.terms = {term_type: (TermItem(term_type, text))}
+
+        terms_table = offer.terms_table()
+
+        expected_terms_table = f"""
+<table cellspacing=3>
+    <tr>
+        <td width=140>{term_type_desc}:</td>
+        <td width=602>{text}</td>
+    </tr>
+    <tr>
+        <td width=140>Uwagi:</td>
+        <td width=602>{expected_remarks}</td>
+    </tr>
+</table>
+        """
+        assert_that(terms_table, is_(equal_to_ignoring_whitespace(expected_terms_table)))
+
+    def test_full_terms_table(self):
+        remarks = "some remarks"
+        test_terms = [
+            (TermType.delivery, "Warunki dostawy", "Some delivery terms text"),
+            (TermType.offer, "Warunki oferty", "Some offer terms text"),
+            (TermType.billing, "Warunki płatności", "Some billing terms text"),
+            (TermType.delivery_date, "Termin dostawy", "Some delivery date terms text"),
+        ]
+        offer = Offer()
+        offer.remarks = remarks
+        offer.terms = {}
+        for row in test_terms:
+            term_type = row[0]
+            offer.terms[term_type] = TermItem(term_type, row[2])
+
+        terms_table = offer.terms_table()
+
+        for row in test_terms:
+            expected_terms_text = f"""
+    <tr>
+        <td width=140>{row[1]}:</td>
+        <td width=602>{row[2]}</td>
+    </tr>
+"""
+            assert_that(terms_table, contains_string(expected_terms_text))
+        expected_remarks_text = f"""
+    <tr>
+        <td width=140>Uwagi:</td>
+        <td width=602>{remarks}</td>
+    </tr>
+"""
+        assert_that(terms_table, contains_string(expected_remarks_text))
+
+    def test_whole_printout(self, mocker):
         expected_date = date(2020, 12, 15)
         mock_date = mocker.patch("src.offer.date", autospec=True)
         mock_date.today.return_value = expected_date
-
 
         vars = {
             "order email": "order@company.com",
