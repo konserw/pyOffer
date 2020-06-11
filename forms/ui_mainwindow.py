@@ -305,67 +305,67 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addWidget(self.groupBox, 2, 0, 2, 2)
 
-#        self.kolumny = QGroupBox(self.tab_2)
-#        self.kolumny.setObjectName(u"kolumny")
-#        sizePolicy2.setHeightForWidth(self.kolumny.sizePolicy().hasHeightForWidth())
-#        self.kolumny.setSizePolicy(sizePolicy2)
-#        self.verticalLayout_4 = QVBoxLayout(self.kolumny)
-#        self.verticalLayout_4.setSpacing(6)
-#        self.verticalLayout_4.setContentsMargins(11, 11, 11, 11)
-#        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
-#        self.check_box_no_column = QCheckBox(self.kolumny)
-#        self.check_box_no_column.setObjectName(u"check_box_no_column")
-#        self.check_box_no_column.setEnabled(False)
-#        self.check_box_no_column.setChecked(True)
-#
-#        self.verticalLayout_4.addWidget(self.check_box_no_column)
-#
-#        self.check_box_merchandise_column = QCheckBox(self.kolumny)
-#        self.check_box_merchandise_column.setObjectName(u"check_box_merchandise_column")
-#        self.check_box_merchandise_column.setEnabled(False)
-#        self.check_box_merchandise_column.setChecked(True)
-#
-#        self.verticalLayout_4.addWidget(self.check_box_merchandise_column)
-#
-#        self.check_box_details_column = QCheckBox(self.kolumny)
-#        self.check_box_details_column.setObjectName(u"check_box_details_column")
-#        self.check_box_details_column.setEnabled(True)
-#        self.check_box_details_column.setChecked(True)
-#
-#        self.verticalLayout_4.addWidget(self.check_box_details_column)
-#
-#        self.check_box_list_price_column = QCheckBox(self.kolumny)
-#        self.check_box_list_price_column.setObjectName(u"check_box_list_price_column")
-#        self.check_box_list_price_column.setChecked(True)
-#
-#        self.verticalLayout_4.addWidget(self.check_box_list_price_column)
-#
-#        self.check_box_discount_column = QCheckBox(self.kolumny)
-#        self.check_box_discount_column.setObjectName(u"check_box_discount_column")
-#        self.check_box_discount_column.setChecked(True)
-#
-#        self.verticalLayout_4.addWidget(self.check_box_discount_column)
-#
-#        self.check_box_price_column = QCheckBox(self.kolumny)
-#        self.check_box_price_column.setObjectName(u"check_box_price_column")
-#        self.check_box_price_column.setChecked(True)
-#
-#        self.verticalLayout_4.addWidget(self.check_box_price_column)
-#
-#        self.check_box_quantity_column = QCheckBox(self.kolumny)
-#        self.check_box_quantity_column.setObjectName(u"check_box_quantity_column")
-#        self.check_box_quantity_column.setChecked(True)
-#
-#        self.verticalLayout_4.addWidget(self.check_box_quantity_column)
-#
-#        self.check_box_total_column = QCheckBox(self.kolumny)
-#        self.check_box_total_column.setObjectName(u"check_box_total_column")
-#        self.check_box_total_column.setEnabled(False)
-#        self.check_box_total_column.setChecked(True)
-#
-#        self.verticalLayout_4.addWidget(self.check_box_total_column)
-#
-#        self.gridLayout.addWidget(self.kolumny, 2, 2, 1, 1)
+        self.group_box_columns = QGroupBox(self.tab_2)
+        self.group_box_columns.setObjectName(u"kolumny")
+        sizePolicy2.setHeightForWidth(self.group_box_columns.sizePolicy().hasHeightForWidth())
+        self.group_box_columns.setSizePolicy(sizePolicy2)
+        self.verticalLayout_4 = QVBoxLayout(self.group_box_columns)
+        self.verticalLayout_4.setSpacing(6)
+        self.verticalLayout_4.setContentsMargins(11, 11, 11, 11)
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.check_box_no_column = QCheckBox(self.group_box_columns)
+        self.check_box_no_column.setObjectName(u"check_box_no_column")
+        self.check_box_no_column.setEnabled(False)
+        self.check_box_no_column.setChecked(True)
+
+        self.verticalLayout_4.addWidget(self.check_box_no_column)
+
+        self.check_box_code_column = QCheckBox(self.group_box_columns)
+        self.check_box_code_column.setObjectName(u"check_box_merchandise_column")
+        self.check_box_code_column.setEnabled(False)
+        self.check_box_code_column.setChecked(True)
+
+        self.verticalLayout_4.addWidget(self.check_box_code_column)
+
+        self.check_box_details_column = QCheckBox(self.group_box_columns)
+        self.check_box_details_column.setObjectName(u"check_box_details_column")
+        self.check_box_details_column.setEnabled(True)
+        self.check_box_details_column.setChecked(True)
+
+        self.verticalLayout_4.addWidget(self.check_box_details_column)
+
+        self.check_box_list_price_column = QCheckBox(self.group_box_columns)
+        self.check_box_list_price_column.setObjectName(u"check_box_list_price_column")
+        self.check_box_list_price_column.setChecked(True)
+
+        self.verticalLayout_4.addWidget(self.check_box_list_price_column)
+
+        self.check_box_discount_column = QCheckBox(self.group_box_columns)
+        self.check_box_discount_column.setObjectName(u"check_box_discount_column")
+        self.check_box_discount_column.setChecked(True)
+
+        self.verticalLayout_4.addWidget(self.check_box_discount_column)
+
+        self.check_box_price_column = QCheckBox(self.group_box_columns)
+        self.check_box_price_column.setObjectName(u"check_box_price_column")
+        self.check_box_price_column.setChecked(True)
+
+        self.verticalLayout_4.addWidget(self.check_box_price_column)
+
+        self.check_box_quantity_column = QCheckBox(self.group_box_columns)
+        self.check_box_quantity_column.setObjectName(u"check_box_quantity_column")
+        self.check_box_quantity_column.setChecked(True)
+
+        self.verticalLayout_4.addWidget(self.check_box_quantity_column)
+
+        self.check_box_total_column = QCheckBox(self.group_box_columns)
+        self.check_box_total_column.setObjectName(u"check_box_total_column")
+        self.check_box_total_column.setEnabled(False)
+        self.check_box_total_column.setChecked(True)
+
+        self.verticalLayout_4.addWidget(self.check_box_total_column)
+
+        self.gridLayout.addWidget(self.group_box_columns, 2, 2, 1, 1)
 
         self.verticalSpacer_7 = QSpacerItem(20, 430, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
