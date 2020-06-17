@@ -19,13 +19,54 @@ from src.database import get_var
 from src.merchandise import MerchandiseListModel
 from src.user import User
 
+document_width = 745
+left_col_width = 140
 
-class Offer(QObject):
-    document_width = 745
-    left_col_width = 140
+
+class Column:
+    def __init__(self, print: bool, width: int):
+        self.print = print
+        self.width = width
+
+
+class PrintOptions:
     col_width_price = 90
     col_width_narrow = 70
 
+    def __init__(self, print_no=True, print_code=True, print_description=True, print_list_price=True, print_discount=True, print_price=True, print_count=True, print_total=True):
+        self.no = Column(print_no, 40)
+        self.symbol = Column(print_code, 0)  # width to be calculated later
+        self.list_price = Column(print_list_price, self.col_width_price)
+        self.discount = Column(print_discount, self.col_width_narrow)
+        self.price = Column(print_price, self.col_width_price)
+        self.count = Column(print_count, self.col_width_narrow)
+        self.total = Column(print_total, self.col_width_price)
+        # another row:
+        self.description = Column(print_description, document_width)
+
+        self.symbol.width = document_width - sum([col.width for col in self if col.print])
+
+    def __getitem__(self, col: int) -> Column:
+        """just for easy sum of col widths"""
+        if col == 0:
+            return self.no
+        elif col == 1:
+            return self.symbol
+        elif col == 2:
+            return self.list_price
+        elif col == 3:
+            return self.discount
+        elif col == 4:
+            return self.price
+        elif col == 5:
+            return self.count
+        elif col == 6:
+            return self.total
+        else:
+            raise IndexError()
+
+
+class Offer(QObject):
     def __init__(self, author: User = None, parent=None):
         super().__init__(parent)
         self.merchandise_list = None
@@ -64,7 +105,7 @@ class Offer(QObject):
         offer.order_email = get_var("order email")
         return offer
 
-    def printout(self) -> str:
+    def printout(self, print_options: PrintOptions = PrintOptions()) -> str:
         style = """
     .spec { font-size: 6pt; }
     .row0 { background: #efefef; }
@@ -89,7 +130,7 @@ class Offer(QObject):
     {self.inquiry_text}
 </td></tr>
 <tr><td>
-{self.merchanidse_table()}
+{self.merchanidse_table(print_options)}
 </td></tr>
 <tr><td>
     Podane ceny nie zawierają podatku VAT<br />
@@ -112,33 +153,32 @@ class Offer(QObject):
         for term in self.terms.values():
             term_table += f"""
     <tr>
-        <td width={self.left_col_width}>{term.type_description}:</td>
-        <td width={self.document_width - self.left_col_width - 3}>{term.long_desc}</td>
+        <td width={left_col_width}>{term.type_description}:</td>
+        <td width={document_width - left_col_width - 3}>{term.long_desc}</td>
     </tr>
 """
         if self.remarks:
             term_table += f"""
     <tr>
-        <td width={self.left_col_width}>Uwagi:</td>
-        <td width={self.document_width - self.left_col_width - 3}>{remarks}</td>
+        <td width={left_col_width}>Uwagi:</td>
+        <td width={document_width - left_col_width - 3}>{remarks}</td>
     </tr>
 """
 
         term_table += "</table>"
         return term_table
 
-    def merchanidse_table(self) -> str:
-        col_width_symbol = self.document_width - 40 - (self.col_width_price * 3) - (self.col_width_narrow * 2)
+    def merchanidse_table(self, print_options: PrintOptions = PrintOptions()) -> str:
         merchandise_list = f"""
     <table cellspacing=0>
         <thead><tr class="header">
-            <td width=40><b>Lp.</b></td>
-            <td width={col_width_symbol}><b>Towar</b></td>
-            <td width={self.col_width_price} align=right><b>Cena kat.</b></td>
-            <td width={self.col_width_narrow} align=right><b>Rabat</b></td>
-            <td width={self.col_width_price} align=right><b>Cena</b></td>
-            <td width={self.col_width_narrow} align=right><b>Ilość</b></td>
-            <td width={self.col_width_price} align=right><b>Wartość</b></td>
+            <td width={print_options.no.width}><b>Lp.</b></td>
+            <td width={print_options.symbol.width}><b>Towar</b></td>
+            <td width={print_options.list_price.width} align=right><b>Cena kat.</b></td>
+            <td width={print_options.discount.width} align=right><b>Rabat</b></td>
+            <td width={print_options.price.width} align=right><b>Cena</b></td>
+            <td width={print_options.count.width} align=right><b>Ilość</b></td>
+            <td width={print_options.total.width} align=right><b>Wartość</b></td>
         </tr></thead>
 """
         for i, item in enumerate(self.merchandise_list.list):

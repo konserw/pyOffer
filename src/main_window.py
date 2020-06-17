@@ -21,7 +21,7 @@ from PySide2.QtWidgets import QMainWindow, QDialog, QApplication, QCalendarWidge
 from forms.ui_mainwindow import Ui_MainWindow
 from src.customer import CustomerSelectionDialog, CreateCustomerDialog
 from src.merchandise import MerchandiseSelectionDialog, DiscountDialog, DiscountGroupDialog, CreateMerchandiseDialog
-from src.offer import Offer
+from src.offer import Offer, PrintOptions
 from src.terms import TermsChooserDialog, TermType
 from src.user import User
 
@@ -275,6 +275,16 @@ class MainWindow(QMainWindow):
 
     @Slot(QPrinter)
     def print(self, printer: QPrinter) -> None:
+        print_options = PrintOptions(
+            print_no=self.ui.check_box_no_column.isChecked(),
+            print_code=self.ui.check_box_code_column.isChecked(),
+            print_description=self.ui.check_box_details_column.isChecked(),
+            print_list_price=self.ui.check_box_list_price_column.isChecked(),
+            print_discount=self.ui.check_box_discount_column.isChecked(),
+            print_price=self.ui.check_box_price_column.isChecked(),
+            print_count=self.ui.check_box_price_column.isChecked(),
+            print_total=self.ui.check_box_total_column.isChecked()
+        )
         margin = 5
         printer.setPageSize(QPrinter.A4)
         printer.setPageMargins(margin, margin, margin, margin, QPrinter.Millimeter)
@@ -283,7 +293,7 @@ class MainWindow(QMainWindow):
         doc = QTextDocument()
         doc.setUseDesignMetrics(True)
         doc.setDefaultFont(self.offer_font)
-        doc.setHtml(self.offer.printout())
+        doc.setHtml(self.offer.printout(print_options))
         doc.setPageSize(printer.pageRect().size())
         doc.print_(printer)
 

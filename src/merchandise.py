@@ -107,6 +107,8 @@ class Merchandise(QObject):
             return self.unit
         elif col == 7:
             return self.total
+        else:
+            raise IndexError()
 
     def __setitem__(self, key: int, value: float) -> None:
         if key == 3:
@@ -133,6 +135,8 @@ class Merchandise(QObject):
             return self.unit
         elif col == 7:
             return f"{self.total:.20n}"
+        else:
+            raise IndexError()
 
 
 class MerchandiseListModel(QAbstractTableModel):
