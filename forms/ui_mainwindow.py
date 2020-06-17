@@ -313,9 +313,10 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.setSpacing(6)
         self.verticalLayout_4.setContentsMargins(11, 11, 11, 11)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+
         self.check_box_no_column = QCheckBox(self.group_box_columns)
         self.check_box_no_column.setObjectName(u"check_box_no_column")
-        self.check_box_no_column.setEnabled(False)
+        self.check_box_no_column.setEnabled(True)
         self.check_box_no_column.setChecked(True)
 
         self.verticalLayout_4.addWidget(self.check_box_no_column)
