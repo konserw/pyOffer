@@ -24,9 +24,11 @@ left_col_width = 140
 
 
 class Column:
-    def __init__(self, print: bool, width: int):
+    def __init__(self, print: bool, width: int, header: str = "", align: str = "right"):
         self.print = print
         self.width = width
+        self.header = header
+        self.align = align
 
 
 class PrintOptions:
@@ -34,15 +36,15 @@ class PrintOptions:
     col_width_narrow = 70
 
     def __init__(self, print_no=True, print_code=True, print_description=True, print_list_price=True, print_discount=True, print_price=True, print_quantity=True, print_total=True):
-        self.no = Column(print_no, 40)
-        self.symbol = Column(print_code, 0)  # width to be calculated later
-        self.list_price = Column(print_list_price, self.col_width_price)
-        self.discount = Column(print_discount, self.col_width_narrow)
-        self.price = Column(print_price, self.col_width_price)
-        self.quantity = Column(print_quantity, self.col_width_narrow)
-        self.total = Column(print_total, self.col_width_price)
+        self.no = Column(print_no, 40, "Lp.", "left")
+        self.symbol = Column(print_code, 0, "Towar", "left")  # width to be calculated later
+        self.list_price = Column(print_list_price, self.col_width_price, "Cena kat.")
+        self.discount = Column(print_discount, self.col_width_narrow, "Rabat")
+        self.price = Column(print_price, self.col_width_price, "Cena")
+        self.quantity = Column(print_quantity, self.col_width_narrow, "Ilość")
+        self.total = Column(print_total, self.col_width_price, "Wartość")
         # another row:
-        self.description = Column(print_description, document_width)
+        self.description = Column(print_description, document_width, "left")
 
         self.symbol.width = document_width - sum([col.width for col in self if col.print])
 
@@ -64,6 +66,15 @@ class PrintOptions:
             return self.total
         else:
             raise IndexError()
+
+    @property
+    def printed_columns(self):
+        return [col for col in self if col.print]
+
+    @property
+    def merchandise_colspan(self):
+        """number of columns to be merged in row with specification, and last row = Printed column count - 1"""
+        return len(self.printed_columns) - 1
 
 
 class Offer(QObject):
@@ -172,35 +183,39 @@ class Offer(QObject):
         merchandise_list = f"""
     <table cellspacing=0>
         <thead><tr class="header">
-            <td width={print_options.no.width}><b>Lp.</b></td>
-            <td width={print_options.symbol.width}><b>Towar</b></td>
-            <td width={print_options.list_price.width} align=right><b>Cena kat.</b></td>
-            <td width={print_options.discount.width} align=right><b>Rabat</b></td>
-            <td width={print_options.price.width} align=right><b>Cena</b></td>
-            <td width={print_options.quantity.width} align=right><b>Ilość</b></td>
-            <td width={print_options.total.width} align=right><b>Wartość</b></td>
-        </tr></thead>
 """
+        for col in print_options.printed_columns:
+            merchandise_list += f"            <td width={col.width} align={col.align}><b>{col.header}</b></td>\n"
+        merchandise_list += "        </tr></thead>\n"
+
         for i, item in enumerate(self.merchandise_list.list):
             row_style = 'row0' if i % 2 else 'row1'
-            merchandise_list += f"""
-        <tr class="{row_style}">
-            <td>{i + 1}</td>
-            <td>{item.code}</td>
-            <td align=right>{item.list_price:.20n} zł</td>
-            <td align=right>{item.discount}%</td>
-            <td align=right>{item.price:.20n} zł</td>
-            <td align=right>{item.count} {item.unit}</td>
-            <td align=right>{item.total:.20n} zł</td>
-        </tr>
+            merchandise_list += f"""        <tr class="{row_style}">\n"""
+            if print_options.no.print:
+                merchandise_list += f"""            <td align=right style="padding-right: 5">{i + 1}</td>\n"""
+            if print_options.symbol.print:
+                merchandise_list += f"            <td>{item.code}</td>\n"
+            if print_options.list_price.print:
+                merchandise_list += f"            <td align=right>{item.list_price:.20n} zł</td>\n"
+            if print_options.discount.print:
+                merchandise_list += f"            <td align=right>{item.discount}%</td>\n"
+            if print_options.price.print:
+                merchandise_list += f"            <td align=right>{item.price:.20n} zł</td>\n"
+            if print_options.quantity.print:
+                merchandise_list += f"            <td align=right>{item.count} {item.unit}</td>\n"
+            if print_options.total.print:
+                merchandise_list += f"            <td align=right>{item.total:.20n} zł</td>\n"
+            merchandise_list += "        </tr>\n"
+            if print_options.description.print:
+                merchandise_list += f"""
         <tr class="{row_style} spec">
             <td></td>
-            <td colspan=6>{item.description}</td>
+            <td colspan={print_options.merchandise_colspan}>{item.description}</td>
         </tr>
 """
         merchandise_list += f"""
         <tr style="font-weight:bold;">
-            <td align=right colspan=6>Razem:</td>
+            <td align=right colspan={print_options.merchandise_colspan}>Razem:</td>
             <td align=right>{self.merchandise_list.grand_total:.20n} zł</td>
         </tr>
     </table>

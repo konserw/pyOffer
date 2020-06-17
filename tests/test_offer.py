@@ -14,7 +14,7 @@ from hamcrest import assert_that, is_, instance_of, equal_to_ignoring_whitespace
 
 from src.customer import Customer
 from src.merchandise import MerchandiseListModel
-from src.offer import Offer
+from src.offer import Offer, PrintOptions
 from src.terms import TermItem, TermType
 from src.user import User
 from tests.test_merchandise import create_merch
@@ -190,8 +190,8 @@ class TestOffer:
         expected_merchandise_table = """
     <table cellspacing=0>
         <thead><tr class="header">
-            <td width=40><b>Lp.</b></td>
-            <td width=295><b>Towar</b></td>
+            <td width=40 align=left><b>Lp.</b></td>
+            <td width=295 align=left><b>Towar</b></td>
             <td width=90 align=right><b>Cena kat.</b></td>
             <td width=70 align=right><b>Rabat</b></td>
             <td width=90 align=right><b>Cena</b></td>
@@ -207,7 +207,7 @@ class TestOffer:
 """
         assert_that(merchandise_table, is_(equal_to_ignoring_whitespace(expected_merchandise_table)))
 
-    def test_merchandise_table_with_one_row(self):
+    def test_merchandise_table_with_all_columns(self):
         offer = Offer()
         offer.merchandise_list = MerchandiseListModel(offer)
         offer.merchandise_list.add_item(create_merch())
@@ -217,8 +217,8 @@ class TestOffer:
         expected_merchandise_table = """
     <table cellspacing=0>
         <thead><tr class="header">
-            <td width=40><b>Lp.</b></td>
-            <td width=295><b>Towar</b></td>
+            <td width=40 align=left><b>Lp.</b></td>
+            <td width=295 align=left><b>Towar</b></td>
             <td width=90 align=right><b>Cena kat.</b></td>
             <td width=70 align=right><b>Rabat</b></td>
             <td width=90 align=right><b>Cena</b></td>
@@ -227,7 +227,7 @@ class TestOffer:
         </tr></thead>
 
         <tr class="row1">
-            <td>1</td>
+            <td align=right style="padding-right: 5">1</td>
             <td>CODE</td>
             <td align=right>9.99 zł</td>
             <td align=right>10.0%</td>
@@ -242,6 +242,339 @@ class TestOffer:
 
         <tr style="font-weight:bold;">
             <td align=right colspan=6>Razem:</td>
+            <td align=right>8.99 zł</td>
+        </tr>
+    </table>
+"""
+        assert_that(merchandise_table, is_(equal_to_ignoring_whitespace(expected_merchandise_table)))
+
+    def test_merchandise_table_without_no(self):
+        offer = Offer()
+        offer.merchandise_list = MerchandiseListModel(offer)
+        offer.merchandise_list.add_item(create_merch())
+
+        merchandise_table = offer.merchanidse_table(PrintOptions(print_no=False))
+
+        expected_merchandise_table = """
+        <table cellspacing=0>
+            <thead><tr class="header">
+                <td width=335 align=left><b>Towar</b></td>
+                <td width=90 align=right><b>Cena kat.</b></td>
+                <td width=70 align=right><b>Rabat</b></td>
+                <td width=90 align=right><b>Cena</b></td>
+                <td width=70 align=right><b>Ilość</b></td>
+                <td width=90 align=right><b>Wartość</b></td>
+            </tr></thead>
+
+            <tr class="row1">
+                <td>CODE</td>
+                <td align=right>9.99 zł</td>
+                <td align=right>10.0%</td>
+                <td align=right>8.99 zł</td>
+                <td align=right>1 szt.</td>
+                <td align=right>8.99 zł</td>
+            </tr>
+            <tr class="row1 spec">
+                <td></td>
+                <td colspan=5>DESCR</td>
+            </tr>
+
+            <tr style="font-weight:bold;">
+                <td align=right colspan=5>Razem:</td>
+                <td align=right>8.99 zł</td>
+            </tr>
+        </table>
+    """
+        assert_that(merchandise_table, is_(equal_to_ignoring_whitespace(expected_merchandise_table)))
+
+    def test_merchandise_table_without_list_price(self):
+        offer = Offer()
+        offer.merchandise_list = MerchandiseListModel(offer)
+        offer.merchandise_list.add_item(create_merch())
+
+        merchandise_table = offer.merchanidse_table(PrintOptions(print_list_price=False))
+
+        expected_merchandise_table = """
+        <table cellspacing=0>
+            <thead><tr class="header">
+                <td width=40 align=left><b>Lp.</b></td>
+                <td width=385 align=left><b>Towar</b></td>
+                <td width=70 align=right><b>Rabat</b></td>
+                <td width=90 align=right><b>Cena</b></td>
+                <td width=70 align=right><b>Ilość</b></td>
+                <td width=90 align=right><b>Wartość</b></td>
+            </tr></thead>
+
+            <tr class="row1">
+                <td align=right style="padding-right: 5">1</td>
+                <td>CODE</td>
+                <td align=right>10.0%</td>
+                <td align=right>8.99 zł</td>
+                <td align=right>1 szt.</td>
+                <td align=right>8.99 zł</td>
+            </tr>
+            <tr class="row1 spec">
+                <td></td>
+                <td colspan=5>DESCR</td>
+            </tr>
+
+            <tr style="font-weight:bold;">
+                <td align=right colspan=5>Razem:</td>
+                <td align=right>8.99 zł</td>
+            </tr>
+        </table>
+    """
+        assert_that(merchandise_table, is_(equal_to_ignoring_whitespace(expected_merchandise_table)))
+
+    def test_merchandise_table_without_discount(self):
+        offer = Offer()
+        offer.merchandise_list = MerchandiseListModel(offer)
+        offer.merchandise_list.add_item(create_merch())
+
+        merchandise_table = offer.merchanidse_table(PrintOptions(print_discount=False))
+
+        expected_merchandise_table = """
+    <table cellspacing=0>
+        <thead><tr class="header">
+            <td width=40 align=left><b>Lp.</b></td>
+            <td width=365 align=left><b>Towar</b></td>
+            <td width=90 align=right><b>Cena kat.</b></td>
+            <td width=90 align=right><b>Cena</b></td>
+            <td width=70 align=right><b>Ilość</b></td>
+            <td width=90 align=right><b>Wartość</b></td>
+        </tr></thead>
+
+        <tr class="row1">
+            <td align=right style="padding-right: 5">1</td>
+            <td>CODE</td>
+            <td align=right>9.99 zł</td>
+            <td align=right>8.99 zł</td>
+            <td align=right>1 szt.</td>
+            <td align=right>8.99 zł</td>
+        </tr>
+        <tr class="row1 spec">
+            <td></td>
+            <td colspan=5>DESCR</td>
+        </tr>
+
+        <tr style="font-weight:bold;">
+            <td align=right colspan=5>Razem:</td>
+            <td align=right>8.99 zł</td>
+        </tr>
+    </table>
+"""
+        assert_that(merchandise_table, is_(equal_to_ignoring_whitespace(expected_merchandise_table)))
+
+    def test_merchandise_table_without_price(self):
+        offer = Offer()
+        offer.merchandise_list = MerchandiseListModel(offer)
+        offer.merchandise_list.add_item(create_merch())
+
+        merchandise_table = offer.merchanidse_table(PrintOptions(print_price=False))
+
+        expected_merchandise_table = """
+    <table cellspacing=0>
+        <thead><tr class="header">
+            <td width=40 align=left><b>Lp.</b></td>
+            <td width=385 align=left><b>Towar</b></td>
+            <td width=90 align=right><b>Cena kat.</b></td>
+            <td width=70 align=right><b>Rabat</b></td>
+            <td width=70 align=right><b>Ilość</b></td>
+            <td width=90 align=right><b>Wartość</b></td>
+        </tr></thead>
+
+        <tr class="row1">
+            <td align=right style="padding-right: 5">1</td>
+            <td>CODE</td>
+            <td align=right>9.99 zł</td>
+            <td align=right>10.0%</td>
+            <td align=right>1 szt.</td>
+            <td align=right>8.99 zł</td>
+        </tr>
+        <tr class="row1 spec">
+            <td></td>
+            <td colspan=5>DESCR</td>
+        </tr>
+
+        <tr style="font-weight:bold;">
+            <td align=right colspan=5>Razem:</td>
+            <td align=right>8.99 zł</td>
+        </tr>
+    </table>
+"""
+        assert_that(merchandise_table, is_(equal_to_ignoring_whitespace(expected_merchandise_table)))
+
+    def test_merchandise_table_without_quantity(self):
+        offer = Offer()
+        offer.merchandise_list = MerchandiseListModel(offer)
+        offer.merchandise_list.add_item(create_merch())
+
+        merchandise_table = offer.merchanidse_table(PrintOptions(print_quantity=False))
+
+        expected_merchandise_table = """
+    <table cellspacing=0>
+        <thead><tr class="header">
+            <td width=40 align=left><b>Lp.</b></td>
+            <td width=365 align=left><b>Towar</b></td>
+            <td width=90 align=right><b>Cena kat.</b></td>
+            <td width=70 align=right><b>Rabat</b></td>
+            <td width=90 align=right><b>Cena</b></td>
+            <td width=90 align=right><b>Wartość</b></td>
+        </tr></thead>
+
+        <tr class="row1">
+            <td align=right style="padding-right: 5">1</td>
+            <td>CODE</td>
+            <td align=right>9.99 zł</td>
+            <td align=right>10.0%</td>
+            <td align=right>8.99 zł</td>
+            <td align=right>8.99 zł</td>
+        </tr>
+        <tr class="row1 spec">
+            <td></td>
+            <td colspan=5>DESCR</td>
+        </tr>
+
+        <tr style="font-weight:bold;">
+            <td align=right colspan=5>Razem:</td>
+            <td align=right>8.99 zł</td>
+        </tr>
+    </table>
+"""
+        assert_that(merchandise_table, is_(equal_to_ignoring_whitespace(expected_merchandise_table)))
+
+    def test_merchandise_table_without_description(self):
+        offer = Offer()
+        offer.merchandise_list = MerchandiseListModel(offer)
+        offer.merchandise_list.add_item(create_merch())
+
+        merchandise_table = offer.merchanidse_table(PrintOptions(print_description=False))
+
+        expected_merchandise_table = """
+    <table cellspacing=0>
+        <thead><tr class="header">
+            <td width=40 align=left><b>Lp.</b></td>
+            <td width=295 align=left><b>Towar</b></td>
+            <td width=90 align=right><b>Cena kat.</b></td>
+            <td width=70 align=right><b>Rabat</b></td>
+            <td width=90 align=right><b>Cena</b></td>
+            <td width=70 align=right><b>Ilość</b></td>
+            <td width=90 align=right><b>Wartość</b></td>
+        </tr></thead>
+
+        <tr class="row1">
+            <td align=right style="padding-right: 5">1</td>
+            <td>CODE</td>
+            <td align=right>9.99 zł</td>
+            <td align=right>10.0%</td>
+            <td align=right>8.99 zł</td>
+            <td align=right>1 szt.</td>
+            <td align=right>8.99 zł</td>
+        </tr>
+
+        <tr style="font-weight:bold;">
+            <td align=right colspan=6>Razem:</td>
+            <td align=right>8.99 zł</td>
+        </tr>
+    </table>
+"""
+        assert_that(merchandise_table, is_(equal_to_ignoring_whitespace(expected_merchandise_table)))
+
+    def test_merchandise_table_without_list_price_and_discount(self):
+        offer = Offer()
+        offer.merchandise_list = MerchandiseListModel(offer)
+        offer.merchandise_list.add_item(create_merch())
+
+        merchandise_table = offer.merchanidse_table(PrintOptions(print_list_price=False, print_discount=False))
+
+        expected_merchandise_table = """
+    <table cellspacing=0>
+        <thead><tr class="header">
+            <td width=40 align=left><b>Lp.</b></td>
+            <td width=455 align=left><b>Towar</b></td>
+            <td width=90 align=right><b>Cena</b></td>
+            <td width=70 align=right><b>Ilość</b></td>
+            <td width=90 align=right><b>Wartość</b></td>
+        </tr></thead>
+
+        <tr class="row1">
+            <td align=right style="padding-right: 5">1</td>
+            <td>CODE</td>
+            <td align=right>8.99 zł</td>
+            <td align=right>1 szt.</td>
+            <td align=right>8.99 zł</td>
+        </tr>
+        <tr class="row1 spec">
+            <td></td>
+            <td colspan=4>DESCR</td>
+        </tr>
+
+        <tr style="font-weight:bold;">
+            <td align=right colspan=4>Razem:</td>
+            <td align=right>8.99 zł</td>
+        </tr>
+    </table>
+"""
+        assert_that(merchandise_table, is_(equal_to_ignoring_whitespace(expected_merchandise_table)))
+
+    def test_merchandise_table_without_price_and_quantity(self):
+        offer = Offer()
+        offer.merchandise_list = MerchandiseListModel(offer)
+        offer.merchandise_list.add_item(create_merch())
+
+        merchandise_table = offer.merchanidse_table(PrintOptions(print_price=False, print_quantity=False))
+
+        expected_merchandise_table = """
+    <table cellspacing=0>
+        <thead><tr class="header">
+            <td width=40 align=left><b>Lp.</b></td>
+            <td width=455 align=left><b>Towar</b></td>
+            <td width=90 align=right><b>Cena kat.</b></td>
+            <td width=70 align=right><b>Rabat</b></td>
+            <td width=90 align=right><b>Wartość</b></td>
+        </tr></thead>
+
+        <tr class="row1">
+            <td align=right style="padding-right: 5">1</td>
+            <td>CODE</td>
+            <td align=right>9.99 zł</td>
+            <td align=right>10.0%</td>
+            <td align=right>8.99 zł</td>
+        </tr>
+        <tr class="row1 spec">
+            <td></td>
+            <td colspan=4>DESCR</td>
+        </tr>
+
+        <tr style="font-weight:bold;">
+            <td align=right colspan=4>Razem:</td>
+            <td align=right>8.99 zł</td>
+        </tr>
+    </table>
+"""
+        assert_that(merchandise_table, is_(equal_to_ignoring_whitespace(expected_merchandise_table)))
+
+    def test_merchandise_table_with_minimum_subset(self):
+        offer = Offer()
+        offer.merchandise_list = MerchandiseListModel(offer)
+        offer.merchandise_list.add_item(create_merch())
+
+        merchandise_table = offer.merchanidse_table(PrintOptions(False, True, False, False, False, False, False, True))
+
+        expected_merchandise_table = """
+    <table cellspacing=0>
+        <thead><tr class="header">
+            <td width=655 align=left><b>Towar</b></td>
+            <td width=90 align=right><b>Wartość</b></td>
+        </tr></thead>
+
+        <tr class="row1">
+            <td>CODE</td>
+            <td align=right>8.99 zł</td>
+        </tr>
+
+        <tr style="font-weight:bold;">
+            <td align=right colspan=1>Razem:</td>
             <td align=right>8.99 zł</td>
         </tr>
     </table>
@@ -542,8 +875,8 @@ In some town<br />
     
     <table cellspacing=0>
         <thead><tr class="header">
-            <td width=40><b>Lp.</b></td>
-            <td width=295><b>Towar</b></td>
+            <td width=40 align=left><b>Lp.</b></td>
+            <td width=295 align=left><b>Towar</b></td>
             <td width=90 align=right><b>Cena kat.</b></td>
             <td width=70 align=right><b>Rabat</b></td>
             <td width=90 align=right><b>Cena</b></td>
@@ -552,7 +885,7 @@ In some town<br />
         </tr></thead>
 
         <tr class="row1">
-            <td>1</td>
+            <td align=right style="padding-right: 5">1</td>
             <td>CODE</td>
             <td align=right>9.99 zł</td>
             <td align=right>10.0%</td>
