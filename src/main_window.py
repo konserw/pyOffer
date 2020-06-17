@@ -282,7 +282,7 @@ class MainWindow(QMainWindow):
             print_list_price=self.ui.check_box_list_price_column.isChecked(),
             print_discount=self.ui.check_box_discount_column.isChecked(),
             print_price=self.ui.check_box_price_column.isChecked(),
-            print_count=self.ui.check_box_price_column.isChecked(),
+            print_quantity=self.ui.check_box_quantity_column.isChecked(),
             print_total=self.ui.check_box_total_column.isChecked()
         )
         margin = 5

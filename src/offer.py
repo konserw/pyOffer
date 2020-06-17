@@ -33,13 +33,13 @@ class PrintOptions:
     col_width_price = 90
     col_width_narrow = 70
 
-    def __init__(self, print_no=True, print_code=True, print_description=True, print_list_price=True, print_discount=True, print_price=True, print_count=True, print_total=True):
+    def __init__(self, print_no=True, print_code=True, print_description=True, print_list_price=True, print_discount=True, print_price=True, print_quantity=True, print_total=True):
         self.no = Column(print_no, 40)
         self.symbol = Column(print_code, 0)  # width to be calculated later
         self.list_price = Column(print_list_price, self.col_width_price)
         self.discount = Column(print_discount, self.col_width_narrow)
         self.price = Column(print_price, self.col_width_price)
-        self.count = Column(print_count, self.col_width_narrow)
+        self.quantity = Column(print_quantity, self.col_width_narrow)
         self.total = Column(print_total, self.col_width_price)
         # another row:
         self.description = Column(print_description, document_width)
@@ -59,7 +59,7 @@ class PrintOptions:
         elif col == 4:
             return self.price
         elif col == 5:
-            return self.count
+            return self.quantity
         elif col == 6:
             return self.total
         else:
@@ -177,7 +177,7 @@ class Offer(QObject):
             <td width={print_options.list_price.width} align=right><b>Cena kat.</b></td>
             <td width={print_options.discount.width} align=right><b>Rabat</b></td>
             <td width={print_options.price.width} align=right><b>Cena</b></td>
-            <td width={print_options.count.width} align=right><b>Ilość</b></td>
+            <td width={print_options.quantity.width} align=right><b>Ilość</b></td>
             <td width={print_options.total.width} align=right><b>Wartość</b></td>
         </tr></thead>
 """
