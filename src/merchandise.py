@@ -277,14 +277,13 @@ class MerchandiseListModel(QAbstractTableModel):
         if destinationChild == len(self.list):
             offset -= 1
 
-        if destinationChild in range(sourceRow, sourceRow + count + 1):
-            return False
+        if self.beginMoveRows(sourceParent, sourceRow, last_row, destinationParent, destinationChild):
+            for i in range(count):
+                self.list.insert(sourceRow + offset + i, self.list.pop(sourceRow + i))
+            self.endMoveRows()
+            return True
 
-        self.beginMoveRows(sourceParent, sourceRow, last_row, destinationParent, destinationChild)
-        for i in range(count):
-            self.list.insert(sourceRow + offset + i, self.list.pop(sourceRow + i))
-        self.endMoveRows()
-        return True
+        return False
 
     def sort(self, column: int, order) -> None:
         reverse = (order == Qt.DescendingOrder)
