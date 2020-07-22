@@ -33,7 +33,7 @@ class Column:
 
 class PrintOptions:
     col_width_price = 90
-    col_width_narrow = 70
+    col_width_narrow = 75
 
     def __init__(self, print_no=True, print_code=True, print_description=True, print_list_price=True, print_discount=True, print_price=True, print_quantity=True, print_total=True):
         self.no = Column(print_no, 40, "Lp.", "left")

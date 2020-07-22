@@ -191,11 +191,11 @@ class TestOffer:
     <table cellspacing=0>
         <thead><tr class="header">
             <td width=40 align=left><b>Lp.</b></td>
-            <td width=295 align=left><b>Towar</b></td>
+            <td width=285 align=left><b>Towar</b></td>
             <td width=90 align=right><b>Cena kat.</b></td>
-            <td width=70 align=right><b>Rabat</b></td>
+            <td width=75 align=right><b>Rabat</b></td>
             <td width=90 align=right><b>Cena</b></td>
-            <td width=70 align=right><b>Ilość</b></td>
+            <td width=75 align=right><b>Ilość</b></td>
             <td width=90 align=right><b>Wartość</b></td>
         </tr></thead>
 
@@ -218,11 +218,11 @@ class TestOffer:
     <table cellspacing=0>
         <thead><tr class="header">
             <td width=40 align=left><b>Lp.</b></td>
-            <td width=295 align=left><b>Towar</b></td>
+            <td width=285 align=left><b>Towar</b></td>
             <td width=90 align=right><b>Cena kat.</b></td>
-            <td width=70 align=right><b>Rabat</b></td>
+            <td width=75 align=right><b>Rabat</b></td>
             <td width=90 align=right><b>Cena</b></td>
-            <td width=70 align=right><b>Ilość</b></td>
+            <td width=75 align=right><b>Ilość</b></td>
             <td width=90 align=right><b>Wartość</b></td>
         </tr></thead>
 
@@ -258,11 +258,11 @@ class TestOffer:
         expected_merchandise_table = """
         <table cellspacing=0>
             <thead><tr class="header">
-                <td width=335 align=left><b>Towar</b></td>
+                <td width=325 align=left><b>Towar</b></td>
                 <td width=90 align=right><b>Cena kat.</b></td>
-                <td width=70 align=right><b>Rabat</b></td>
+                <td width=75 align=right><b>Rabat</b></td>
                 <td width=90 align=right><b>Cena</b></td>
-                <td width=70 align=right><b>Ilość</b></td>
+                <td width=75 align=right><b>Ilość</b></td>
                 <td width=90 align=right><b>Wartość</b></td>
             </tr></thead>
 
@@ -298,10 +298,10 @@ class TestOffer:
         <table cellspacing=0>
             <thead><tr class="header">
                 <td width=40 align=left><b>Lp.</b></td>
-                <td width=385 align=left><b>Towar</b></td>
-                <td width=70 align=right><b>Rabat</b></td>
+                <td width=375 align=left><b>Towar</b></td>
+                <td width=75 align=right><b>Rabat</b></td>
                 <td width=90 align=right><b>Cena</b></td>
-                <td width=70 align=right><b>Ilość</b></td>
+                <td width=75 align=right><b>Ilość</b></td>
                 <td width=90 align=right><b>Wartość</b></td>
             </tr></thead>
 
@@ -337,10 +337,10 @@ class TestOffer:
     <table cellspacing=0>
         <thead><tr class="header">
             <td width=40 align=left><b>Lp.</b></td>
-            <td width=365 align=left><b>Towar</b></td>
+            <td width=360 align=left><b>Towar</b></td>
             <td width=90 align=right><b>Cena kat.</b></td>
             <td width=90 align=right><b>Cena</b></td>
-            <td width=70 align=right><b>Ilość</b></td>
+            <td width=75 align=right><b>Ilość</b></td>
             <td width=90 align=right><b>Wartość</b></td>
         </tr></thead>
 
@@ -376,10 +376,10 @@ class TestOffer:
     <table cellspacing=0>
         <thead><tr class="header">
             <td width=40 align=left><b>Lp.</b></td>
-            <td width=385 align=left><b>Towar</b></td>
+            <td width=375 align=left><b>Towar</b></td>
             <td width=90 align=right><b>Cena kat.</b></td>
-            <td width=70 align=right><b>Rabat</b></td>
-            <td width=70 align=right><b>Ilość</b></td>
+            <td width=75 align=right><b>Rabat</b></td>
+            <td width=75 align=right><b>Ilość</b></td>
             <td width=90 align=right><b>Wartość</b></td>
         </tr></thead>
 
@@ -415,9 +415,9 @@ class TestOffer:
     <table cellspacing=0>
         <thead><tr class="header">
             <td width=40 align=left><b>Lp.</b></td>
-            <td width=365 align=left><b>Towar</b></td>
+            <td width=360 align=left><b>Towar</b></td>
             <td width=90 align=right><b>Cena kat.</b></td>
-            <td width=70 align=right><b>Rabat</b></td>
+            <td width=75 align=right><b>Rabat</b></td>
             <td width=90 align=right><b>Cena</b></td>
             <td width=90 align=right><b>Wartość</b></td>
         </tr></thead>
@@ -454,11 +454,11 @@ class TestOffer:
     <table cellspacing=0>
         <thead><tr class="header">
             <td width=40 align=left><b>Lp.</b></td>
-            <td width=295 align=left><b>Towar</b></td>
+            <td width=285 align=left><b>Towar</b></td>
             <td width=90 align=right><b>Cena kat.</b></td>
-            <td width=70 align=right><b>Rabat</b></td>
+            <td width=75 align=right><b>Rabat</b></td>
             <td width=90 align=right><b>Cena</b></td>
-            <td width=70 align=right><b>Ilość</b></td>
+            <td width=75 align=right><b>Ilość</b></td>
             <td width=90 align=right><b>Wartość</b></td>
         </tr></thead>
 
@@ -491,9 +491,9 @@ class TestOffer:
     <table cellspacing=0>
         <thead><tr class="header">
             <td width=40 align=left><b>Lp.</b></td>
-            <td width=455 align=left><b>Towar</b></td>
+            <td width=450 align=left><b>Towar</b></td>
             <td width=90 align=right><b>Cena</b></td>
-            <td width=70 align=right><b>Ilość</b></td>
+            <td width=75 align=right><b>Ilość</b></td>
             <td width=90 align=right><b>Wartość</b></td>
         </tr></thead>
 
@@ -528,9 +528,9 @@ class TestOffer:
     <table cellspacing=0>
         <thead><tr class="header">
             <td width=40 align=left><b>Lp.</b></td>
-            <td width=455 align=left><b>Towar</b></td>
+            <td width=450 align=left><b>Towar</b></td>
             <td width=90 align=right><b>Cena kat.</b></td>
-            <td width=70 align=right><b>Rabat</b></td>
+            <td width=75 align=right><b>Rabat</b></td>
             <td width=90 align=right><b>Wartość</b></td>
         </tr></thead>
 
@@ -876,11 +876,11 @@ In some town<br />
     <table cellspacing=0>
         <thead><tr class="header">
             <td width=40 align=left><b>Lp.</b></td>
-            <td width=295 align=left><b>Towar</b></td>
+            <td width=285 align=left><b>Towar</b></td>
             <td width=90 align=right><b>Cena kat.</b></td>
-            <td width=70 align=right><b>Rabat</b></td>
+            <td width=75 align=right><b>Rabat</b></td>
             <td width=90 align=right><b>Cena</b></td>
-            <td width=70 align=right><b>Ilość</b></td>
+            <td width=75 align=right><b>Ilość</b></td>
             <td width=90 align=right><b>Wartość</b></td>
         </tr></thead>
 
