@@ -512,20 +512,30 @@ class TestMerchandiseListDelegate:
 @pytest.mark.xfail  # Events are not processed correctly in QTest
 class TestMerchandiseListView:
     def test_drag_and_drop(self, qtbot, sample_model):
-        sample_model.add_item(create_merch(2))
+        merch = create_merch(2)
+        merch.description = "SECOND"
+        sample_model.add_item(merch)
         view = MerchandiseListView()
         qtbot.addWidget(view)
         view.setModel(sample_model)
+        view.show()
+        view.resize(800,600)
+
         pos0 = QPoint(view.columnViewportPosition(1), view.rowViewportPosition(0))
         assert_that(view.indexAt(pos0).data(Qt.UserRole), is_(1))
         pos1 = QPoint(view.columnViewportPosition(1), view.rowViewportPosition(1))
         assert_that(view.indexAt(pos1).data(Qt.UserRole), is_(2))
         pos2 = QPoint(view.columnViewportPosition(1), view.rowViewportPosition(2))
 
-        qtbot.mousePress(view, Qt.LeftButton, pos=pos0)
-        qtbot.mouseMove(view, pos2)
-        qtbot.mouseRelease(view, Qt.LeftButton, delay=15)
+        qtbot.mouseMove(view.viewport(), pos0, delay=100)
+        qtbot.mousePress(view.viewport(), Qt.LeftButton, pos=pos0, delay=100)
+        qtbot.wait(1000)
+        qtbot.mouseMove(view.viewport(), pos2, delay=100)
+        qtbot.wait(1000)
+        qtbot.mouseRelease(view.viewport(), Qt.LeftButton, delay=100)
+        qtbot.wait(1000)
 
+        qtbot.stop()
         assert_that(view.indexAt(pos0).data(Qt.UserRole), is_(2))
         assert_that(view.indexAt(pos1).data(Qt.UserRole), is_(1))
 

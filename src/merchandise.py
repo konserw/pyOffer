@@ -460,16 +460,34 @@ class MerchandiseListDelegate(QItemDelegate):
         editor.setGeometry(option.rect)
 
 
+class MyStyle(QtWidgets.QProxyStyle):
+    def drawPrimitive(self, element, option, painter, widget=None):
+        """
+        Draw a line across the entire row we're hovering over.
+        This may not always work depending on global style
+        """
+        if element == self.PE_IndicatorItemViewItemDrop and not option.rect.isNull():
+            option_new = QtWidgets.QStyleOption(option)
+            option_new.rect.setLeft(0)
+            option_new.rect.setHeight(1)
+            if widget:
+                option_new.rect.setRight(widget.width())
+            option = option_new
+        super().drawPrimitive(element, option, painter, widget)
+
+
 class MerchandiseListView(QTableView):
     def __init__(self, parent: QObject = None):
         super().__init__(parent)
-        self.drag_start_index = None
+        self.drag_start_row = None
         self.setItemDelegate(MerchandiseListDelegate(self))
-        self.setSortingEnabled(True)
+        self.setSortingEnabled(False)
         self.setAcceptDrops(True)
-        self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
+        self.setDragDropMode(self.InternalMove)
         self.setDropIndicatorShown(True)
-        self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.setSelectionBehavior(self.SelectRows)
+        self.setSelectionMode(self.SingleSelection)
+        self.setStyle(MyStyle())
 
         self.header = super().horizontalHeader()
         self.header.setSortIndicatorShown(False)
@@ -481,12 +499,12 @@ class MerchandiseListView(QTableView):
 
     def dragEnterEvent(self, a0: QtGui.QDragEnterEvent) -> None:
         if a0.source() is self:
-            self.drag_start_index = self.indexAt(a0.pos())
+            self.drag_start_row = self.indexAt(a0.pos()).row()
             a0.acceptProposedAction()
 
     def dropEvent(self, a0: QtGui.QDropEvent) -> None:
-        drag_end_index = self.indexAt(a0.pos())
-        self.model().moveRow(QModelIndex(), self.drag_start_index.row(), QModelIndex(), drag_end_index.row())
+        drag_end_row = self.indexAt(a0.pos()).row()
+        self.model().moveRow(QModelIndex(), self.drag_start_row, QModelIndex(), drag_end_row)
         a0.acceptProposedAction()
 
 
