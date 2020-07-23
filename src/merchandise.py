@@ -25,9 +25,8 @@ import resources.all  # noqa: F401
 from src.database import get_merchandise_sql_model, create_merchandise, get_discount_groups_model
 
 
-class Merchandise(QObject):
+class Merchandise:
     def __init__(self, merchandise_id: int = None):
-        super().__init__()
         self.id = merchandise_id
         self.code = None
         self.description = None
