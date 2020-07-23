@@ -88,7 +88,9 @@ class Merchandise(QObject):
         return item
 
     def __eq__(self, other) -> bool:
-        return self.id == other.id
+        if isinstance(other, Merchandise):
+            return self.id == other.id
+        return False
 
     def __getitem__(self, col: int):
         if col == 0:
