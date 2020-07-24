@@ -509,7 +509,7 @@ class TestMerchandiseListDelegate:
         assert_that(sample_model.data(index, Qt.DisplayRole), is_("50.0%" if col == 3 else "50"))
 
 
-@pytest.mark.xfail  # Events are not processed correctly in QTest
+@pytest.mark.skip  # Events are not processed correctly in QTest
 class TestMerchandiseListView:
     def test_drag_and_drop(self, qtbot, sample_model):
         merch = create_merch(2)
@@ -519,7 +519,7 @@ class TestMerchandiseListView:
         qtbot.addWidget(view)
         view.setModel(sample_model)
         view.show()
-        view.resize(800,600)
+        view.resize(800, 600)
 
         pos0 = QPoint(view.columnViewportPosition(1), view.rowViewportPosition(0))
         assert_that(view.indexAt(pos0).data(Qt.UserRole), is_(1))
