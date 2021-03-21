@@ -23,14 +23,8 @@ jobs:
     - name: Build installer
       run: python setup.py bdist_msi --target-name pyOffer.msi
 
-      # This step will retry until required check passes
-      # and will fail the whole workflow if the check conclusion is not a success
     - name: Wait on tests
-      uses: lewagon/wait-on-check-action@v0.2
-      with:
-        ref: ${{ github.ref }}
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        wait-interval: 20 # seconds
+      uses: jitterbit/await-check-suites@v1
 
     - name: Create Release
       id: create_release
