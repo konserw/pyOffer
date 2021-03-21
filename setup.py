@@ -13,6 +13,8 @@ buildOptions = {
                       os.path.join(plugins_path, "sqldrivers"),
                       os.path.join(plugins_path, "platforms"),
                       os.path.join(plugins_path, "printsupport"),
+                      os.path.join(plugins_path, "styles"),
+                      os.path.join(plugins_path, "imageformats"),
                       "translations",
                       ],
     "excludes": ["tkinter", "unittest", "email", "http", "xml", "pydoc", "pdb"],
