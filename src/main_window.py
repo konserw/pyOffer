@@ -16,7 +16,7 @@ from datetime import date
 from PySide2.QtCore import Slot, Qt, QDate
 from PySide2.QtGui import QTextDocument, QFontDatabase
 from PySide2.QtPrintSupport import QPrinter, QPrintPreviewDialog
-from PySide2.QtWidgets import QMainWindow, QDialog, QApplication, QCalendarWidget, QFileDialog
+from PySide2.QtWidgets import QMainWindow, QDialog, QApplication, QCalendarWidget, QFileDialog, QMessageBox
 
 from forms.ui_mainwindow import Ui_MainWindow
 from src.customer import CustomerSelectionDialog, CreateCustomerDialog
@@ -24,6 +24,11 @@ from src.merchandise import MerchandiseSelectionDialog, DiscountDialog, Discount
 from src.offer import Offer, PrintOptions
 from src.terms import TermsChooserDialog, TermType
 from src.user import User
+
+try:
+    from src.version import version
+except ImportError:
+    version = 'development_build'
 
 
 class MainWindow(QMainWindow):
@@ -115,7 +120,7 @@ class MainWindow(QMainWindow):
         self.ui.command_link_button_offer.setText(self.tr("Offer terms"))
         self.ui.command_link_button_remarks.setText(self.tr("Remarks"))
         self.ui.group_box_columns.setTitle(self.tr("Columns to be printed"))
-        self.ui.check_box_no_column.setText(self.tr("No"))
+        self.ui.check_box_no_column.setText(self.tr("No."))
         self.ui.check_box_code_column.setText(self.tr("Code"))
         self.ui.check_box_details_column.setText(self.tr("Specification"))
         self.ui.check_box_list_price_column.setText(self.tr("List Price"))
@@ -331,7 +336,7 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def about(self) -> None:
-        pass
+        QMessageBox.information(self, self.tr("About pyOffer"), self.tr("pyOffer version {}\nAll rights reserved (c) Kamil Strzempowicz".format(version)))
 
     @Slot()
     def about_qt(self) -> None:

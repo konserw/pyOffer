@@ -46,52 +46,52 @@
 <context>
     <name>CreateMerchandiseDialog</name>
     <message>
-        <location filename="src/merchandise.py" line="652"/>
+        <location filename="src/merchandise.py" line="670"/>
         <source>Create merchandise</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="661"/>
+        <location filename="src/merchandise.py" line="679"/>
         <source>Code:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="667"/>
+        <location filename="src/merchandise.py" line="685"/>
         <source>Description:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="673"/>
+        <location filename="src/merchandise.py" line="691"/>
         <source>Unit:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="675"/>
+        <location filename="src/merchandise.py" line="693"/>
         <source>metre</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="676"/>
+        <location filename="src/merchandise.py" line="694"/>
         <source>piece</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="684"/>
+        <location filename="src/merchandise.py" line="702"/>
         <source>Discount group:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="694"/>
+        <location filename="src/merchandise.py" line="712"/>
         <source>Price:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="728"/>
+        <location filename="src/merchandise.py" line="746"/>
         <source>Database operation failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="730"/>
+        <location filename="src/merchandise.py" line="748"/>
         <source>Success</source>
         <translation type="unfinished"></translation>
     </message>
@@ -168,255 +168,266 @@ or leave empty to add discount to all items.</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="src/main_window.py" line="89"/>
+        <location filename="src/main_window.py" line="94"/>
         <source>New</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="90"/>
+        <location filename="src/main_window.py" line="95"/>
         <source>Open</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="91"/>
+        <location filename="src/main_window.py" line="96"/>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="92"/>
+        <location filename="src/main_window.py" line="97"/>
         <source>Exit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="93"/>
+        <location filename="src/main_window.py" line="98"/>
         <source>PDF</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="94"/>
+        <location filename="src/main_window.py" line="99"/>
         <source>Print preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="97"/>
+        <location filename="src/main_window.py" line="102"/>
         <source>About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="98"/>
+        <location filename="src/main_window.py" line="103"/>
         <source>About Qt</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="99"/>
+        <location filename="src/main_window.py" line="104"/>
         <source>Set new offer symbol</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="100"/>
+        <location filename="src/main_window.py" line="105"/>
         <source>Add merchandise</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="101"/>
+        <location filename="src/main_window.py" line="106"/>
         <source>Set Discount</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="103"/>
+        <location filename="src/main_window.py" line="108"/>
         <source>Remove row</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="104"/>
+        <location filename="src/main_window.py" line="109"/>
         <source>Offer table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="106"/>
+        <location filename="src/main_window.py" line="111"/>
         <source>Choose customer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="107"/>
+        <location filename="src/main_window.py" line="112"/>
         <source>Inquiry</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="108"/>
+        <location filename="src/main_window.py" line="113"/>
         <source>Inquiry date:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="110"/>
+        <location filename="src/main_window.py" line="115"/>
         <source>Inquiry number:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="111"/>
+        <location filename="src/main_window.py" line="116"/>
         <source>Other information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="112"/>
+        <location filename="src/main_window.py" line="117"/>
         <source>Shipment terms</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="113"/>
+        <location filename="src/main_window.py" line="118"/>
         <source>Delivery date</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="114"/>
+        <location filename="src/main_window.py" line="119"/>
         <source>Billing terms</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="115"/>
+        <location filename="src/main_window.py" line="120"/>
         <source>Offer terms</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="116"/>
+        <location filename="src/main_window.py" line="121"/>
         <source>Remarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="85"/>
+        <location filename="src/main_window.py" line="90"/>
         <source>Offer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="86"/>
+        <location filename="src/main_window.py" line="91"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="88"/>
+        <location filename="src/main_window.py" line="93"/>
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="87"/>
+        <location filename="src/main_window.py" line="92"/>
         <source>Database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="95"/>
+        <location filename="src/main_window.py" line="100"/>
         <source>Create merchandise</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="96"/>
+        <location filename="src/main_window.py" line="101"/>
         <source>Create customer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="102"/>
+        <location filename="src/main_window.py" line="107"/>
         <source>Set Discount for group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="117"/>
+        <location filename="src/main_window.py" line="122"/>
         <source>Columns to be printed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="118"/>
-        <source>No</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/main_window.py" line="119"/>
+        <location filename="src/main_window.py" line="124"/>
         <source>Code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="120"/>
+        <location filename="src/main_window.py" line="125"/>
         <source>Specification</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="121"/>
+        <location filename="src/main_window.py" line="126"/>
         <source>List Price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="122"/>
+        <location filename="src/main_window.py" line="127"/>
         <source>Discount</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="123"/>
+        <location filename="src/main_window.py" line="128"/>
         <source>Price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="124"/>
+        <location filename="src/main_window.py" line="129"/>
         <source>Quantity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="125"/>
+        <location filename="src/main_window.py" line="130"/>
         <source>Total</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="313"/>
+        <location filename="src/main_window.py" line="318"/>
         <source>Save to .pdf</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="313"/>
+        <location filename="src/main_window.py" line="318"/>
         <source>Portable Document Format (*.pdf)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/main_window.py" line="339"/>
+        <source>About pyOffer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/main_window.py" line="123"/>
+        <source>No.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/main_window.py" line="339"/>
+        <source>pyOffer version {}
+All rights reserved (c) Kamil Strzempowicz</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>MerchandiseListModel</name>
     <message>
-        <location filename="src/merchandise.py" line="148"/>
+        <location filename="src/merchandise.py" line="149"/>
         <source>Code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="149"/>
+        <location filename="src/merchandise.py" line="150"/>
         <source>Description</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="150"/>
+        <location filename="src/merchandise.py" line="151"/>
         <source>List Price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="151"/>
+        <location filename="src/merchandise.py" line="152"/>
         <source>Discount</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="152"/>
+        <location filename="src/merchandise.py" line="153"/>
         <source>Price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="153"/>
+        <location filename="src/merchandise.py" line="154"/>
         <source>Count</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="154"/>
+        <location filename="src/merchandise.py" line="155"/>
         <source>Unit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="156"/>
+        <location filename="src/merchandise.py" line="157"/>
         <source>Total</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="211"/>
+        <location filename="src/merchandise.py" line="212"/>
         <source>Total:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -424,17 +435,17 @@ or leave empty to add discount to all items.</source>
 <context>
     <name>MerchandiseSelectionDialog</name>
     <message>
-        <location filename="src/merchandise.py" line="602"/>
+        <location filename="src/merchandise.py" line="620"/>
         <source>Choose merchandise</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="608"/>
+        <location filename="src/merchandise.py" line="626"/>
         <source>Filter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="613"/>
+        <location filename="src/merchandise.py" line="631"/>
         <source>Add</source>
         <translation type="unfinished"></translation>
     </message>
@@ -442,27 +453,27 @@ or leave empty to add discount to all items.</source>
 <context>
     <name>MerchandiseSelectionModel</name>
     <message>
-        <location filename="src/merchandise.py" line="499"/>
+        <location filename="src/merchandise.py" line="517"/>
         <source>Count</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="500"/>
+        <location filename="src/merchandise.py" line="518"/>
         <source>Code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="501"/>
+        <location filename="src/merchandise.py" line="519"/>
         <source>Description</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="502"/>
+        <location filename="src/merchandise.py" line="520"/>
         <source>Unit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="503"/>
+        <location filename="src/merchandise.py" line="521"/>
         <source>List price</source>
         <translation type="unfinished"></translation>
     </message>
@@ -524,7 +535,7 @@ or leave empty to add discount to all items.</source>
 <context>
     <name>app</name>
     <message>
-        <location filename="main.py" line="73"/>
+        <location filename="main.py" line="75"/>
         <source>Database connection failed</source>
         <translation type="unfinished"></translation>
     </message>

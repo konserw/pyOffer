@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="pl_PL">
+<!DOCTYPE TS><TS version="1.1" language="pl_PL">
 <context>
     <name>CreateCustomerDialog</name>
     <message>
@@ -47,52 +46,52 @@
 <context>
     <name>CreateMerchandiseDialog</name>
     <message>
-        <location filename="src/merchandise.py" line="652"/>
+        <location filename="src/merchandise.py" line="670"/>
         <source>Create merchandise</source>
         <translation>Tworzenie produktu</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="661"/>
+        <location filename="src/merchandise.py" line="679"/>
         <source>Code:</source>
         <translation>Kode:</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="667"/>
+        <location filename="src/merchandise.py" line="685"/>
         <source>Description:</source>
         <translation>Opis:</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="673"/>
+        <location filename="src/merchandise.py" line="691"/>
         <source>Unit:</source>
         <translation>Jednostka:</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="675"/>
+        <location filename="src/merchandise.py" line="693"/>
         <source>metre</source>
         <translation>metr</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="676"/>
+        <location filename="src/merchandise.py" line="694"/>
         <source>piece</source>
         <translation>sztuka</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="684"/>
+        <location filename="src/merchandise.py" line="702"/>
         <source>Discount group:</source>
         <translation>Grupa produktowa:</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="694"/>
+        <location filename="src/merchandise.py" line="712"/>
         <source>Price:</source>
         <translation>Cena:</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="728"/>
+        <location filename="src/merchandise.py" line="746"/>
         <source>Database operation failed</source>
         <translation>Zapis w bazie danych nie powiódł się</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="730"/>
+        <location filename="src/merchandise.py" line="748"/>
         <source>Success</source>
         <translation>Sukces</translation>
     </message>
@@ -171,255 +170,267 @@ lub pozostaw puste aby ustawić rabat dla wszystkich.</translation>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="src/main_window.py" line="86"/>
+        <location filename="src/main_window.py" line="91"/>
         <source>Export</source>
         <translation>Druk</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="88"/>
+        <location filename="src/main_window.py" line="93"/>
         <source>Help</source>
         <translation>Pomoc</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="93"/>
+        <location filename="src/main_window.py" line="98"/>
         <source>PDF</source>
         <translation>PDF</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="313"/>
+        <location filename="src/main_window.py" line="318"/>
         <source>Save to .pdf</source>
         <translation>Zapis do pliku .pdf</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="313"/>
+        <location filename="src/main_window.py" line="318"/>
         <source>Portable Document Format (*.pdf)</source>
         <translation>Portable Document Format (*.pdf)</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="89"/>
+        <location filename="src/main_window.py" line="94"/>
         <source>New</source>
         <translation>Nowa</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="90"/>
+        <location filename="src/main_window.py" line="95"/>
         <source>Open</source>
         <translation>Otwórz</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="91"/>
+        <location filename="src/main_window.py" line="96"/>
         <source>Save</source>
         <translation>Zapisz</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="92"/>
+        <location filename="src/main_window.py" line="97"/>
         <source>Exit</source>
         <translation>Wyjście</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="94"/>
+        <location filename="src/main_window.py" line="99"/>
         <source>Print preview</source>
         <translation>Podgląd wydruku</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="97"/>
+        <location filename="src/main_window.py" line="102"/>
         <source>About</source>
         <translation>O pyOffer</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="98"/>
+        <location filename="src/main_window.py" line="103"/>
         <source>About Qt</source>
         <translation>O Qt</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="99"/>
+        <location filename="src/main_window.py" line="104"/>
         <source>Set new offer symbol</source>
         <translation>Nadaj nowy symbol</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="100"/>
+        <location filename="src/main_window.py" line="105"/>
         <source>Add merchandise</source>
         <translation>Dodaj towar</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="101"/>
+        <location filename="src/main_window.py" line="106"/>
         <source>Set Discount</source>
         <translation>Ustaw rabat</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="103"/>
+        <location filename="src/main_window.py" line="108"/>
         <source>Remove row</source>
         <translation>Usuń wiersz</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="104"/>
+        <location filename="src/main_window.py" line="109"/>
         <source>Offer table</source>
         <translation>Tabela Oferty</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="106"/>
+        <location filename="src/main_window.py" line="111"/>
         <source>Choose customer</source>
         <translation>Wybierz klienta</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="107"/>
+        <location filename="src/main_window.py" line="112"/>
         <source>Inquiry</source>
         <translation>Zapytanie</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="108"/>
+        <location filename="src/main_window.py" line="113"/>
         <source>Inquiry date:</source>
         <translation>Data zapytania:</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="110"/>
+        <location filename="src/main_window.py" line="115"/>
         <source>Inquiry number:</source>
         <translation>Numer zapytania:</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="111"/>
+        <location filename="src/main_window.py" line="116"/>
         <source>Other information</source>
         <translation>Pozostałe informacje</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="112"/>
+        <location filename="src/main_window.py" line="117"/>
         <source>Shipment terms</source>
         <translation>Warunki dostawy</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="113"/>
+        <location filename="src/main_window.py" line="118"/>
         <source>Delivery date</source>
         <translation>Termin dostawy</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="114"/>
+        <location filename="src/main_window.py" line="119"/>
         <source>Billing terms</source>
         <translation>Warunki płatności</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="115"/>
+        <location filename="src/main_window.py" line="120"/>
         <source>Offer terms</source>
         <translation>Warunki oferty</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="116"/>
+        <location filename="src/main_window.py" line="121"/>
         <source>Remarks</source>
         <translation>Uwagi</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="85"/>
+        <location filename="src/main_window.py" line="90"/>
         <source>Offer</source>
         <translation>Oferta</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="87"/>
+        <location filename="src/main_window.py" line="92"/>
         <source>Database</source>
         <translation>Baza danych</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="95"/>
+        <location filename="src/main_window.py" line="100"/>
         <source>Create merchandise</source>
         <translation>Tworzenie produktu</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="96"/>
+        <location filename="src/main_window.py" line="101"/>
         <source>Create customer</source>
         <translation>Tworzenie klienta</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="102"/>
+        <location filename="src/main_window.py" line="107"/>
         <source>Set Discount for group</source>
         <translation>Ustaw rabat dla grupy produktowej</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="117"/>
+        <location filename="src/main_window.py" line="122"/>
         <source>Columns to be printed</source>
         <translation>Kolumny do druku</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="118"/>
-        <source>No</source>
-        <translation>L.p.</translation>
-    </message>
-    <message>
-        <location filename="src/main_window.py" line="119"/>
+        <location filename="src/main_window.py" line="124"/>
         <source>Code</source>
         <translation>Kod</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="120"/>
+        <location filename="src/main_window.py" line="125"/>
         <source>Specification</source>
         <translation>Specyfikacja</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="121"/>
+        <location filename="src/main_window.py" line="126"/>
         <source>List Price</source>
         <translation>Cena katalogowa</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="122"/>
+        <location filename="src/main_window.py" line="127"/>
         <source>Discount</source>
         <translation>Rabat</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="123"/>
+        <location filename="src/main_window.py" line="128"/>
         <source>Price</source>
         <translation>Cena</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="124"/>
+        <location filename="src/main_window.py" line="129"/>
         <source>Quantity</source>
         <translation>Ilość</translation>
     </message>
     <message>
-        <location filename="src/main_window.py" line="125"/>
+        <location filename="src/main_window.py" line="130"/>
         <source>Total</source>
         <translation>Kwota</translation>
+    </message>
+    <message>
+        <location filename="src/main_window.py" line="339"/>
+        <source>About pyOffer</source>
+        <translation>O programie pyOffer</translation>
+    </message>
+    <message>
+        <location filename="src/main_window.py" line="123"/>
+        <source>No.</source>
+        <translation>L.p.</translation>
+    </message>
+    <message>
+        <location filename="src/main_window.py" line="339"/>
+        <source>pyOffer version {}
+All rights reserved (c) Kamil Strzempowicz</source>
+        <translation>pyOffer wersja {}
+Wszystkie prawa zastrzeżone © Kamil Strzempowicz</translation>
     </message>
 </context>
 <context>
     <name>MerchandiseListModel</name>
     <message>
-        <location filename="src/merchandise.py" line="148"/>
+        <location filename="src/merchandise.py" line="149"/>
         <source>Code</source>
         <translation>Kod</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="149"/>
+        <location filename="src/merchandise.py" line="150"/>
         <source>Description</source>
         <translation>Opis</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="150"/>
+        <location filename="src/merchandise.py" line="151"/>
         <source>List Price</source>
         <translation>Cena katalogowa</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="151"/>
+        <location filename="src/merchandise.py" line="152"/>
         <source>Discount</source>
         <translation>Rabat</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="152"/>
+        <location filename="src/merchandise.py" line="153"/>
         <source>Price</source>
         <translation>Cena</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="153"/>
+        <location filename="src/merchandise.py" line="154"/>
         <source>Count</source>
         <translation>Ilość</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="154"/>
+        <location filename="src/merchandise.py" line="155"/>
         <source>Unit</source>
         <translation>Jednostka</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="156"/>
+        <location filename="src/merchandise.py" line="157"/>
         <source>Total</source>
         <translation>Kwota</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="211"/>
+        <location filename="src/merchandise.py" line="212"/>
         <source>Total:</source>
         <translation>Kwota:</translation>
     </message>
@@ -427,17 +438,17 @@ lub pozostaw puste aby ustawić rabat dla wszystkich.</translation>
 <context>
     <name>MerchandiseSelectionDialog</name>
     <message>
-        <location filename="src/merchandise.py" line="602"/>
+        <location filename="src/merchandise.py" line="620"/>
         <source>Choose merchandise</source>
         <translation>Wybierz towar</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="608"/>
+        <location filename="src/merchandise.py" line="626"/>
         <source>Filter</source>
         <translation>Filtr</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="613"/>
+        <location filename="src/merchandise.py" line="631"/>
         <source>Add</source>
         <translation>Dodaj</translation>
     </message>
@@ -445,27 +456,27 @@ lub pozostaw puste aby ustawić rabat dla wszystkich.</translation>
 <context>
     <name>MerchandiseSelectionModel</name>
     <message>
-        <location filename="src/merchandise.py" line="499"/>
+        <location filename="src/merchandise.py" line="517"/>
         <source>Count</source>
         <translation>Ilość</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="500"/>
+        <location filename="src/merchandise.py" line="518"/>
         <source>Code</source>
         <translation>Kod</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="501"/>
+        <location filename="src/merchandise.py" line="519"/>
         <source>Description</source>
         <translation>Opis</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="502"/>
+        <location filename="src/merchandise.py" line="520"/>
         <source>Unit</source>
         <translation>Jednostka</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="503"/>
+        <location filename="src/merchandise.py" line="521"/>
         <source>List price</source>
         <translation>Cena katalogowa</translation>
     </message>
@@ -527,7 +538,7 @@ lub pozostaw puste aby ustawić rabat dla wszystkich.</translation>
 <context>
     <name>app</name>
     <message>
-        <location filename="main.py" line="73"/>
+        <location filename="main.py" line="75"/>
         <source>Database connection failed</source>
         <translation>Połączenie z bazą danych nie powiodło się</translation>
     </message>
