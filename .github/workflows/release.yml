@@ -25,6 +25,8 @@ jobs:
 
     - name: Wait on tests
       uses: jitterbit/await-check-suites@v1
+      with:
+        ref: ${{ github.ref }}
 
     - name: Create Release
       id: create_release
