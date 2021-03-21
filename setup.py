@@ -1,22 +1,27 @@
-import os
 import sys
+from pathlib import Path
 
 import PySide2
 from cx_Freeze import setup, Executable
 
 from main import VERSION
 
-plugins_path = os.path.join(PySide2.__path__[0], "plugins")
+plugins_path = Path(PySide2.__path__[0]) / "plugins"
 
 buildOptions = {
-    "include_files": ["libssl-1_1-x64.dll", "libpq.dll", "libintl-8.dll", "libiconv-2.dll", "libcrypto-1_1-x64.dll",
-                      os.path.join(plugins_path, "sqldrivers"),
-                      os.path.join(plugins_path, "platforms"),
-                      os.path.join(plugins_path, "printsupport"),
-                      os.path.join(plugins_path, "styles"),
-                      os.path.join(plugins_path, "imageformats"),
-                      "translations",
-                      ],
+    "include_files": [
+        "libssl-1_1-x64.dll",
+        "libpq.dll",
+        "libintl-8.dll",
+        "libiconv-2.dll",
+        "libcrypto-1_1-x64.dll",
+        plugins_path / "sqldrivers",
+        plugins_path / "platforms",
+        plugins_path / "printsupport",
+        plugins_path / "styles",
+        plugins_path / "imageformats",
+        "translations",
+    ],
     "excludes": ["tkinter", "unittest", "email", "http", "xml", "pydoc", "pdb"],
     "zip_include_packages": ["PySide2", "shiboken2", "encodings"],
     "optimize": 2
