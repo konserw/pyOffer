@@ -19,8 +19,10 @@ from PySide2.QtWidgets import QApplication, QDialog, QMessageBox
 from src import database
 from src.main_window import MainWindow
 from src.user import User, UserSelectionDialog
-
-VERSION = 1.0
+try:
+    from src.version import version
+except ImportError:
+    version = 'development_build'
 
 if __name__ == '__main__':
     if getattr(sys, 'frozen', False):
@@ -35,7 +37,7 @@ if __name__ == '__main__':
             level=logging.DEBUG,
         )
 
-    logging.info("pyOffer version %s started at %s", VERSION, datetime.now())
+    logging.info("pyOffer version %s started at %s", version, datetime.now())
 
     locale_set = locale.setlocale(locale.LC_ALL, '')
     logging.info("System locale: %s", locale_set)
