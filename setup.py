@@ -8,7 +8,7 @@ from main import VERSION
 
 plugins_path = Path(PySide2.__path__[0]) / "plugins"
 
-buildOptions = {
+build_options = {
     "include_files": [
         "libssl-1_1-x64.dll",
         "libpq.dll",
@@ -27,14 +27,18 @@ buildOptions = {
     "optimize": 2
 }
 
-base = 'Win32GUI' if sys.platform == 'win32' else None
-
 executables = [
-    Executable('main.py', base=base, targetName='pyOffer')
+    Executable(
+        'main.py',
+        base='Win32GUI' if sys.platform == 'win32' else None,
+        target_name='pyOffer'
+    )
 ]
 
-setup(name='pyOffer',
-      version=str(VERSION),
-      description='Program for creating business proposals for purchase of items',
-      options=dict(build_exe=buildOptions),
-      executables=executables)
+setup(
+    name='pyOffer',
+    version=str(VERSION),
+    description='Program for creating business proposals for purchase of items',
+    options=dict(build_exe=build_options),
+    executables=executables
+)
