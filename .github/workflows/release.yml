@@ -22,12 +22,6 @@ jobs:
         pip install -r requirements.txt
     - name: Build installer
       run: python setup.py bdist_msi --target-name pyOffer.msi
-
-    - name: Wait on tests
-      uses: jitterbit/await-check-suites@v1
-      with:
-        ref: ${{ github.ref }}
-
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
