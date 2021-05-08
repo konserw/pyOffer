@@ -24,6 +24,53 @@ try:
 except ImportError:
     version = 'development_build'
 
+
+def main():
+    logging.info("pyOffer version %s started at %s", version, datetime.now())
+    locale_set = locale.setlocale(locale.LC_ALL, '')
+    logging.info("System locale: %s", locale_set)
+    app = QApplication(sys.argv)
+    app.setOrganizationName("KonserwSoft")
+    app.setApplicationName("pyOffer")
+
+    lang = QLocale.system().name()[0:2]
+    logging.info("Loading translation for: %s", lang)
+    translator = QTranslator()
+    if translator.load(f"translations/{lang}"):
+        app.installTranslator(translator)
+        logging.info("Loaded translations from: %s", f"translations/{lang}")
+    else:
+        logging.warning("Failed to load translations from: %s", f"translations/{lang}")
+
+    settings = QSettings()
+    settings.beginGroup("database")
+    host_name = settings.value("host_name", "127.0.0.1")
+    port = int(settings.value("port", "5432"))
+    database_name = settings.value("database_name", "koferta_test")
+    user_name = settings.value("user_name", "postgres")
+    password = settings.value("password", "docker")
+    settings.endGroup()
+    try:
+        logging.info("DB host name: %s", host_name)
+        logging.info("DB port: %s", port)
+        logging.info("DB database name: %s", database_name)
+        logging.info("DB user name: %s", user_name)
+        database.connect(host_name, database_name, user_name, password, port)
+    except RuntimeError as e:
+        QMessageBox.critical(None, app.tr("Database connection failed"), app.tr(f"Driver error: {e.args[1]}\nDatabase error: {e.args[2]}"))
+        return str(e)
+    user_dialog = UserSelectionDialog.make()
+    if user_dialog.exec_() == QDialog.Accepted:
+        logging.debug("User dialog accepted")
+        user = User.from_sql_record(user_dialog.chosen_user_record)
+        logging.info("Chosen user: %s", user)
+        main_window = MainWindow(user)
+        main_window.show()
+        return app.exec_()
+    logging.info("User hasn't been chosen - exiting")
+    return 0
+
+
 if __name__ == '__main__':
     if getattr(sys, 'frozen', False):
         logging.basicConfig(
@@ -37,52 +84,4 @@ if __name__ == '__main__':
             level=logging.DEBUG,
         )
 
-    logging.info("pyOffer version %s started at %s", version, datetime.now())
-
-    locale_set = locale.setlocale(locale.LC_ALL, '')
-    logging.info("System locale: %s", locale_set)
-
-    app = QApplication(sys.argv)
-    app.setOrganizationName("KonserwSoft")
-    app.setApplicationName("pyOffer")
-
-    translator = QTranslator()
-    lang = QLocale.system().name()[0:2]
-    logging.info("Loading translation for: %s", lang)
-    translation_file = f"translations/{lang}"
-    if translator.load(translation_file):
-        app.installTranslator(translator)
-        logging.info("Loaded translation: %s", translation_file)
-    else:
-        logging.warning("Failed to load translation: %s", translation_file)
-
-    settings = QSettings()
-    settings.beginGroup("database")
-    host_name = settings.value("host_name", "127.0.0.1")
-    port = int(settings.value("port", "5432"))
-    database_name = settings.value("database_name", "koferta_test")
-    user_name = settings.value("user_name", "postgres")
-    password = settings.value("password", "docker")
-    settings.endGroup()
-
-    try:
-        logging.info("DB host name: %s", host_name)
-        logging.info("DB port: %s", port)
-        logging.info("DB database name: %s", database_name)
-        logging.info("DB user name: %s", user_name)
-        database.connect(host_name, database_name, user_name, password, port)
-    except RuntimeError as e:
-        QMessageBox.critical(None, app.tr("Database connection failed"), app.tr(f"Driver error: {e.args[1]}\nDatabase error: {e.args[2]}"))
-        sys.exit(str(e))
-
-    user_dialog = UserSelectionDialog.make()
-    if user_dialog.exec_() == QDialog.Accepted:
-        logging.debug("User dialog accepted")
-        user = User.from_sql_record(user_dialog.chosen_user_record)
-        logging.info("Chosen user: %s", user)
-        main_window = MainWindow(user)
-        main_window.show()
-        sys.exit(app.exec_())
-
-    logging.info("User hasn't been chosen - exiting")
-    sys.exit(0)
+    sys.exit(main())
