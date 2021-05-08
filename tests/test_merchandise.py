@@ -939,7 +939,7 @@ class TestCreateMerchandiseDialog:
         create_merchandise_dialog.save()
 
         create_method.assert_called_once_with(code, description, by_metre, group, price)
-        message.assert_called_once_with(create_merchandise_dialog, "Success", f"Created new merchandise, id: {merch_id}")
+        message.assert_called_once_with(create_merchandise_dialog, "Success", "Created new merchandise.")
 
     def test_reset(self, create_merchandise_dialog):
         create_merchandise_dialog.line_edit_code.insert("sample code")
