@@ -20,7 +20,7 @@ def main() -> None:
                 code = row[0]
                 price = row[1]
 
-                price_sql.write(f"SELECT public.update_price({code}, '{price}');\n")
+                price_sql.write(f"SELECT public.update_price('{code}', {price});\n")
 
 
 if __name__ == '__main__':
