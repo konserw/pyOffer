@@ -111,7 +111,7 @@ begin
 
 
   if exists(select merchandise_id from public.price where merchandise_id = l_id) then
-    update public.price set valid_to = current_date where merchandise_id = l_id and valid_to = '9999-12-31';
+    update public.price set valid_to = current_date-1 where merchandise_id = l_id and valid_to = '9999-12-31';
   end if;
 
   INSERT INTO public.price(
