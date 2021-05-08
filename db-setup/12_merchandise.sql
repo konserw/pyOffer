@@ -86,3 +86,40 @@ end;$BODY$;
 
 ALTER FUNCTION public.create_merchandise(text, text, unit_type, text, numeric(8,2))
     OWNER TO postgres;
+
+-- FUNCTION: public.update_price(text, numeric(8,2))
+-- DROP FUNCTION public.update_price(text, numeric(8,2))
+
+CREATE OR REPLACE FUNCTION public.update_price(
+    in_code text,
+	in_price numeric(8,2) DEFAULT 0
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE
+
+AS $BODY$
+declare
+  l_id integer;
+begin
+  SELECT merchandise_id into l_id from public.merchandise WHERE code = in_code;
+  if l_id is null then
+    return -1;
+  end if;
+
+
+  if exists(select merchandise_id from public.price where merchandise_id = l_id) then
+    update public.price set valid_to = current_date where merchandise_id = l_id and valid_to = '9999-12-31';
+  end if;
+
+  INSERT INTO public.price(
+	merchandise_id, value, valid_from, valid_to)
+	VALUES (l_id, in_price, current_date, DEFAULT);
+
+  return l_id;
+end;$BODY$;
+
+ALTER FUNCTION public.update_price(text, numeric(8,2))
+    OWNER TO postgres;
