@@ -167,7 +167,7 @@ class CreateCustomerDialog(QtWidgets.QDialog):
         self.grid_layout = QtWidgets.QGridLayout(self)
         self.grid_layout.setSpacing(6)
         self.grid_layout.setContentsMargins(11, 11, 11, 11)
-        self.grid_layout.setObjectName(u"gridLayout")
+        self.grid_layout.setObjectName("gridLayout")
 
         label = QtWidgets.QLabel(self)
         label.setText(self.tr("Title:"))
@@ -207,13 +207,16 @@ class CreateCustomerDialog(QtWidgets.QDialog):
         self.line_edit_address.setCompleter(completer)
         self.grid_layout.addWidget(self.line_edit_address, 4, 1, 1, 1)
 
+        vertical_spacer = QtWidgets.QSpacerItem(20, 135, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.grid_layout.addItem(vertical_spacer, 5, 0, 1, 2)
+
         self.button_box = QtWidgets.QDialogButtonBox(self)
         self.button_box.setOrientation(Qt.Horizontal)
         self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Save | QtWidgets.QDialogButtonBox.Close | QtWidgets.QDialogButtonBox.Reset)
         self.button_box.accepted.connect(self.save)
         self.button_box.rejected.connect(self.reject)
         self.button_box.button(QtWidgets.QDialogButtonBox.Reset).clicked.connect(self.reset)
-        self.grid_layout.addWidget(self.button_box, 5, 0, 1, 2)
+        self.grid_layout.addWidget(self.button_box, 6, 0, 1, 2)
 
     @classmethod
     def make(cls, parent: QObject = None) -> CreateCustomerDialog:

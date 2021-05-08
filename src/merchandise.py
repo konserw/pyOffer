@@ -690,12 +690,14 @@ class CreateMerchandiseDialog(QtWidgets.QDialog):
         label = QtWidgets.QLabel(self)
         label.setText(self.tr("Unit:"))
         self.grid_layout.addWidget(label, 2, 0, 1, 1)
+        hbox = QtWidgets.QHBoxLayout()
         self.radio_button_metre = QtWidgets.QRadioButton(self.tr("metre"))
+        hbox.addWidget(self.radio_button_metre)
         self.radio_button_piece = QtWidgets.QRadioButton(self.tr("piece"))
         self.radio_button_piece.setChecked(True)
-        hbox = QtWidgets.QHBoxLayout()
-        hbox.addWidget(self.radio_button_metre)
         hbox.addWidget(self.radio_button_piece)
+        horizontal_spacer = QtWidgets.QSpacerItem(1, 1, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        hbox.addItem(horizontal_spacer)
         self.grid_layout.addLayout(hbox, 2, 1, 1, 1)
 
         label = QtWidgets.QLabel(self)
@@ -716,7 +718,14 @@ class CreateMerchandiseDialog(QtWidgets.QDialog):
         self.spin_box_price.setMinimum(0.0)
         self.spin_box_price.setSingleStep(1.0)
         self.spin_box_price.setMaximum(100000.0)
-        self.grid_layout.addWidget(self.spin_box_price, 4, 1, 1, 1)
+        spin_layout = QtWidgets.QHBoxLayout()
+        spin_layout.addWidget(self.spin_box_price)
+        horizontal_spacer = QtWidgets.QSpacerItem(1, 1, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spin_layout.addItem(horizontal_spacer)
+        self.grid_layout.addLayout(spin_layout, 4, 1, 1, 1)
+
+        vertical_spacer = QtWidgets.QSpacerItem(1, 1, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.grid_layout.addItem(vertical_spacer, 5, 0, 1, 2)
 
         self.button_box = QtWidgets.QDialogButtonBox(self)
         self.button_box.setOrientation(Qt.Horizontal)
@@ -724,7 +733,7 @@ class CreateMerchandiseDialog(QtWidgets.QDialog):
         self.button_box.accepted.connect(self.save)
         self.button_box.rejected.connect(self.reject)
         self.button_box.button(QtWidgets.QDialogButtonBox.Reset).clicked.connect(self.reset)
-        self.grid_layout.addWidget(self.button_box, 5, 0, 1, 2)
+        self.grid_layout.addWidget(self.button_box, 6, 0, 1, 2)
 
     @classmethod
     def make(cls, parent: QObject = None) -> MerchandiseSelectionDialog:
