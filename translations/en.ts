@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="en_US">
+<!DOCTYPE TS>
+<TS version="2.1" language="en_US">
 <context>
     <name>CreateCustomerDialog</name>
     <message>
@@ -33,14 +34,19 @@
         <translation>Address:</translation>
     </message>
     <message>
-        <location filename="src/customer.py" line="236"/>
+        <location filename="src/customer.py" line="240"/>
         <source>Database operation failed</source>
         <translation>Database operation failed</translation>
     </message>
     <message>
-        <location filename="src/customer.py" line="238"/>
+        <location filename="src/customer.py" line="243"/>
         <source>Success</source>
         <translation>Success</translation>
+    </message>
+    <message>
+        <location filename="src/customer.py" line="243"/>
+        <source>Created new customer.</source>
+        <translation>Created new customer.</translation>
     </message>
 </context>
 <context>
@@ -66,34 +72,39 @@
         <translation>Unit:</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="693"/>
+        <location filename="src/merchandise.py" line="694"/>
         <source>metre</source>
         <translation>metre</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="694"/>
+        <location filename="src/merchandise.py" line="696"/>
         <source>piece</source>
         <translation>piece</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="702"/>
+        <location filename="src/merchandise.py" line="704"/>
         <source>Discount group:</source>
         <translation>Discount group:</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="712"/>
+        <location filename="src/merchandise.py" line="714"/>
         <source>Price:</source>
         <translation>Price:</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="746"/>
+        <location filename="src/merchandise.py" line="756"/>
         <source>Database operation failed</source>
         <translation>Database operation failed</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="748"/>
+        <location filename="src/merchandise.py" line="759"/>
         <source>Success</source>
         <translation>Success</translation>
+    </message>
+    <message>
+        <location filename="src/merchandise.py" line="759"/>
+        <source>Created new merchandise.</source>
+        <translation>Created new merchandise.</translation>
     </message>
 </context>
 <context>

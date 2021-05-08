@@ -752,9 +752,11 @@ class CreateMerchandiseDialog(QtWidgets.QDialog):
                 self.spin_box_price.value()
             )
         except RuntimeError as e:
+            logging.error(f"New merchandise creation failed: {e}")
             QtWidgets.QMessageBox.warning(self, self.tr("Database operation failed"), str(e))
         else:
-            QtWidgets.QMessageBox.information(self, self.tr("Success"), self.tr(f"Created new merchandise, id: {merch_id}"))
+            logging.info(f"Created new merchandise, id: {merch_id}")
+            QtWidgets.QMessageBox.information(self, self.tr("Success"), self.tr("Created new merchandise."))
 
     @Slot()
     def reset(self) -> None:

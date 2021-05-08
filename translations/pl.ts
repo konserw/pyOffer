@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="pl_PL">
+<!DOCTYPE TS>
+<TS version="2.1" language="pl_PL">
 <context>
     <name>CreateCustomerDialog</name>
     <message>
@@ -33,14 +34,19 @@
         <translation>Adres:</translation>
     </message>
     <message>
-        <location filename="src/customer.py" line="236"/>
+        <location filename="src/customer.py" line="240"/>
         <source>Database operation failed</source>
         <translation>Zapis w bazie danych nie powiódł się</translation>
     </message>
     <message>
-        <location filename="src/customer.py" line="238"/>
+        <location filename="src/customer.py" line="243"/>
         <source>Success</source>
         <translation>Sukces</translation>
+    </message>
+    <message>
+        <location filename="src/customer.py" line="243"/>
+        <source>Created new customer.</source>
+        <translation>Utworzono nowego klienta.</translation>
     </message>
 </context>
 <context>
@@ -53,7 +59,7 @@
     <message>
         <location filename="src/merchandise.py" line="679"/>
         <source>Code:</source>
-        <translation>Kode:</translation>
+        <translation>Kod:</translation>
     </message>
     <message>
         <location filename="src/merchandise.py" line="685"/>
@@ -66,34 +72,39 @@
         <translation>Jednostka:</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="693"/>
+        <location filename="src/merchandise.py" line="694"/>
         <source>metre</source>
         <translation>metr</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="694"/>
+        <location filename="src/merchandise.py" line="696"/>
         <source>piece</source>
         <translation>sztuka</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="702"/>
+        <location filename="src/merchandise.py" line="704"/>
         <source>Discount group:</source>
         <translation>Grupa produktowa:</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="712"/>
+        <location filename="src/merchandise.py" line="714"/>
         <source>Price:</source>
         <translation>Cena:</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="746"/>
+        <location filename="src/merchandise.py" line="756"/>
         <source>Database operation failed</source>
         <translation>Zapis w bazie danych nie powiódł się</translation>
     </message>
     <message>
-        <location filename="src/merchandise.py" line="748"/>
+        <location filename="src/merchandise.py" line="759"/>
         <source>Success</source>
         <translation>Sukces</translation>
+    </message>
+    <message>
+        <location filename="src/merchandise.py" line="759"/>
+        <source>Created new merchandise.</source>
+        <translation>Utworzono nowy towar.</translation>
     </message>
 </context>
 <context>

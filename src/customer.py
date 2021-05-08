@@ -236,9 +236,11 @@ class CreateCustomerDialog(QtWidgets.QDialog):
                 self.line_edit_address.text()
             )
         except RuntimeError as e:
+            logging.error(f"New customer creation failed: {e}")
             QtWidgets.QMessageBox.warning(self, self.tr("Database operation failed"), str(e))
         else:
-            QtWidgets.QMessageBox.information(self, self.tr("Success"), self.tr(f"Created new customer."))
+            logging.info(f"Created new customer")
+            QtWidgets.QMessageBox.information(self, self.tr("Success"), self.tr("Created new customer."))
 
     @Slot()
     def reset(self) -> None:

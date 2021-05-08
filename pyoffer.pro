@@ -11,6 +11,7 @@
 SOURCES = \
     main.py \
     src/customer.py \
+    src/database.py \
     src/main_window.py \
     src/merchandise.py \
     src/offer.py \
